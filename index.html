@@ -72,10 +72,14 @@ section.course{scroll-margin-top:12px}
   .day{min-height:44px;min-width:44px}
   section.course{scroll-margin-top:8px}
 }
+
+/* V6.7 appendix mobile navigation */
+#meditationPage,#businessPage{scroll-margin-top:10px}
+.topAppendixBtn{touch-action:manipulation}
 </style></head><body>
-<header><div class="top"><div class="brand">🌱 播种幸福</div><div class="badge">21天幸福人生觉醒体验系统｜移动版导航修正 V6.6</div></div></header>
+<header><div class="top"><div class="brand">🌱 播种幸福</div><div class="badge">21天幸福人生觉醒体验系统｜手机导航完整修正 V6.7</div></div></header>
 <main><section class="hero"><div class="eyebrow" style="color:#dce8d8">WELCOME</div><h1>每天一点点，重新练习幸福。</h1><p>幸福，不只是懂得更多，而是开始做一点不一样的事。每天只走5步：先体验、明白一点、看见自己、做一件事、晚上记录。原版完整内容仍然全部保留。</p>
-<div class="actions"><button class="btn" onclick="openStart()">START HERE｜第一次使用</button><button class="btn" onclick="continueCourse()">继续上次学习 →</button><a class="btn" href="https://bozhongxingfu-13tools.vercel.app/" target="_blank">🧰 13项幸福工具箱</a><button class="btn topAppendixBtn" onclick="showBusiness()">💼 附录一｜商业问题</button><button class="btn topAppendixBtn" onclick="showMeditation()">🧘 附录二｜施与受冥想</button></div>
+<div class="actions"><button class="btn" onclick="openStart()">START HERE｜第一次使用</button><button class="btn" onclick="continueCourse()">继续上次学习 →</button><a class="btn" href="https://bozhongxingfu-13tools.vercel.app/" target="_blank">🧰 13项幸福工具箱</a><button class="btn topAppendixBtn" onclick="showBusiness();scrollToAppendix('businessPage')">💼 附录一｜商业问题</button><button class="btn topAppendixBtn" onclick="showMeditation();scrollToAppendix('meditationPage')">🧘 附录二｜施与受冥想</button></div>
 <div style="margin-top:18px"><div style="display:flex;justify-content:space-between;font-weight:900;font-size:13px"><span>我的课程进度</span><span id="pt">0 / 21</span></div><div class="bar"><i id="pb"></i></div></div></section>
 <section class="start" id="start">
 <div class="guideBlock">
@@ -291,6 +295,18 @@ function saveGuideAction(){let s=get();s.guide=s.guide||{};s.guide[cur]=s.guide[
 function finishGuideDay(){let s=get();s.guide=s.guide||{};s.guide[cur]=s.guide[cur]||{};s.guide[cur].gnight1=document.getElementById('gnight1').value;s.guide[cur].gnight2=document.getElementById('gnight2').value;put(s);completeDay();alert('🌱 DAY '+String(cur).padStart(2,'0')+' 完成。今天做到这里就够了。')}
 
 
+
+function scrollToAppendix(id){
+  const el=document.getElementById(id);
+  if(!el)return;
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      const y=el.getBoundingClientRect().top+window.pageYOffset-10;
+      window.scrollTo({top:y,behavior:'smooth'});
+    });
+  });
+}
+
 function scrollToDayCourse(){
   const course=document.querySelector('section.course');
   if(!course)return;
@@ -330,8 +346,8 @@ function loadMeditationNote(){
  if(document.getElementById('medAction'))document.getElementById('medAction').value=m.action||'';
 }
 
-function showMeditation(){hideCourseForAppendix();$('meditationPage').classList.add('show')}
-function showBusiness(){hideCourseForAppendix();$('businessPage').classList.add('show')}
+function showMeditation(){hideCourseForAppendix();$('meditationPage').classList.add('show');scrollToAppendix('meditationPage')}
+function showBusiness(){hideCourseForAppendix();$('businessPage').classList.add('show');scrollToAppendix('businessPage')}
 function prevDay(){showDay(cur-1)}function nextDay(){showDay(cur+1)}function continueCourse(){showDay(get().last||1)}
 function downloadJSON(obj,name){
   let b=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'}),
