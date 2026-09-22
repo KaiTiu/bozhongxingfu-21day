@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>播种幸福｜Admin Dashboard V2.1</title>
+<title>播种幸福｜Admin Dashboard V2.2 Sales + Ops</title>
 <style>
 :root{--g:#355a42;--g2:#4e725a;--sage:#e4ede0;--paper:#fffdf8;--cream:#f4f0e7;--ink:#30362f;--muted:#707870;--gold:#bd995c;--line:#dce5d9;--warn:#fff4d7;--danger:#a6473d;--shadow:0 14px 38px rgba(53,90,66,.09)}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:linear-gradient(180deg,#f7f3ea,#edf3e9);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","Noto Sans SC",sans-serif}button,input,select{font:inherit}button{cursor:pointer}.shell{max-width:1480px;margin:auto;padding:18px}.hidden{display:none!important}
@@ -18,6 +18,26 @@ label{display:block;font-weight:900;color:var(--g);margin:13px 0 6px}input,selec
 .modal{position:fixed;inset:0;background:rgba(28,40,31,.48);display:none;align-items:center;justify-content:center;padding:18px;z-index:50}.modal.show{display:flex}.modalCard{width:min(680px,100%);max-height:92vh;overflow:auto;background:var(--paper);border-radius:24px;padding:22px;border:1px solid var(--line);box-shadow:0 24px 80px rgba(0,0,0,.18)}.modalHead{display:flex;justify-content:space-between;gap:10px;align-items:start}.modalHead h2{color:var(--g);margin:0}.closeBtn{border:0;background:var(--sage);color:var(--g);width:39px;height:39px;border-radius:50%;font-size:20px;font-weight:900}.modalActions{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}.renewPreview{margin-top:12px;background:#eef4eb;border-radius:14px;padding:12px;color:#4a5b4d;font-size:13px;line-height:1.6}.muted{color:var(--muted);font-size:12px}.dangerText{color:var(--danger);font-size:12px}
 @media(max-width:1100px){.grid{grid-template-columns:1fr}.toolbar{grid-template-columns:1fr 1fr 1fr}.searchWrap{grid-column:1/-1}.stats{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:650px){.shell{padding:10px}.top{align-items:flex-start;flex-direction:column}.top h1{font-size:27px}.stats{grid-template-columns:1fr 1fr}.toolbar{grid-template-columns:1fr 1fr}.searchWrap{grid-column:1/-1}.row2{grid-template-columns:1fr}.modalCard{padding:17px}}
+
+/* ===== V2.2 SALES + OPERATIONS ===== */
+.stats{grid-template-columns:repeat(6,1fr)}
+.moneyStat strong{font-size:22px}
+.salesGroup{margin-top:15px;padding-top:14px;border-top:1px dashed var(--line)}
+.salesGroup h3{margin:0 0 8px;color:var(--g);font-size:16px}
+.opsPill{display:inline-block;border-radius:999px;padding:5px 8px;font-size:10px;font-weight:900}
+.opsPill.paid{background:#e2eddf;color:#28583d}
+.opsPill.pending{background:#fff0cf;color:#7d5c1c}
+.opsPill.refunded{background:#f4e1de;color:#8d3d35}
+.salesMeta{font-size:11px;color:var(--muted);line-height:1.55}
+.salesMoney{font-weight:900;color:var(--g)}
+.salesWarn{background:#fff7e8;border:1px solid #ead7af;border-radius:12px;padding:10px 12px;margin-top:10px;color:#725a36;font-size:12px;line-height:1.55}
+.opsToolbar{display:grid;grid-template-columns:minmax(220px,1fr) 145px 145px 145px 155px 160px 100px;gap:8px;align-items:end;margin:14px 0}
+.opsToolbar label{font-size:11px;margin:0 0 4px}
+.memberTable{min-width:1180px}
+.checkboxLine{display:flex;align-items:center;gap:8px;margin-top:10px}.checkboxLine input{width:auto}.checkboxLine label{margin:0;color:var(--ink);font-weight:700}
+@media(max-width:1280px){.stats{grid-template-columns:repeat(3,1fr)}.opsToolbar{grid-template-columns:repeat(3,1fr)}.searchWrap{grid-column:1/-1}}
+@media(max-width:650px){.stats{grid-template-columns:1fr 1fr}.opsToolbar{grid-template-columns:1fr 1fr}.searchWrap{grid-column:1/-1}}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -37,7 +57,7 @@ label{display:block;font-weight:900;color:var(--g);margin:13px 0 6px}input,selec
 
 <section id="dashboardView" class="hidden">
   <div class="top">
-    <div><h1>🌱 播种幸福｜学员管理 V2.1</h1><p>一年制课程 · 自动到期 · 一键续费 · 快速搜索与编辑</p></div>
+    <div><h1>🌱 播种幸福｜学员管理 V2.2</h1><p>一年制课程 · 学员权限 · 收款记录 · 客户来源 · 续费提醒</p></div>
     <div class="topActions"><button class="btn" onclick="refreshMembers()">刷新名单</button><button class="btn" onclick="window.open('./index.html','_blank')">打开课程</button><button class="btn" onclick="adminLogout()">退出</button></div>
   </div>
 
@@ -46,6 +66,8 @@ label{display:block;font-weight:900;color:var(--g);margin:13px 0 6px}input,selec
     <div class="stat"><strong id="statActive">0</strong><span>ACTIVE</span></div>
     <div class="stat"><strong id="statSoon">0</strong><span>30天内到期</span></div>
     <div class="stat"><strong id="statExpired">0</strong><span>已到期</span></div>
+    <div class="stat moneyStat"><strong id="statRevenue">RM 0.00</strong><span>累计已付款收入</span></div>
+    <div class="stat"><strong id="statPendingPay">0</strong><span>待确认付款</span></div>
   </div>
 
   <div class="grid">
@@ -56,6 +78,14 @@ label{display:block;font-weight:900;color:var(--g);margin:13px 0 6px}input,selec
       <label>Email</label><input id="newEmail" type="email" placeholder="student@example.com">
       <label>开始日期</label><input id="newStart" type="date" onchange="updateNewExpiryPreview()">
       <div class="planBox"><b>课程期限：1 年</b><span id="newExpiryPreview">到期日期会自动计算。</span></div>
+
+      <div class="salesGroup">
+        <h3>💰 销售 / 付款资料</h3>
+        <div class="row2"><div><label>WhatsApp</label><input id="newWhatsapp" placeholder="例如：0177483191"></div><div><label>付款金额 (RM)</label><input id="newPaymentAmount" type="number" min="0" step="0.01" placeholder="0.00"></div></div>
+        <div class="row2"><div><label>付款日期</label><input id="newPaymentDate" type="date"></div><div><label>客户来源</label><select id="newSource"><option value="">未选择</option><option>Facebook</option><option>Instagram</option><option>TikTok</option><option>WhatsApp</option><option>Website</option><option>Referral</option><option>Other</option></select></div></div>
+        <label>付款状态</label><select id="newPaymentStatus"><option value="paid">PAID</option><option value="pending">PENDING</option><option value="refunded">REFUNDED</option></select>
+        <label>备注</label><input id="newNotes" placeholder="例如：银行转账 / 特别优惠 / 客户要求">
+      </div>
       <button class="btn" style="width:100%;margin-top:14px" onclick="createMember()">建立学员 + 临时密码</button>
       <div id="createStatus" class="status"></div>
       <div id="tempResult" class="tempResult">
@@ -78,17 +108,19 @@ label{display:block;font-weight:900;color:var(--g);margin:13px 0 6px}input,selec
     <div class="card">
       <h2>学员名单</h2>
       <div class="sub">使用搜索、筛选和分页管理大量学员。点击「编辑」才打开详细资料。</div>
-      <div class="toolbar">
-        <div class="searchWrap"><label>搜索</label><input id="searchMember" placeholder="姓名或 Email" oninput="filtersChanged()"></div>
-        <div><label>状态</label><select id="statusFilter" onchange="filtersChanged()"><option value="all">全部状态</option><option value="active">ACTIVE</option><option value="expired">EXPIRED</option><option value="inactive">INACTIVE</option><option value="cancelled">CANCELLED</option></select></div>
-        <div><label>期限</label><select id="expiryFilter" onchange="filtersChanged()"><option value="all">全部期限</option><option value="soon">30天内到期</option><option value="expired">已到期</option></select></div>
-        <div><label>排序</label><select id="sortMode" onchange="filtersChanged()"><option value="newest">最新加入</option><option value="name">姓名 A–Z</option><option value="expiry">最早到期</option></select></div>
+      <div class="opsToolbar">
+        <div class="searchWrap"><label>搜索</label><input id="searchMember" placeholder="姓名 / Email / WhatsApp" oninput="filtersChanged()"></div>
+        <div><label>课程状态</label><select id="statusFilter" onchange="filtersChanged()"><option value="all">全部</option><option value="active">ACTIVE</option><option value="expired">EXPIRED</option><option value="inactive">INACTIVE</option><option value="cancelled">CANCELLED</option></select></div>
+        <div><label>付款状态</label><select id="paymentFilter" onchange="filtersChanged()"><option value="all">全部</option><option value="paid">PAID</option><option value="pending">PENDING</option><option value="refunded">REFUNDED</option><option value="none">未登记</option></select></div>
+        <div><label>来源</label><select id="sourceFilter" onchange="filtersChanged()"><option value="all">全部</option><option>Facebook</option><option>Instagram</option><option>TikTok</option><option>WhatsApp</option><option>Website</option><option>Referral</option><option>Other</option></select></div>
+        <div><label>期限</label><select id="expiryFilter" onchange="filtersChanged()"><option value="all">全部</option><option value="soon">30天内到期</option><option value="expired">已到期</option></select></div>
+        <div><label>排序</label><select id="sortMode" onchange="filtersChanged()"><option value="newest">最新加入</option><option value="name">姓名 A–Z</option><option value="expiry">最早到期</option><option value="payment">付款日期最新</option></select></div>
         <div><label>每页</label><select id="pageSize" onchange="filtersChanged()"><option value="20">20</option><option value="50">50</option><option value="100">100</option></select></div>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:9px"><span id="memberCount" class="countBadge">0 位</span><span id="listStatus" class="status" style="margin:0"></span></div>
       <div class="tableWrap">
         <table class="memberTable">
-          <thead><tr><th>姓名</th><th>Email</th><th>状态</th><th>开始日期</th><th>到期日期</th><th>操作</th></tr></thead>
+          <thead><tr><th>姓名</th><th>Email</th><th>付款</th><th>来源</th><th>课程状态</th><th>开始日期</th><th>到期日期</th><th>操作</th></tr></thead>
           <tbody id="memberRows"></tbody>
         </table>
       </div>
@@ -106,6 +138,15 @@ label{display:block;font-weight:900;color:var(--g);margin:13px 0 6px}input,selec
     <div class="row2"><div><label>状态</label><select id="editStatus"><option value="active">active</option><option value="inactive">inactive</option><option value="expired">expired</option><option value="cancelled">cancelled</option></select></div><div><label>开始日期</label><input id="editStart" type="date"></div></div>
     <label>到期日期</label><input id="editExpiry" type="date">
     <div class="renewPreview" id="renewPreview"></div>
+
+    <div class="salesGroup">
+      <h3>💰 销售 / 付款资料</h3>
+      <div class="row2"><div><label>WhatsApp</label><input id="editWhatsapp"></div><div><label>付款金额 (RM)</label><input id="editPaymentAmount" type="number" min="0" step="0.01"></div></div>
+      <div class="row2"><div><label>付款日期</label><input id="editPaymentDate" type="date"></div><div><label>客户来源</label><select id="editSource"><option value="">未选择</option><option>Facebook</option><option>Instagram</option><option>TikTok</option><option>WhatsApp</option><option>Website</option><option>Referral</option><option>Other</option></select></div></div>
+      <label>付款状态</label><select id="editPaymentStatus"><option value="paid">paid</option><option value="pending">pending</option><option value="refunded">refunded</option></select>
+      <label>营运备注</label><input id="editNotes">
+      <div class="checkboxLine"><input id="editWelcomeSent" type="checkbox"><label for="editWelcomeSent">欢迎讯息已发送</label></div>
+    </div>
     <div class="modalActions">
       <button class="btn" onclick="saveEdit()">保存修改</button>
       <button class="btn warn" onclick="renewOneYear()">🔄 续费 1 年</button>
@@ -121,7 +162,7 @@ label{display:block;font-weight:900;color:var(--g);margin:13px 0 6px}input,selec
 const SUPABASE_URL='https://sopjtukcrghvgemdishz.supabase.co';
 const SUPABASE_KEY='sb_publishable_ltqt7kjBSZE-YO3SRnnbxg_uqmt6Ooh';
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
-let MEMBERS=[];let CURRENT_PAGE=1;let CURRENT_EDIT=null;let LAST_CREATED_MEMBER=null;
+let MEMBERS=[];let SALES=[];let SALES_MAP=new Map();let CURRENT_PAGE=1;let CURRENT_EDIT=null;let LAST_CREATED_MEMBER=null;
 const $=id=>document.getElementById(id);
 function today(){const d=new Date(),o=d.getTimezoneOffset();return new Date(d.getTime()-o*60000).toISOString().slice(0,10)}
 function addYear(ds){if(!ds)return'';const [y,m,d]=ds.split('-').map(Number),ty=y+1,last=new Date(ty,m,0).getDate(),dd=Math.min(d,last);return `${ty}-${String(m).padStart(2,'0')}-${String(dd).padStart(2,'0')}`}
@@ -130,10 +171,90 @@ function fmt(ds){if(!ds)return'—';const [y,m,d]=ds.split('-');return `${d}/${m
 function setStatus(id,msg,kind=''){const e=$(id);e.textContent=msg;e.className='status'+(kind?' '+kind:'')}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
 async function invoke(body){const {data,error}=await sb.functions.invoke('admin-members',{body});if(error)throw new Error(error.message||'Function error');if(data?.error)throw new Error(data.error);return data}
+
+async function loadSales(){
+  const {data,error}=await sb.from('bzxf_student_sales').select('*');
+  if(error){
+    if(String(error.message||'').toLowerCase().includes('bzxf_student_sales')) throw new Error('销售资料表尚未建立。请先运行 bzxf-student-sales-setup.sql。');
+    throw error;
+  }
+  SALES=data||[];
+  SALES_MAP=new Map(SALES.map(x=>[x.user_id,x]));
+}
+function saleOf(uid){return SALES_MAP.get(uid)||null}
+async function saveSales(uid,payload){
+  const row={user_id:uid,...payload,updated_at:new Date().toISOString()};
+  const {error}=await sb.from('bzxf_student_sales').upsert(row,{onConflict:'user_id'});
+  if(error)throw error;
+  await loadSales();
+}
+async function markWelcomeSent(uid){
+  if(!uid)return;
+  const current=saleOf(uid)||{};
+  await saveSales(uid,{
+    whatsapp:current.whatsapp||null,
+    payment_amount:Number(current.payment_amount||0),
+    payment_date:current.payment_date||null,
+    source:current.source||null,
+    payment_status:current.payment_status||'paid',
+    notes:current.notes||null,
+    welcome_sent_at:new Date().toISOString()
+  });
+}
+function money(v){return 'RM '+Number(v||0).toFixed(2)}
+function paymentPill(s){
+  if(!s)return '<span class="opsPill pending">未登记</span>';
+  const st=s.payment_status||'pending';
+  return `<span class="opsPill ${esc(st)}">${esc(st.toUpperCase())}</span><div class="salesMeta">${money(s.payment_amount)}${s.payment_date?'<br>'+fmt(s.payment_date):''}</div>`;
+}
+
 async function adminLogin(){setStatus('loginStatus','正在登录…');const email=$('adminEmail').value.trim(),password=$('adminPassword').value;const {data,error}=await sb.auth.signInWithPassword({email,password});if(error||!data?.user){setStatus('loginStatus','登录失败，请检查 Email 与密码。','err');return}try{await refreshMembers();$('loginView').classList.add('hidden');$('dashboardView').classList.remove('hidden')}catch(e){await sb.auth.signOut();setStatus('loginStatus','这个账号不是管理员，或 Admin Function 尚未部署。\n'+e.message,'err')}}
 async function adminLogout(){await sb.auth.signOut();$('dashboardView').classList.add('hidden');$('loginView').classList.remove('hidden')}
 function updateNewExpiryPreview(){const s=$('newStart').value||today();$('newExpiryPreview').textContent=`开始 ${fmt(s)} → 自动到期 ${fmt(addYear(s))}`}
-async function createMember(){const name=$('newName').value.trim(),email=$('newEmail').value.trim().toLowerCase(),start=$('newStart').value||today();if(!email){setStatus('createStatus','请输入 Email。','err');return}setStatus('createStatus','正在建立账号…');$('tempResult').classList.remove('show');try{const r=await invoke({action:'create',display_name:name,email,start_date:start});LAST_CREATED_MEMBER={display_name:name||email,email,temporary_password:r.temporary_password,start_date:r.start_date,expiry_date:r.expiry_date};$('tempPassword').textContent=r.temporary_password;$('createdDates').textContent=`开始：${fmt(r.start_date)} ｜ 到期：${fmt(r.expiry_date)}`;$('tempResult').classList.add('show');setStatus('createStatus','✓ 学员账号与一年课程权限已建立。','ok');$('newName').value='';$('newEmail').value='';await refreshMembers()}catch(e){LAST_CREATED_MEMBER=null;setStatus('createStatus',e.message,'err')}}
+async function createMember(){
+  const name=$('newName').value.trim(),
+        email=$('newEmail').value.trim().toLowerCase(),
+        start=$('newStart').value||today(),
+        whatsapp=$('newWhatsapp').value.trim(),
+        paymentAmount=Number($('newPaymentAmount').value||0),
+        paymentDate=$('newPaymentDate').value||null,
+        source=$('newSource').value||null,
+        paymentStatus=$('newPaymentStatus').value||'paid',
+        notes=$('newNotes').value.trim()||null;
+  if(!email){setStatus('createStatus','请输入 Email。','err');return}
+  setStatus('createStatus','正在建立账号…');
+  $('tempResult').classList.remove('show');
+  try{
+    const r=await invoke({action:'create',display_name:name,email,start_date:start});
+    LAST_CREATED_MEMBER={user_id:r.user_id,display_name:name||email,email,temporary_password:r.temporary_password,start_date:r.start_date,expiry_date:r.expiry_date};
+    $('tempPassword').textContent=r.temporary_password;
+    $('createdDates').textContent=`开始：${fmt(r.start_date)} ｜ 到期：${fmt(r.expiry_date)}`;
+    $('tempResult').classList.add('show');
+
+    let salesOk=true;
+    try{
+      await saveSales(r.user_id,{
+        whatsapp:whatsapp||null,
+        payment_amount:paymentAmount,
+        payment_date:paymentDate,
+        source,
+        payment_status:paymentStatus,
+        notes,
+        welcome_sent_at:null
+      });
+    }catch(se){
+      salesOk=false;
+      console.error(se);
+    }
+
+    setStatus('createStatus',salesOk?'✓ 学员账号、课程权限与销售资料已建立。':'✓ 学员账号已建立，但销售资料保存失败；请到编辑学员里补填。',salesOk?'ok':'err');
+    $('newName').value='';$('newEmail').value='';$('newWhatsapp').value='';$('newPaymentAmount').value='';$('newNotes').value='';
+    await refreshMembers();
+  }catch(e){
+    LAST_CREATED_MEMBER=null;
+    setStatus('createStatus',e.message,'err')
+  }
+}
 async function copyText(text){try{await navigator.clipboard.writeText(text);return true}catch(e){try{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.focus();ta.select();const ok=document.execCommand('copy');ta.remove();return ok}catch(_){return false}}}
 function copyTempPassword(){copyText($('tempPassword').textContent||'').then(ok=>setStatus('createStatus',ok?'✓ 临时密码已复制。':'复制失败，请手动复制临时密码。',ok?'ok':'err'))}
 function courseUrl(){return window.location.origin.replace(/\/$/,'')+'/'}
@@ -220,29 +341,57 @@ ${m.temporary_password}
 
 播种幸福｜21天幸福人生实践系统`;
 }
-function copyWelcomeMessage(lang){if(!LAST_CREATED_MEMBER){setStatus('createStatus','请先成功建立学员账号。','err');return}const msg=buildWelcomeMessage(lang);copyText(msg).then(ok=>setStatus('createStatus',ok?(lang==='en'?'✓ English welcome message copied.':'✓ 中文欢迎讯息已复制。'):'复制失败，请手动复制。',ok?'ok':'err'))}
-async function refreshMembers(){setStatus('listStatus','正在读取…');try{const r=await invoke({action:'list'});MEMBERS=r.members||[];setStatus('listStatus','');CURRENT_PAGE=1;renderAll()}catch(e){setStatus('listStatus',e.message,'err');throw e}}
+function copyWelcomeMessage(lang){if(!LAST_CREATED_MEMBER){setStatus('createStatus','请先成功建立学员账号。','err');return}const msg=buildWelcomeMessage(lang);copyText(msg).then(async ok=>{if(ok){try{await markWelcomeSent(LAST_CREATED_MEMBER.user_id)}catch(e){console.warn(e)}setStatus('createStatus',lang==='en'?'✓ English welcome message copied.':'✓ 中文欢迎讯息已复制。','ok');renderAll()}else{setStatus('createStatus','复制失败，请手动复制。','err')}})}
+async function refreshMembers(){setStatus('listStatus','正在读取…');try{const r=await invoke({action:'list'});MEMBERS=r.members||[];await loadSales();setStatus('listStatus','');CURRENT_PAGE=1;renderAll()}catch(e){setStatus('listStatus',e.message,'err');throw e}}
 function effectiveStatus(m){const t=today();if(m.expiry_date&&m.expiry_date<t)return'expired';return m.status||'inactive'}
 function isSoon(m){const st=effectiveStatus(m);if(st!=='active'||!m.expiry_date)return false;const d=daysBetween(today(),m.expiry_date);return d>=0&&d<=30}
 function filtersChanged(){CURRENT_PAGE=1;renderAll()}
-function filteredMembers(){const q=($('searchMember')?.value||'').trim().toLowerCase(),sf=$('statusFilter')?.value||'all',ef=$('expiryFilter')?.value||'all',sort=$('sortMode')?.value||'newest';let arr=MEMBERS.filter(m=>{const st=effectiveStatus(m);if(q&&!String(m.display_name||'').toLowerCase().includes(q)&&!String(m.email||'').toLowerCase().includes(q))return false;if(sf!=='all'&&st!==sf)return false;if(ef==='soon'&&!isSoon(m))return false;if(ef==='expired'&&st!=='expired')return false;return true});arr.sort((a,b)=>{if(sort==='name')return String(a.display_name||a.email||'').localeCompare(String(b.display_name||b.email||''),'zh-Hans');if(sort==='expiry')return String(a.expiry_date||'9999-12-31').localeCompare(String(b.expiry_date||'9999-12-31'));return String(b.created_at||'').localeCompare(String(a.created_at||''))});return arr}
-function renderStats(){const total=MEMBERS.length,active=MEMBERS.filter(m=>effectiveStatus(m)==='active').length,soon=MEMBERS.filter(isSoon).length,expired=MEMBERS.filter(m=>effectiveStatus(m)==='expired').length;$('statTotal').textContent=total;$('statActive').textContent=active;$('statSoon').textContent=soon;$('statExpired').textContent=expired}
+function filteredMembers(){
+  const q=($('searchMember')?.value||'').trim().toLowerCase(),
+        sf=$('statusFilter')?.value||'all',
+        pf=$('paymentFilter')?.value||'all',
+        srcf=$('sourceFilter')?.value||'all',
+        ef=$('expiryFilter')?.value||'all',
+        sort=$('sortMode')?.value||'newest';
+  let arr=MEMBERS.filter(m=>{
+    const st=effectiveStatus(m),s=saleOf(m.user_id);
+    if(q
+      &&!String(m.display_name||'').toLowerCase().includes(q)
+      &&!String(m.email||'').toLowerCase().includes(q)
+      &&!String(s?.whatsapp||'').toLowerCase().includes(q))return false;
+    if(sf!=='all'&&st!==sf)return false;
+    if(pf==='none'&&s)return false;
+    if(pf!=='all'&&pf!=='none'&&(s?.payment_status||'')!==pf)return false;
+    if(srcf!=='all'&&(s?.source||'')!==srcf)return false;
+    if(ef==='soon'&&!isSoon(m))return false;
+    if(ef==='expired'&&st!=='expired')return false;
+    return true
+  });
+  arr.sort((a,b)=>{
+    if(sort==='name')return String(a.display_name||a.email||'').localeCompare(String(b.display_name||b.email||''),'zh-Hans');
+    if(sort==='expiry')return String(a.expiry_date||'9999-12-31').localeCompare(String(b.expiry_date||'9999-12-31'));
+    if(sort==='payment')return String(saleOf(b.user_id)?.payment_date||'').localeCompare(String(saleOf(a.user_id)?.payment_date||''));
+    return String(b.created_at||'').localeCompare(String(a.created_at||''))
+  });
+  return arr
+}
+function renderStats(){const total=MEMBERS.length,active=MEMBERS.filter(m=>effectiveStatus(m)==='active').length,soon=MEMBERS.filter(isSoon).length,expired=MEMBERS.filter(m=>effectiveStatus(m)==='expired').length,revenue=SALES.filter(s=>s.payment_status==='paid').reduce((n,s)=>n+Number(s.payment_amount||0),0),pending=SALES.filter(s=>s.payment_status==='pending').length;$('statTotal').textContent=total;$('statActive').textContent=active;$('statSoon').textContent=soon;$('statExpired').textContent=expired;$('statRevenue').textContent=money(revenue);$('statPendingPay').textContent=pending}
 function renderAll(){renderStats();renderMembers()}
 function statusPill(m){const st=effectiveStatus(m),soon=isSoon(m);return `<span class="pill ${st}">${st.toUpperCase()}</span>${soon?'<br><span class="pill soon" style="margin-top:4px">即将到期</span>':''}`}
-function renderMembers(){const arr=filteredMembers(),size=Number($('pageSize')?.value||20),pages=Math.max(1,Math.ceil(arr.length/size));if(CURRENT_PAGE>pages)CURRENT_PAGE=pages;const start=(CURRENT_PAGE-1)*size,view=arr.slice(start,start+size);$('memberCount').textContent=`${arr.length} 位 / 共 ${MEMBERS.length} 位`;$('memberRows').innerHTML=view.length?view.map(m=>`<tr><td class="nameCell"><b>${esc(m.display_name||'未填写姓名')}</b><small>${esc(m.user_id.slice(0,8))}…</small></td><td>${esc(m.email||'')}</td><td>${statusPill(m)}</td><td>${fmt(m.start_date)}</td><td>${fmt(m.expiry_date)}</td><td class="actionsCell"><button class="btn small" onclick="openEdit('${m.user_id}')">编辑</button><button class="btn soft small" onclick="quickRenew('${m.user_id}')">续费1年</button></td></tr>`).join(''):`<tr><td colspan="6" class="empty">没有符合条件的学员。</td></tr>`;$('pageInfo').textContent=`第 ${CURRENT_PAGE} / ${pages} 页`;$('pageBtns').innerHTML=`<button onclick="gotoPage(${Math.max(1,CURRENT_PAGE-1)})" ${CURRENT_PAGE===1?'disabled':''}>‹</button>${pageNumbers(pages).map(p=>`<button class="${p===CURRENT_PAGE?'active':''}" onclick="gotoPage(${p})">${p}</button>`).join('')}<button onclick="gotoPage(${Math.min(pages,CURRENT_PAGE+1)})" ${CURRENT_PAGE===pages?'disabled':''}>›</button>`}
+function renderMembers(){const arr=filteredMembers(),size=Number($('pageSize')?.value||20),pages=Math.max(1,Math.ceil(arr.length/size));if(CURRENT_PAGE>pages)CURRENT_PAGE=pages;const start=(CURRENT_PAGE-1)*size,view=arr.slice(start,start+size);$('memberCount').textContent=`${arr.length} 位 / 共 ${MEMBERS.length} 位`;$('memberRows').innerHTML=view.length?view.map(m=>{const s=saleOf(m.user_id);return `<tr><td class="nameCell"><b>${esc(m.display_name||'未填写姓名')}</b><small>${esc(m.user_id.slice(0,8))}…${s?.whatsapp?'<br>'+esc(s.whatsapp):''}</small></td><td>${esc(m.email||'')}</td><td>${paymentPill(s)}</td><td>${s?.source?esc(s.source):'—'}</td><td>${statusPill(m)}</td><td>${fmt(m.start_date)}</td><td>${fmt(m.expiry_date)}</td><td class="actionsCell"><button class="btn small" onclick="openEdit('${m.user_id}')">编辑</button><button class="btn soft small" onclick="quickRenew('${m.user_id}')">续费1年</button></td></tr>`}).join(''):`<tr><td colspan="8" class="empty">没有符合条件的学员。</td></tr>`;$('pageInfo').textContent=`第 ${CURRENT_PAGE} / ${pages} 页`;$('pageBtns').innerHTML=`<button onclick="gotoPage(${Math.max(1,CURRENT_PAGE-1)})" ${CURRENT_PAGE===1?'disabled':''}>‹</button>${pageNumbers(pages).map(p=>`<button class="${p===CURRENT_PAGE?'active':''}" onclick="gotoPage(${p})">${p}</button>`).join('')}<button onclick="gotoPage(${Math.min(pages,CURRENT_PAGE+1)})" ${CURRENT_PAGE===pages?'disabled':''}>›</button>`}
 function pageNumbers(pages){const out=[];let a=Math.max(1,CURRENT_PAGE-2),b=Math.min(pages,a+4);a=Math.max(1,b-4);for(let i=a;i<=b;i++)out.push(i);return out}
 function gotoPage(p){CURRENT_PAGE=p;renderMembers();document.querySelector('.tableWrap')?.scrollIntoView({behavior:'smooth',block:'start'})}
 function memberById(uid){return MEMBERS.find(m=>m.user_id===uid)}
-function openEdit(uid){const m=memberById(uid);if(!m)return;CURRENT_EDIT=m;$('editUserId').value=uid;$('editUid').textContent='User ID: '+uid;$('editName').value=m.display_name||'';$('editEmail').value=m.email||'';$('editStatus').value=effectiveStatus(m);$('editStart').value=m.start_date||'';$('editExpiry').value=m.expiry_date||'';$('editTempResult').classList.remove('show');setStatus('editStatusMsg','');updateRenewPreview();$('editModal').classList.add('show')}
+function openEdit(uid){const m=memberById(uid);if(!m)return;const s=saleOf(uid)||{};CURRENT_EDIT=m;$('editUserId').value=uid;$('editUid').textContent='User ID: '+uid;$('editName').value=m.display_name||'';$('editEmail').value=m.email||'';$('editStatus').value=effectiveStatus(m);$('editStart').value=m.start_date||'';$('editExpiry').value=m.expiry_date||'';$('editWhatsapp').value=s.whatsapp||'';$('editPaymentAmount').value=s.payment_amount??'';$('editPaymentDate').value=s.payment_date||'';$('editSource').value=s.source||'';$('editPaymentStatus').value=s.payment_status||'paid';$('editNotes').value=s.notes||'';$('editWelcomeSent').checked=!!s.welcome_sent_at;$('editTempResult').classList.remove('show');setStatus('editStatusMsg','');updateRenewPreview();$('editModal').classList.add('show')}
 function closeEdit(){$('editModal').classList.remove('show');CURRENT_EDIT=null}
 function modalBackdrop(e){if(e.target.id==='editModal')closeEdit()}
 function updateRenewPreview(){if(!CURRENT_EDIT)return;const exp=$('editExpiry').value||CURRENT_EDIT.expiry_date,base=(exp&&exp>=today())?exp:today(),newExp=addYear(base);$('renewPreview').innerHTML=`<b>续费规则</b><br>未到期：从现有到期日再加 1 年。<br>已到期：从续费当天重新计算 1 年。<br><b>现在续费预计新到期日：${fmt(newExp)}</b>`}
 $('editExpiry')?.addEventListener?.('change',updateRenewPreview)
-async function saveEdit(){const uid=$('editUserId').value,name=$('editName').value.trim(),email=$('editEmail').value.trim().toLowerCase(),status=$('editStatus').value,start=$('editStart').value||null,expiry=$('editExpiry').value||null;setStatus('editStatusMsg','正在保存…');try{await invoke({action:'update_member',user_id:uid,display_name:name,email});await invoke({action:'update_access',user_id:uid,status,start_date:start,expiry_date:expiry});setStatus('editStatusMsg','✓ 姓名、Email 与课程权限已更新。','ok');await refreshMembers();const fresh=memberById(uid);if(fresh){CURRENT_EDIT=fresh;$('editName').value=fresh.display_name||'';$('editEmail').value=fresh.email||'';$('editStatus').value=effectiveStatus(fresh);$('editStart').value=fresh.start_date||'';$('editExpiry').value=fresh.expiry_date||'';updateRenewPreview()}}catch(e){setStatus('editStatusMsg',e.message,'err')}}
+async function saveEdit(){const uid=$('editUserId').value,name=$('editName').value.trim(),email=$('editEmail').value.trim().toLowerCase(),status=$('editStatus').value,start=$('editStart').value||null,expiry=$('editExpiry').value||null,whatsapp=$('editWhatsapp').value.trim()||null,paymentAmount=Number($('editPaymentAmount').value||0),paymentDate=$('editPaymentDate').value||null,source=$('editSource').value||null,paymentStatus=$('editPaymentStatus').value||'paid',notes=$('editNotes').value.trim()||null,welcomeSent=$('editWelcomeSent').checked;setStatus('editStatusMsg','正在保存…');try{await invoke({action:'update_member',user_id:uid,display_name:name,email});await invoke({action:'update_access',user_id:uid,status,start_date:start,expiry_date:expiry});const old=saleOf(uid)||{};await saveSales(uid,{whatsapp,payment_amount:paymentAmount,payment_date:paymentDate,source,payment_status:paymentStatus,notes,welcome_sent_at:welcomeSent?(old.welcome_sent_at||new Date().toISOString()):null});setStatus('editStatusMsg','✓ 学员、课程权限与销售资料已更新。','ok');await refreshMembers();const fresh=memberById(uid);if(fresh){CURRENT_EDIT=fresh;openEdit(uid)}}catch(e){setStatus('editStatusMsg',e.message,'err')}}
 async function renewOneYear(){const uid=$('editUserId').value;if(!confirm('确定为这个学员续费 1 年吗？'))return;setStatus('editStatusMsg','正在续费…');try{const r=await invoke({action:'renew_one_year',user_id:uid,renewal_date:today()});setStatus('editStatusMsg',`✓ 已续费 1 年，新到期日：${fmt(r.expiry_date)}`,'ok');await refreshMembers();const fresh=memberById(uid);if(fresh){CURRENT_EDIT=fresh;$('editStatus').value=effectiveStatus(fresh);$('editStart').value=fresh.start_date||'';$('editExpiry').value=fresh.expiry_date||'';updateRenewPreview()}}catch(e){setStatus('editStatusMsg',e.message,'err')}}
 async function quickRenew(uid){const m=memberById(uid);if(!m)return;const base=(m.expiry_date&&m.expiry_date>=today())?m.expiry_date:today(),next=addYear(base);if(!confirm(`${m.display_name||m.email}\n\n续费 1 年后预计到期：${fmt(next)}\n\n确定继续？`))return;try{await invoke({action:'renew_one_year',user_id:uid,renewal_date:today()});await refreshMembers()}catch(e){alert(e.message)}}
 async function resetTempFromModal(){const uid=$('editUserId').value,email=$('editEmail').value;if(!confirm('确定要为 '+email+' 重新生成临时密码吗？'))return;setStatus('editStatusMsg','正在生成临时密码…');try{const r=await invoke({action:'reset_password',user_id:uid});$('editTempPassword').textContent=r.temporary_password;$('editTempResult').classList.add('show');setStatus('editStatusMsg','✓ 已生成新的临时密码。','ok');navigator.clipboard.writeText(r.temporary_password).catch(()=>{})}catch(e){setStatus('editStatusMsg',e.message,'err')}}
 function copyEditTemp(){navigator.clipboard.writeText($('editTempPassword').textContent||'').then(()=>setStatus('editStatusMsg','✓ 临时密码已复制。','ok')).catch(()=>{})}
-(async()=>{$('newStart').value=today();updateNewExpiryPreview();const {data:{session}}=await sb.auth.getSession();if(session?.user){try{await refreshMembers();$('loginView').classList.add('hidden');$('dashboardView').classList.remove('hidden')}catch(e){await sb.auth.signOut()}}})();
+(async()=>{$('newStart').value=today();$('newPaymentDate').value=today();updateNewExpiryPreview();const {data:{session}}=await sb.auth.getSession();if(session?.user){try{await refreshMembers();$('loginView').classList.add('hidden');$('dashboardView').classList.remove('hidden')}catch(e){await sb.auth.signOut()}}})();
 </script>
 </body></html>
