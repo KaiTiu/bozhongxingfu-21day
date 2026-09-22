@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>播种幸福｜Admin Dashboard V2.4.1 Sales Scripts Bottom Fix</title>
+<title>播种幸福｜Admin Dashboard V2.5 Bilingual Sales Scripts</title>
 <style>
 :root{--g:#355a42;--g2:#4e725a;--sage:#e4ede0;--paper:#fffdf8;--cream:#f4f0e7;--ink:#30362f;--muted:#707870;--gold:#bd995c;--line:#dce5d9;--warn:#fff4d7;--danger:#a6473d;--shadow:0 14px 38px rgba(53,90,66,.09)}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:linear-gradient(180deg,#f7f3ea,#edf3e9);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","Noto Sans SC",sans-serif}button,input,select{font:inherit}button{cursor:pointer}.shell{max-width:1480px;margin:auto;padding:18px}.hidden{display:none!important}
@@ -65,10 +65,21 @@ label{display:block;font-weight:900;color:var(--g);margin:13px 0 6px}input,selec
 @media(max-width:980px){.scriptGrid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:560px){.scriptGrid{grid-template-columns:1fr}.scriptText{min-height:260px}}
 
+
+/* ===== V2.5 BILINGUAL + PRICE-STAGE SALES SCRIPTS ===== */
+.scriptModeBar{display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-top:14px;padding:12px;background:#f6f8f3;border:1px solid var(--line);border-radius:14px}
+.scriptModeBar>div{min-width:180px}
+.scriptModeBar label{display:block;margin:0 0 5px;font-size:11px;font-weight:900;color:var(--g)}
+.scriptModeBar select{width:100%;margin:0}
+.scriptModeHint{flex:1;min-width:240px;font-size:12px;color:var(--muted);line-height:1.55;padding:4px 0}
+.scriptStageBadge{display:inline-block;background:#fff1cc;color:#7a5b21;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:900;margin-left:6px}
+@media(max-width:650px){.scriptModeBar>div,.scriptModeHint{width:100%;min-width:0}}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+<!-- V2.5: Chinese/English sales scripts + RM99 launch / RM199 official pricing modes -->
 <!-- V2.4: built-in copyable sales script library -->
 <!-- V2.3: 30-day renewal reminder tools; no new SQL required -->
 <div class="shell">
@@ -86,7 +97,7 @@ label{display:block;font-weight:900;color:var(--g);margin:13px 0 6px}input,selec
 
 <section id="dashboardView" class="hidden">
   <div class="top">
-    <div><h1>🌱 播种幸福｜学员管理 V2.4.1</h1><p>一年制课程 · 学员权限 · 收款记录 · 续费提醒 · 成交话术库</p></div>
+    <div><h1>🌱 播种幸福｜学员管理 V2.5</h1><p>一年制课程 · 学员权限 · 收款记录 · 续费提醒 · 中英双语成交话术</p></div>
     <div class="topActions"><button class="btn" onclick="refreshMembers()">刷新名单</button><button class="btn" onclick="window.open('./index.html','_blank')">打开课程</button><button class="btn" onclick="adminLogout()">退出</button></div>
   </div>
 
@@ -171,6 +182,23 @@ label{display:block;font-weight:900;color:var(--g);margin:13px 0 6px}input,selec
     </div>
 
     <div id="scriptLibraryBody">
+      <div class="scriptModeBar">
+        <div>
+          <label>话术语言 / Language</label>
+          <select id="scriptLang" onchange="changeScriptMode()">
+            <option value="zh">中文</option>
+            <option value="en">English</option>
+          </select>
+        </div>
+        <div>
+          <label>销售阶段 / Price Stage</label>
+          <select id="scriptStage" onchange="changeScriptMode()">
+            <option value="launch99">首发价 RM99</option>
+            <option value="official199">正式价 RM199</option>
+          </select>
+        </div>
+        <div class="scriptModeHint" id="scriptModeHint">目前显示：中文｜首发会员价 RM99，之后正式售价 RM199。</div>
+      </div>
       <div class="scriptGrid" id="scriptQuickGrid"></div>
       <div class="scriptViewer">
         <div class="scriptTitle" id="scriptTitle">想了解</div>
@@ -227,7 +255,7 @@ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSe
 let MEMBERS=[];let SALES=[];let SALES_MAP=new Map();let CURRENT_PAGE=1;let CURRENT_EDIT=null;let LAST_CREATED_MEMBER=null;
 const $=id=>document.getElementById(id);
 
-const SALES_SCRIPTS = [
+const SALES_SCRIPTS_ZH_99 = [
   {
     key:'了解',
     title:'1｜客户说：想了解',
@@ -425,20 +453,265 @@ RM99 包含完整21天实践、13项幸福工具、个人记录、云端保存�
 
 如果你想开始，我可以直接把付款方式发给你。😊`
   }
+
 ];
 
+const SALES_SCRIPTS_EN_99 = [
+  {
+    key:'了解',
+    title:'1｜Customer says: I want to know more',
+    text:`Hi 😊 Thank you for your interest in Planting Happiness | 21-Day Happiness Practice System. 🌱
+
+This is not a course that simply gives you more life advice. It is a practical system that takes about 10 minutes a day and helps you practise:
+
+Notice yourself → Understand your reaction → Choose again → Take one small action → Reflect at night.
+
+You can start with a FREE in-depth experience first. There is no need to purchase before trying it.
+
+If you'd like, I can send you the FREE experience link. 😊`
+  },
+  {
+    key:'FREE完成',
+    title:'2｜Follow up after FREE experience',
+    text:`Hi 😊 After completing the FREE Planting Happiness experience, was there any part that especially connected with you? 🌱
+
+The full version continues this practice for 21 days, so it is not only about “understanding” an idea, but gradually applying it in real life.
+
+The launch membership price is currently RM99. The official price will later be RM199.
+
+If you'd like to continue, I can send you the full details and payment information.`
+  },
+  {
+    key:'多少钱',
+    title:'3｜Customer asks: What is included in RM99?',
+    text:`RM99 is the current launch membership price for Planting Happiness. 🌱
+
+You will receive:
+21-Day Complete Practice System
+13 Happiness Tools
+Daily action and reflection
+Your personal 21-day goal
+Personal growth records
+Cloud-saved learning progress
+Access from both phone and computer
+Chinese / English bilingual system
+One-year membership access
+
+The official price will later be RM199.
+
+If you'd like to join, I can send you the payment details directly. 😊`
+  },
+  {
+    key:'考虑',
+    title:'4｜Customer says: I need to think about it',
+    text:`Of course 😊
+
+I actually don't recommend making a decision just because of a promotion.
+
+You can first ask yourself one question:
+
+During the FREE experience, did you notice something about yourself that you had not really paid attention to before?
+
+If yes, and you would like to keep practising that kind of awareness, then the full 21-day system may be suitable for you. 🌱
+
+The current launch membership price is RM99. Take your time, and let me know when you're ready.`
+  },
+  {
+    key:'有点贵',
+    title:'5｜Customer says: It feels a little expensive',
+    text:`I understand 😊
+
+Planting Happiness is not an e-book or video course that you go through once and then finish.
+
+RM99 includes the full 21-day practice, 13 Happiness Tools, personal records, cloud saving, and one full year of membership access.
+
+So the value is not simply “finishing 21 days”. When you face emotions, relationships, stress, or moments when life feels stuck, you can come back and use the tools again. 🌱
+
+If now is not the right time, you can still continue practising the small action you learned from the FREE experience.`
+  },
+  {
+    key:'有用吗',
+    title:'6｜Customer asks: Does it really work?',
+    text:`Everyone's situation is different, so we don't promise that everyone will feel or change in the same way after 21 days. 😊
+
+What Planting Happiness provides is a practical method that you can practise in daily life.
+
+It is not about forcing yourself to “stay positive”. It helps you gradually learn to:
+
+Notice your reaction first, then decide how you truly want to respond.
+
+That is why I recommend trying the FREE experience first and asking:
+
+Does this way of practising feel useful and suitable for me?
+
+If it does, you can then continue with the full 21-day system with more confidence.`
+  },
+  {
+    key:'为什么21天',
+    title:'7｜Customer asks: Why 21 days?',
+    text:`Understanding an idea can happen very quickly, but when real situations happen, we often fall back into familiar habits.
+
+The full system is not 21 days of simply “listening to lessons”. Instead, you practise the same core process through different real-life themes:
+
+Awareness → Understanding → Choice → Action → Reflection
+
+The goal is to make this new way of responding more familiar through repeated practice. 🌱`
+  },
+  {
+    key:'加入',
+    title:'8｜Customer says: I want to join',
+    text:`Wonderful 🌱
+
+Planting Happiness | 21-Day Happiness Practice System
+
+Launch Membership Price: RM99
+
+After payment, please send me:
+
+① Your name
+② Your Email
+③ Payment screenshot
+
+Once received, we will create your personal member account and send you the login details. 😊`
+  },
+  {
+    key:'付款后',
+    title:'9｜After customer has paid',
+    text:`✅ We have received your payment. Thank you for joining Planting Happiness. 🌱
+
+We will now create your personal member account.
+
+You will receive:
+
+• Login website
+• Login Email
+• Temporary password
+• First-time login instructions
+
+When you log in for the first time, the system will ask you to change your password and set your 21-day goal.
+
+After that, you can officially begin DAY 01. 😊`
+  },
+  {
+    key:'开通',
+    title:'10｜Account has been activated',
+    text:`🌱 Your Planting Happiness personal member account is now active.
+
+Please use the login details we send you to enter the system.
+
+After your first login:
+
+① Change your password
+② Read the first-time user guide
+③ Set your 21-day goal
+④ Begin DAY 01
+
+You do not need to go through everything at once. Just complete the practice for that day, one day at a time. 😊`
+  },
+  {
+    key:'当天跟进',
+    title:'11｜Same-day follow-up',
+    text:`Hi 😊 Just checking in — were you able to log in to Planting Happiness successfully today? 🌱
+
+If you have already entered DAY 01, simply follow the system one step at a time.
+
+You do not need to do a lot. Completing a small amount mindfully each day matters more than trying to finish everything at once.`
+  },
+  {
+    key:'未开始',
+    title:'12｜Customer purchased but has not started',
+    text:`Hi 😊 How have you been?
+
+I noticed that you've already joined Planting Happiness, so I just wanted to remind you of one small thing:
+
+You don't have to wait until you are in the “perfect mood” to begin.
+
+Even opening the system today and completing one small step counts as starting again. 🌱
+
+You can simply continue from where you last stopped.`
+  },
+  {
+    key:'续费',
+    title:'13｜30-day renewal reminder',
+    text:`🌱 Planting Happiness | Membership Renewal Reminder
+
+Hi 😊
+
+A quick reminder that your Planting Happiness | 21-Day Happiness Practice System membership will be expiring soon.
+
+If you would like to continue keeping access to the course, your personal learning records, and the 13 Happiness Tools, simply reply:
+
+"I want to renew"
+
+We will send you the renewal details. 💚`
+  },
+  {
+    key:'最短成交',
+    title:'14｜Short closing message',
+    text:`The current launch membership price for Planting Happiness is RM99. The official price will later be RM199.
+
+It includes the full 21-Day Practice System, 13 Happiness Tools, personal growth records, cloud saving, and one full year of membership access. 🌱
+
+If you'd like to start, I can send you the payment details directly. 😊`
+  }
+
+];
+
+function official199Scripts(base,lang){
+  return base.map(s=>{
+    let title=s.title, t=s.text;
+
+    if(lang==='zh'){
+      title=title.replace('RM99有什么？','RM199有什么？');
+      t=t
+        .replace('目前首发会员价是 RM99，完整正式售价之后会调整到 RM199。','目前正式会员价是 RM199。')
+        .replace('RM99 是《播种幸福》目前的首发会员价。🌱','RM199 是《播种幸福》目前的正式会员价。🌱')
+        .replace('\n\n之后正式售价会调整至 RM199。','')
+        .replace('目前首发会员价是 RM99，你决定好了再告诉我就可以。','目前正式会员价是 RM199，你决定好了再告诉我就可以。')
+        .replace('RM99 包含完整21天实践','RM199 包含完整21天实践')
+        .replace('首发会员价：RM99','正式会员价：RM199')
+        .replace('目前《播种幸福》首发会员价是 RM99，之后正式售价会调整到 RM199。','目前《播种幸福》正式会员价是 RM199。');
+    }else{
+      title=title.replace('What is included in RM99?','What is included in RM199?');
+      t=t
+        .replace('The launch membership price is currently RM99. The official price will later be RM199.','The official membership price is currently RM199.')
+        .replace('RM99 is the current launch membership price for Planting Happiness. 🌱','RM199 is the current official membership price for Planting Happiness. 🌱')
+        .replace('\n\nThe official price will later be RM199.','')
+        .replace('The current launch membership price is RM99. Take your time, and let me know when you\'re ready.','The current official membership price is RM199. Take your time, and let me know when you\'re ready.')
+        .replace('RM99 includes the full 21-day practice','RM199 includes the full 21-day practice')
+        .replace('Launch Membership Price: RM99','Official Membership Price: RM199')
+        .replace('The current launch membership price for Planting Happiness is RM99. The official price will later be RM199.','The current official membership price for Planting Happiness is RM199.');
+    }
+
+    return {...s,title,text:t};
+  });
+}
+
 let CURRENT_SCRIPT_INDEX = 0;
+let CURRENT_SCRIPT_LANG = 'zh';
+let CURRENT_SCRIPT_STAGE = 'launch99';
+
+function currentSalesScripts(){
+  const base=CURRENT_SCRIPT_LANG==='en'?SALES_SCRIPTS_EN_99:SALES_SCRIPTS_ZH_99;
+  return CURRENT_SCRIPT_STAGE==='official199'
+    ? official199Scripts(base,CURRENT_SCRIPT_LANG)
+    : base;
+}
 
 function renderSalesScripts(){
   const grid=$('scriptQuickGrid');
   if(!grid)return;
-  grid.innerHTML=SALES_SCRIPTS.map((s,i)=>`<button type="button" class="scriptQuick ${i===CURRENT_SCRIPT_INDEX?'active':''}" onclick="selectSalesScript(${i})">${esc(s.title)}</button>`).join('');
+  const scripts=currentSalesScripts();
+  if(CURRENT_SCRIPT_INDEX>=scripts.length)CURRENT_SCRIPT_INDEX=0;
+  grid.innerHTML=scripts.map((s,i)=>`<button type="button" class="scriptQuick ${i===CURRENT_SCRIPT_INDEX?'active':''}" onclick="selectSalesScript(${i})">${esc(s.title)}</button>`).join('');
   selectSalesScript(CURRENT_SCRIPT_INDEX);
+  updateScriptModeHint();
 }
 
 function selectSalesScript(i){
   CURRENT_SCRIPT_INDEX=i;
-  const s=SALES_SCRIPTS[i];
+  const scripts=currentSalesScripts();
+  const s=scripts[i];
   if(!s)return;
   $('scriptTitle').textContent=s.title;
   $('scriptText').value=s.text;
@@ -446,10 +719,29 @@ function selectSalesScript(i){
   document.querySelectorAll('.scriptQuick').forEach((b,idx)=>b.classList.toggle('active',idx===i));
 }
 
+function changeScriptMode(){
+  CURRENT_SCRIPT_LANG=$('scriptLang')?.value||'zh';
+  CURRENT_SCRIPT_STAGE=$('scriptStage')?.value||'launch99';
+  CURRENT_SCRIPT_INDEX=0;
+  renderSalesScripts();
+}
+
+function updateScriptModeHint(){
+  const hint=$('scriptModeHint');
+  if(!hint)return;
+  const en=CURRENT_SCRIPT_LANG==='en';
+  const official=CURRENT_SCRIPT_STAGE==='official199';
+  hint.textContent=en
+    ? (official?'Currently showing: English | Official Price RM199.':'Currently showing: English | Launch Price RM99 → Official Price RM199.')
+    : (official?'目前显示：中文｜正式会员价 RM199。':'目前显示：中文｜首发会员价 RM99，之后正式售价 RM199。');
+}
+
 async function copyCurrentSalesScript(){
   const t=$('scriptText').value;
   const ok=await copyText(t);
-  $('scriptCopyStatus').textContent=ok?'✓ 已复制':'复制失败';
+  $('scriptCopyStatus').textContent=ok
+    ? (CURRENT_SCRIPT_LANG==='en'?'✓ Copied':'✓ 已复制')
+    : (CURRENT_SCRIPT_LANG==='en'?'Copy failed':'复制失败');
 }
 
 function toggleScriptLibrary(){
