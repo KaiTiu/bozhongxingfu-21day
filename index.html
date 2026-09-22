@@ -188,8 +188,20 @@ section.course{scroll-margin-top:12px}
 .mainApp.bzGoalLocked #todayCard,.mainApp.bzGoalLocked #growthCard,.mainApp.bzGoalLocked .layout,.mainApp.bzGoalLocked .mobileBottomResources,.mainApp.bzGoalLocked .mobileCourseData{display:none!important}.mainApp.bzGoalLocked .topContinueBtn,.mainApp.bzGoalLocked .topResourceBtn{opacity:.48}.mainApp.bzGoalLocked .hero{margin-bottom:14px}
 @media(max-width:720px){.bzFirstUseCard{padding:20px 17px;border-radius:20px}.bzFirstUseCard h2{font-size:23px}.bzFirstUseStep{grid-template-columns:34px 1fr;padding:11px}.bzFirstUseStep span{width:34px;height:34px}}
 </style>
+
+<style id="bzV1032DayTitleContrastFix">
+/* V10.3.2 — DAY title contrast fix */
+.guidedIntro h2{
+  color:#fff !important;
+}
+.guidedIntro h2 *{
+  color:inherit !important;
+}
+</style>
+
 </head><!-- V10.8.9: all course -> toolbox entries land on #welcome; recommended tool no longer uses ?tool= -->
 <body>
+<!-- V10.3.2 visual fix: DAY title in guidedIntro forced white for readability -->
 <!-- V10.3.1 FREE-only fix: correct 24-hour action display; paid-member login preserved --><section class="freeGate" id="freeGate"><div class="freeShell">
 <div class="freeTop"><div class="freeBrand">🌱 <span data-i18n="brand">播种幸福</span></div><div class="langSwitch"><button class="langBtn active" data-lang="zh" onclick="setLang('zh')">中文</button><button class="langBtn" data-lang="en" onclick="setLang('en')">English</button></div></div><div class="freeHero"><span class="freeBadge" data-i18n="freeBadge">FREE 深度体验｜约 10–12 分钟</span><h1 data-i18n="freeTitle">先别急着买。先看看这套课程，能不能真的让你看见自己。</h1><p data-i18n="freeLead">这不是试看几页内容。你会完成一套真正的迷你练习：找到自己的自动反应、重新选择一个回应，并带走一个今天就能执行的小行动。</p><div class="freeProof"><div><b data-i18n="proof1b">10–12 分钟</b><span data-i18n="proof1s">完成一次真实练习</span></div><div><b data-i18n="proof2b">5 个步骤</b><span data-i18n="proof2s">从觉察走到行动</span></div><div><b data-i18n="proof3b">0 元体验</b><span data-i18n="proof3s">无需先购买课程</span></div></div><div class="bzAuthInline"><button class="btn" style="margin-top:18px" onclick="startFreeExperience()" data-i18n="freeStart">开始我的 FREE 体验 →</button><button class="btn bzAuthSecondary" style="margin-top:18px" type="button" onclick="bzOpenMemberLogin()" id="bzHeroMemberLogin">已购买？会员登录</button></div></div>
 
