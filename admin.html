@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>播种幸福｜Admin Dashboard V2.4 Sales Scripts</title>
+<title>播种幸福｜Admin Dashboard V2.4.1 Sales Scripts Bottom Fix</title>
 <style>
 :root{--g:#355a42;--g2:#4e725a;--sage:#e4ede0;--paper:#fffdf8;--cream:#f4f0e7;--ink:#30362f;--muted:#707870;--gold:#bd995c;--line:#dce5d9;--warn:#fff4d7;--danger:#a6473d;--shadow:0 14px 38px rgba(53,90,66,.09)}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:linear-gradient(180deg,#f7f3ea,#edf3e9);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","Noto Sans SC",sans-serif}button,input,select{font:inherit}button{cursor:pointer}.shell{max-width:1480px;margin:auto;padding:18px}.hidden{display:none!important}
@@ -49,7 +49,7 @@ label{display:block;font-weight:900;color:var(--g);margin:13px 0 6px}input,selec
 
 
 /* ===== V2.4 SALES SCRIPT LIBRARY ===== */
-.scriptLibrary{margin-top:18px;background:#fffdf8;border:1px solid var(--line);border-radius:20px;padding:18px}
+.scriptLibrary{width:100%;margin-top:18px;background:#fffdf8;border:1px solid var(--line);border-radius:20px;padding:18px}
 .scriptLibraryHead{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
 .scriptLibraryHead h2{margin:0;color:var(--g);font-size:22px}
 .scriptLibraryHead p{margin:4px 0 0;color:var(--muted);font-size:13px;line-height:1.55}
@@ -86,7 +86,7 @@ label{display:block;font-weight:900;color:var(--g);margin:13px 0 6px}input,selec
 
 <section id="dashboardView" class="hidden">
   <div class="top">
-    <div><h1>🌱 播种幸福｜学员管理 V2.4</h1><p>一年制课程 · 学员权限 · 收款记录 · 续费提醒 · 成交话术库</p></div>
+    <div><h1>🌱 播种幸福｜学员管理 V2.4.1</h1><p>一年制课程 · 学员权限 · 收款记录 · 续费提醒 · 成交话术库</p></div>
     <div class="topActions"><button class="btn" onclick="refreshMembers()">刷新名单</button><button class="btn" onclick="window.open('./index.html','_blank')">打开课程</button><button class="btn" onclick="adminLogout()">退出</button></div>
   </div>
 
@@ -134,28 +134,7 @@ label{display:block;font-weight:900;color:var(--g);margin:13px 0 6px}input,selec
       </div>
     </div>
 
-  <div class="scriptLibrary" id="scriptLibrary">
-    <div class="scriptLibraryHead">
-      <div>
-        <h2>💬 成交话术库</h2>
-        <p>客户回复到哪一步，就点对应按钮。话术会自动出现，再按「复制话术」即可。</p>
-      </div>
-      <button class="btn soft" type="button" onclick="toggleScriptLibrary()">收起 / 展开</button>
-    </div>
-
-    <div id="scriptLibraryBody">
-      <div class="scriptGrid" id="scriptQuickGrid"></div>
-      <div class="scriptViewer">
-        <div class="scriptTitle" id="scriptTitle">想了解</div>
-        <textarea class="scriptText" id="scriptText" readonly></textarea>
-        <div class="scriptActions">
-          <button class="btn" type="button" onclick="copyCurrentSalesScript()">📋 复制话术</button>
-          <button class="btn soft" type="button" onclick="openGeneralWhatsApp()">💬 打开 WhatsApp</button>
-          <span class="scriptCopyStatus" id="scriptCopyStatus"></span>
-        </div>
-      </div>
-    </div>
-  </div>
+  
 
 
     <div class="card">
@@ -180,6 +159,31 @@ label{display:block;font-weight:900;color:var(--g);margin:13px 0 6px}input,selec
       <div class="pagination"><span id="pageInfo"></span><div id="pageBtns" class="pageBtns"></div></div>
     </div>
   </div>
+
+  <!-- V2.4.1: Sales scripts moved below the student management grid -->
+  <div class="scriptLibrary" id="scriptLibrary">
+    <div class="scriptLibraryHead">
+      <div>
+        <h2>💬 成交话术库</h2>
+        <p>客户回复到哪一步，就点对应按钮。话术会自动出现，再按「复制话术」即可。</p>
+      </div>
+      <button class="btn soft" type="button" onclick="toggleScriptLibrary()">收起 / 展开</button>
+    </div>
+
+    <div id="scriptLibraryBody">
+      <div class="scriptGrid" id="scriptQuickGrid"></div>
+      <div class="scriptViewer">
+        <div class="scriptTitle" id="scriptTitle">想了解</div>
+        <textarea class="scriptText" id="scriptText" readonly></textarea>
+        <div class="scriptActions">
+          <button class="btn" type="button" onclick="copyCurrentSalesScript()">📋 复制话术</button>
+          <button class="btn soft" type="button" onclick="openGeneralWhatsApp()">💬 打开 WhatsApp</button>
+          <span class="scriptCopyStatus" id="scriptCopyStatus"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </section>
 </div>
 
