@@ -1271,4 +1271,68 @@ setTimeout(()=>{const p=new URLSearchParams(location.search),tool=p.get('tool');
 })();
 </script>
 
+
+<style id="v516EditScrollStyle">
+#toolContent .v52Field.on{scroll-margin-top:18px}
+</style>
+<script id="v516EditScrollFix">
+(function(){
+  function showToolView(){
+    if(typeof window.v54ShowView==='function') window.v54ShowView('toolView');
+    else if(typeof window.v53ShowView==='function') window.v53ShowView('toolView');
+    else if(typeof window.show==='function') window.show('toolView');
+  }
+
+  function clearWelcomeHash(){
+    try{
+      if(location.hash==='#welcome'){
+        history.replaceState(null,'',location.pathname+location.search);
+      }
+    }catch(e){}
+  }
+
+  function scrollToEditingQuestion(){
+    const target =
+      document.querySelector('#toolContent .v52Field.on') ||
+      document.querySelector('#toolContent .v52Stepper') ||
+      document.getElementById('toolContent');
+    if(target) target.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+
+  // FINAL edit handler: growth journal -> edit -> actual question area
+  window.editRecord=function(id){
+    const r=(typeof db==='function'?db().records:[]).find(x=>x.id===id);
+    if(!r)return;
+
+    clearWelcomeHash();
+
+    selectedTool=r.tool;
+    editingRecordId=id;
+    moodValue=0;
+    chipValue='';
+    mapValues={};
+
+    if(typeof window.v53RenderToolForm==='function') window.v53RenderToolForm(r);
+    else if(typeof window.renderToolForm==='function') window.renderToolForm(r);
+
+    showToolView();
+
+    // Some older view/cloud code can re-position after rendering.
+    // Re-assert the real edit field after each likely repaint.
+    setTimeout(scrollToEditingQuestion,60);
+    setTimeout(scrollToEditingQuestion,220);
+    setTimeout(scrollToEditingQuestion,600);
+  };
+
+  window.addEventListener('load',()=>{
+    const v=document.getElementById('v53Version');
+    if(v)v.textContent='V5.16 · EDIT SCROLL FIX';
+    const f=document.getElementById('footerText');
+    if(f)f.innerHTML=(typeof LANG!=='undefined'&&LANG==='en')
+      ?'🌱 Planting Happiness | My Happiness Companion · V5.16<br/>A better life can begin with one small decision.'
+      :'🌱 播种幸福｜我的幸福陪伴系统 · V5.16<br/>更好的自己，从一个小小的决定开始。';
+  });
+})();
+</script>
+
 </body></html>
