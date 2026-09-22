@@ -451,6 +451,7 @@ function openToolboxWithReturn(e){
   toolbox.searchParams.set('return', returnUrl);
   toolbox.searchParams.set('lang', CURRENT_LANG);
   toolbox.searchParams.set('entry','course');
+  toolbox.hash='welcome';
   window.location.href=toolbox.href;
 }
 
