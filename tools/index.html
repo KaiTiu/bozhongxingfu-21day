@@ -241,7 +241,8 @@ input:focus,textarea:focus,select:focus{border-color:#91aa8e;box-shadow:0 0 0 3p
   try{
     if('scrollRestoration' in history) history.scrollRestoration='manual';
     const p=new URLSearchParams(location.search);
-    if(p.get('entry')==='course' && !p.get('tool') && !p.get('view')){
+    const fromCourse = p.get('entry')==='course' || p.has('return');
+    if(fromCourse && !p.get('tool') && !p.get('view')){
       window.scrollTo(0,0);
     }
   }catch(e){}
@@ -1113,7 +1114,9 @@ setTimeout(()=>{const p=new URLSearchParams(location.search),tool=p.get('tool');
 <script id="v512StableEntryLanding">
 (function(){
   const params=new URLSearchParams(location.search);
-  const fromCourse=params.get('entry')==='course';
+  let sameOriginReferrer=false;
+  try{ sameOriginReferrer=!!document.referrer && new URL(document.referrer).origin===location.origin; }catch(e){}
+  const fromCourse=params.get('entry')==='course' || params.has('return') || sameOriginReferrer;
   const deepLink=!!params.get('tool') || !!params.get('view');
   if(!fromCourse || deepLink) return;
 
@@ -1175,11 +1178,11 @@ setTimeout(()=>{const p=new URLSearchParams(location.search),tool=p.get('tool');
 
   window.addEventListener('load',()=>{
     const v=document.getElementById('v53Version');
-    if(v)v.textContent='V5.12 · STABLE WELCOME LANDING';
+    if(v)v.textContent='V5.13 · RETURN-AWARE WELCOME LANDING';
     const f=document.getElementById('footerText');
     if(f)f.innerHTML=(typeof LANG!=='undefined'&&LANG==='en')
-      ?'🌱 Planting Happiness | My Happiness Companion · V5.12<br/>A better life can begin with one small decision.'
-      :'🌱 播种幸福｜我的幸福陪伴系统 · V5.12<br/>更好的自己，从一个小小的决定开始。';
+      ?'🌱 Planting Happiness | My Happiness Companion · V5.13<br/>A better life can begin with one small decision.'
+      :'🌱 播种幸福｜我的幸福陪伴系统 · V5.13<br/>更好的自己，从一个小小的决定开始。';
   });
 })();
 </script>
