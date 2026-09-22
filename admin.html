@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>播种幸福｜Admin Dashboard V2</title>
+<title>播种幸福｜Admin Dashboard V2.1</title>
 <style>
 :root{--g:#355a42;--g2:#4e725a;--sage:#e4ede0;--paper:#fffdf8;--cream:#f4f0e7;--ink:#30362f;--muted:#707870;--gold:#bd995c;--line:#dce5d9;--warn:#fff4d7;--danger:#a6473d;--shadow:0 14px 38px rgba(53,90,66,.09)}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:linear-gradient(180deg,#f7f3ea,#edf3e9);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","Noto Sans SC",sans-serif}button,input,select{font:inherit}button{cursor:pointer}.shell{max-width:1480px;margin:auto;padding:18px}.hidden{display:none!important}
@@ -37,7 +37,7 @@ label{display:block;font-weight:900;color:var(--g);margin:13px 0 6px}input,selec
 
 <section id="dashboardView" class="hidden">
   <div class="top">
-    <div><h1>🌱 播种幸福｜学员管理 V2</h1><p>一年制课程 · 自动到期 · 一键续费 · 快速搜索与编辑</p></div>
+    <div><h1>🌱 播种幸福｜学员管理 V2.1</h1><p>一年制课程 · 自动到期 · 一键续费 · 快速搜索与编辑</p></div>
     <div class="topActions"><button class="btn" onclick="refreshMembers()">刷新名单</button><button class="btn" onclick="window.open('./index.html','_blank')">打开课程</button><button class="btn" onclick="adminLogout()">退出</button></div>
   </div>
 
@@ -62,7 +62,15 @@ label{display:block;font-weight:900;color:var(--g);margin:13px 0 6px}input,selec
         <b>临时密码（请复制后交给学员）</b>
         <div id="tempPassword" class="tempCode"></div>
         <div class="muted" id="createdDates"></div>
-        <button class="btn soft" style="margin-top:8px" onclick="copyTempPassword()">复制临时密码</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+          <button class="btn soft" onclick="copyTempPassword()">复制临时密码</button>
+          <button class="btn" onclick="copyWelcomeMessage('zh')">复制中文欢迎讯息</button>
+          <button class="btn light" onclick="copyWelcomeMessage('en')">Copy English Welcome</button>
+        </div>
+        <div class="planBox" style="margin-top:10px">
+          <b>一键欢迎讯息</b>
+          建立学员后，可直接复制完整中文或英文欢迎讯息。系统会自动带入学员姓名、Email、临时密码与课程链接。
+        </div>
         <div class="planBox" style="margin-top:10px">学员第一次登录课程时，会被要求更换自己的新密码，然后才可进入 21 天课程。</div>
       </div>
     </div>
@@ -113,7 +121,7 @@ label{display:block;font-weight:900;color:var(--g);margin:13px 0 6px}input,selec
 const SUPABASE_URL='https://sopjtukcrghvgemdishz.supabase.co';
 const SUPABASE_KEY='sb_publishable_ltqt7kjBSZE-YO3SRnnbxg_uqmt6Ooh';
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
-let MEMBERS=[];let CURRENT_PAGE=1;let CURRENT_EDIT=null;
+let MEMBERS=[];let CURRENT_PAGE=1;let CURRENT_EDIT=null;let LAST_CREATED_MEMBER=null;
 const $=id=>document.getElementById(id);
 function today(){const d=new Date(),o=d.getTimezoneOffset();return new Date(d.getTime()-o*60000).toISOString().slice(0,10)}
 function addYear(ds){if(!ds)return'';const [y,m,d]=ds.split('-').map(Number),ty=y+1,last=new Date(ty,m,0).getDate(),dd=Math.min(d,last);return `${ty}-${String(m).padStart(2,'0')}-${String(dd).padStart(2,'0')}`}
@@ -125,8 +133,94 @@ async function invoke(body){const {data,error}=await sb.functions.invoke('admin-
 async function adminLogin(){setStatus('loginStatus','正在登录…');const email=$('adminEmail').value.trim(),password=$('adminPassword').value;const {data,error}=await sb.auth.signInWithPassword({email,password});if(error||!data?.user){setStatus('loginStatus','登录失败，请检查 Email 与密码。','err');return}try{await refreshMembers();$('loginView').classList.add('hidden');$('dashboardView').classList.remove('hidden')}catch(e){await sb.auth.signOut();setStatus('loginStatus','这个账号不是管理员，或 Admin Function 尚未部署。\n'+e.message,'err')}}
 async function adminLogout(){await sb.auth.signOut();$('dashboardView').classList.add('hidden');$('loginView').classList.remove('hidden')}
 function updateNewExpiryPreview(){const s=$('newStart').value||today();$('newExpiryPreview').textContent=`开始 ${fmt(s)} → 自动到期 ${fmt(addYear(s))}`}
-async function createMember(){const name=$('newName').value.trim(),email=$('newEmail').value.trim().toLowerCase(),start=$('newStart').value||today();if(!email){setStatus('createStatus','请输入 Email。','err');return}setStatus('createStatus','正在建立账号…');$('tempResult').classList.remove('show');try{const r=await invoke({action:'create',display_name:name,email,start_date:start});$('tempPassword').textContent=r.temporary_password;$('createdDates').textContent=`开始：${fmt(r.start_date)} ｜ 到期：${fmt(r.expiry_date)}`;$('tempResult').classList.add('show');setStatus('createStatus','✓ 学员账号与一年课程权限已建立。','ok');$('newName').value='';$('newEmail').value='';await refreshMembers()}catch(e){setStatus('createStatus',e.message,'err')}}
-function copyTempPassword(){navigator.clipboard.writeText($('tempPassword').textContent||'').then(()=>setStatus('createStatus','✓ 临时密码已复制。','ok')).catch(()=>{})}
+async function createMember(){const name=$('newName').value.trim(),email=$('newEmail').value.trim().toLowerCase(),start=$('newStart').value||today();if(!email){setStatus('createStatus','请输入 Email。','err');return}setStatus('createStatus','正在建立账号…');$('tempResult').classList.remove('show');try{const r=await invoke({action:'create',display_name:name,email,start_date:start});LAST_CREATED_MEMBER={display_name:name||email,email,temporary_password:r.temporary_password,start_date:r.start_date,expiry_date:r.expiry_date};$('tempPassword').textContent=r.temporary_password;$('createdDates').textContent=`开始：${fmt(r.start_date)} ｜ 到期：${fmt(r.expiry_date)}`;$('tempResult').classList.add('show');setStatus('createStatus','✓ 学员账号与一年课程权限已建立。','ok');$('newName').value='';$('newEmail').value='';await refreshMembers()}catch(e){LAST_CREATED_MEMBER=null;setStatus('createStatus',e.message,'err')}}
+async function copyText(text){try{await navigator.clipboard.writeText(text);return true}catch(e){try{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.focus();ta.select();const ok=document.execCommand('copy');ta.remove();return ok}catch(_){return false}}}
+function copyTempPassword(){copyText($('tempPassword').textContent||'').then(ok=>setStatus('createStatus',ok?'✓ 临时密码已复制。':'复制失败，请手动复制临时密码。',ok?'ok':'err'))}
+function courseUrl(){return window.location.origin.replace(/\/$/,'')+'/'}
+function buildWelcomeMessage(lang='zh'){
+ const m=LAST_CREATED_MEMBER;if(!m)return'';
+ const name=m.display_name||m.email;
+ const link=courseUrl();
+ if(lang==='en')return `🌱 Welcome to Planting Happiness | 21-Day Happiness Life Practice System
+
+Hi ${name} 😊
+Your course account has been successfully activated.
+
+🔐 Login Details
+
+Course Link:
+${link}
+
+Login Email:
+${m.email}
+
+Temporary Password:
+${m.temporary_password}
+
+When you log in for the first time, please follow the instructions to create your own new password.
+
+For your first visit, follow these steps:
+
+① Log in to the course
+② Read the First-Time User Guide
+③ Set your 21-Day Happiness Goal
+④ Begin DAY 01
+⑤ Complete the small daily practice
+⑥ Use the 13 Happiness Tools whenever you need extra support
+
+Your course progress, reflections and toolbox records will be saved to your account, so you can continue even when using another phone or computer.
+
+🌱 You do not need to change everything at once.
+
+Notice a little, understand a little, and take one small action each day.
+
+We wish you a meaningful 21-day happiness journey. 💚
+
+If you need help logging in or using the course, WhatsApp us at:
+017-748 3191
+
+Planting Happiness | 21-Day Happiness Life Practice System`;
+ return `🌱 欢迎加入《播种幸福｜21天幸福人生实践系统》
+
+你好，${name} 😊
+你的课程账号已经成功开通。
+
+🔐 登录资料
+
+课程链接：
+${link}
+
+登录 Email：
+${m.email}
+
+临时密码：
+${m.temporary_password}
+
+第一次登录后，请按照系统提示设定自己的新密码。
+
+第一次进入课程，请按照这个顺序开始：
+
+① 登录课程
+② 查看第一次使用指南
+③ 写下你的 21天幸福目标
+④ 开始 DAY 01
+⑤ 每天完成当天的小练习
+⑥ 有需要时使用 13项幸福工具箱
+
+你的学习记录、幸福工具记录和成长进度都会跟随你的账号保存，让你以后换手机或电脑也可以继续。
+
+🌱 记住：不用一次改变很多。
+
+每天看见一点、理解一点、行动一点，就是在为自己的生活种下一颗新的种子。
+
+祝你有一个很好的21天幸福旅程。💚
+
+如在登录或使用课程时遇到问题，可以直接 WhatsApp 联系我们：
+017-748 3191
+
+播种幸福｜21天幸福人生实践系统`;
+}
+function copyWelcomeMessage(lang){if(!LAST_CREATED_MEMBER){setStatus('createStatus','请先成功建立学员账号。','err');return}const msg=buildWelcomeMessage(lang);copyText(msg).then(ok=>setStatus('createStatus',ok?(lang==='en'?'✓ English welcome message copied.':'✓ 中文欢迎讯息已复制。'):'复制失败，请手动复制。',ok?'ok':'err'))}
 async function refreshMembers(){setStatus('listStatus','正在读取…');try{const r=await invoke({action:'list'});MEMBERS=r.members||[];setStatus('listStatus','');CURRENT_PAGE=1;renderAll()}catch(e){setStatus('listStatus',e.message,'err');throw e}}
 function effectiveStatus(m){const t=today();if(m.expiry_date&&m.expiry_date<t)return'expired';return m.status||'inactive'}
 function isSoon(m){const st=effectiveStatus(m);if(st!=='active'||!m.expiry_date)return false;const d=daysBetween(today(),m.expiry_date);return d>=0&&d<=30}
