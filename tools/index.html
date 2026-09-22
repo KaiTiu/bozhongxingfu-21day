@@ -235,6 +235,19 @@ input:focus,textarea:focus,select:focus{border-color:#91aa8e;box-shadow:0 0 0 3p
 @media(max-width:650px){.v5HistoryTools{grid-template-columns:1fr}.v5CompanionActions{flex-direction:column}.v5CompanionActions button{width:100%}.v5CloudBar{align-items:stretch}.v5CloudBar button{flex:1}.v5CloudPill{justify-content:center;width:100%}}
 </style>
 
+
+<script id="v512EarlyScrollControl">
+(function(){
+  try{
+    if('scrollRestoration' in history) history.scrollRestoration='manual';
+    const p=new URLSearchParams(location.search);
+    if(p.get('entry')==='course' && !p.get('tool') && !p.get('view')){
+      window.scrollTo(0,0);
+    }
+  }catch(e){}
+})();
+</script>
+
 </head>
 <body>
 <div class="app">
@@ -986,7 +999,7 @@ setTimeout(()=>{const p=new URLSearchParams(location.search),tool=p.get('tool');
   try{ if('scrollRestoration' in history) history.scrollRestoration='manual'; }catch(e){}
 
   const params=new URLSearchParams(location.search);
-  const normalEntry=!params.get('tool') && !params.get('view');
+  const normalEntry=false; // superseded by V5.12 stable entry landing
   if(!normalEntry) return;
 
   let landed=false;
@@ -1089,6 +1102,84 @@ setTimeout(()=>{const p=new URLSearchParams(location.search),tool=p.get('tool');
     if(f)f.innerHTML=(typeof LANG!=='undefined'&&LANG==='en')
       ?'🌱 Planting Happiness | My Happiness Companion · V5.11<br/>A better life can begin with one small decision.'
       :'🌱 播种幸福｜我的幸福陪伴系统 · V5.11<br/>更好的自己，从一个小小的决定开始。';
+  });
+})();
+</script>
+
+
+<style id="v512WelcomeLandingStyle">
+.v51CompanionTop{scroll-margin-top:14px}
+</style>
+<script id="v512StableEntryLanding">
+(function(){
+  const params=new URLSearchParams(location.search);
+  const fromCourse=params.get('entry')==='course';
+  const deepLink=!!params.get('tool') || !!params.get('view');
+  if(!fromCourse || deepLink) return;
+
+  try{ if('scrollRestoration' in history) history.scrollRestoration='manual'; }catch(e){}
+
+  let userInteracted=false;
+  const markInteraction=()=>{ userInteracted=true; };
+  ['pointerdown','touchstart','wheel','keydown'].forEach(evt=>{
+    window.addEventListener(evt,markInteraction,{once:true,passive:true});
+  });
+
+  function target(){
+    return document.querySelector('.v51CompanionTop') || document.getElementById('v5Companion');
+  }
+
+  function land(force=false){
+    if(userInteracted && !force) return;
+    const el=target();
+    if(!el) return;
+    const y=Math.max(0, el.getBoundingClientRect().top + window.pageYOffset - 12);
+    window.scrollTo({top:y,left:0,behavior:'auto'});
+  }
+
+  // Start at the top immediately so old /tools/ browser position is never reused.
+  window.scrollTo(0,0);
+
+  // Re-assert the correct landing while the cloud session and "Welcome back" card are rendering.
+  [0,80,220,450,800,1300].forEach(ms=>setTimeout(()=>land(false),ms));
+
+  window.addEventListener('pageshow',()=>{
+    if(!userInteracted){
+      window.scrollTo(0,0);
+      setTimeout(()=>land(false),60);
+      setTimeout(()=>land(false),300);
+    }
+  });
+
+  window.addEventListener('load',()=>{
+    if(!userInteracted){
+      setTimeout(()=>land(false),40);
+      setTimeout(()=>land(false),500);
+    }
+  });
+
+  // Cloud sync can repaint the companion card after page load.
+  const box=document.getElementById('v5Companion');
+  if(box && 'MutationObserver' in window){
+    const obs=new MutationObserver(()=>{
+      const t=(box.textContent||'').trim();
+      if(!userInteracted && (t.includes('欢迎回来') || t.includes('Welcome back'))){
+        setTimeout(()=>land(true),30);
+        setTimeout(()=>land(false),180);
+        obs.disconnect();
+      }
+    });
+    obs.observe(box,{childList:true,subtree:true,characterData:true});
+    setTimeout(()=>obs.disconnect(),3500);
+  }
+
+  window.addEventListener('load',()=>{
+    const v=document.getElementById('v53Version');
+    if(v)v.textContent='V5.12 · STABLE WELCOME LANDING';
+    const f=document.getElementById('footerText');
+    if(f)f.innerHTML=(typeof LANG!=='undefined'&&LANG==='en')
+      ?'🌱 Planting Happiness | My Happiness Companion · V5.12<br/>A better life can begin with one small decision.'
+      :'🌱 播种幸福｜我的幸福陪伴系统 · V5.12<br/>更好的自己，从一个小小的决定开始。';
   });
 })();
 </script>
