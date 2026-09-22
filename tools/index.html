@@ -1,1 +1,870 @@
+<!DOCTYPE html>
 
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
+<meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
+<meta content="#355a42" name="theme-color"/>
+<!-- V5.7 same-origin integrated toolbox / shared member session -->
+<title>播种幸福｜我的幸福陪伴系统 V5.5</title>
+<style>
+:root{
+  --bg:#f6f1e7;--card:#fffdf8;--green:#355a42;--green2:#54735d;--sage:#dfe9db;
+  --sage2:#edf3ea;--ink:#2f342f;--muted:#7d827a;--gold:#c5a46a;--line:#dfe7dc;
+  --warn:#fff7e8;--danger:#9d5151;--shadow:0 14px 36px rgba(53,90,66,.09)
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","Noto Sans SC",sans-serif;
+  color:var(--ink);background:
+  radial-gradient(circle at 92% 0%,rgba(197,164,106,.12),transparent 24%),
+  linear-gradient(180deg,#faf6ee,#edf3e9)
+}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+.app{max-width:1100px;margin:auto;padding:16px 12px 44px}
+.hero{position:relative;overflow:hidden;background:linear-gradient(145deg,#355a42,#4d7057);color:#fff;border-radius:28px;padding:28px 24px;box-shadow:0 20px 55px rgba(53,90,66,.15)}
+.hero:after{content:"🌿";position:absolute;right:-10px;bottom:-28px;font-size:150px;opacity:.08;transform:rotate(-10deg)}
+.eyebrow{font-size:13px;font-weight:900;letter-spacing:1px;color:#e6f0e2}
+.hero h1{font-size:38px;line-height:1.18;margin:8px 0 10px}
+.hero p{margin:0;line-height:1.7;color:#edf5eb;max-width:760px}
+.top-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:17px}
+.top-actions button{border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.10);color:#fff;border-radius:999px;padding:8px 11px;font-size:12px;font-weight:800}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}
+.stat{background:#fff;border:1px solid var(--line);border-radius:17px;padding:14px 8px;text-align:center;box-shadow:0 8px 20px rgba(53,90,66,.05)}
+.stat strong{display:block;color:var(--green);font-size:24px}
+.stat small{color:var(--muted);font-size:11px}
+.nav{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:14px 0}
+.nav button{border:0;background:#fff;color:var(--green);border-radius:13px;padding:11px 8px;font-weight:900;box-shadow:0 7px 18px rgba(53,90,66,.05)}
+.nav button.active{background:var(--green);color:#fff}
+.view{display:none}.view.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:20px 17px;margin:13px 0;box-shadow:var(--shadow)}
+.card h2{margin:0;color:var(--green);font-size:23px}
+.sub{color:var(--muted);font-size:14px;line-height:1.55;margin-top:5px;margin-bottom:16px}
+.toolgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.tool{background:#fff;border:1px solid var(--line);border-radius:20px;padding:16px;box-shadow:0 8px 22px rgba(53,90,66,.05)}
+.tooltop{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.num{display:inline-flex;width:34px;height:34px;align-items:center;justify-content:center;border-radius:50%;background:var(--sage);color:var(--green);font-weight:900}
+.tool .icon{font-size:30px;margin:10px 0 6px}
+.tool h3{margin:0;color:var(--green);font-size:18px}
+.tool p{margin:6px 0 0;color:var(--muted);font-size:13px;line-height:1.5}
+.btn{border:0;border-radius:13px;padding:11px 13px;font-weight:900}
+.primary{background:var(--green);color:#fff}
+.secondary{background:var(--sage);color:var(--green)}
+.ghost{background:#fff;border:1px solid var(--line);color:var(--green)}
+.danger{background:#f6e8e8;color:var(--danger)}
+.btnrow{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px}
+label{display:block;font-weight:900;color:var(--green);margin:15px 0 7px}
+input,textarea,select{width:100%;border:1.5px solid #dbe5d8;background:#fff;color:var(--ink);border-radius:14px;padding:12px 13px;outline:none}
+textarea{min-height:86px;resize:vertical;line-height:1.55}
+input:focus,textarea:focus,select:focus{border-color:#91aa8e;box-shadow:0 0 0 3px rgba(84,115,93,.10)}
+.moods{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
+.mood{border:1px solid var(--line);background:#fff;border-radius:12px;padding:9px 2px;text-align:center}
+.mood.sel{background:var(--sage);border-color:#8fa88d}
+.mood span{display:block;font-size:23px}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{border:1px solid var(--line);background:#fff;color:var(--green);border-radius:999px;padding:8px 10px;font-weight:800;font-size:12px}
+.chip.sel{background:var(--sage);border-color:#91a98f}
+.entry{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;margin:10px 0}
+.entryhead{display:flex;justify-content:space-between;gap:10px}
+.entrydate{font-weight:900;color:var(--green)}
+.entrymeta{font-size:12px;color:var(--muted)}
+.entry h4{font-size:13px;color:var(--green);margin:11px 0 3px}
+.entry p{margin:0;line-height:1.55;white-space:pre-wrap}
+.smallactions{display:flex;gap:7px;margin-top:11px}
+.small{border:0;border-radius:9px;padding:7px 9px;font-size:11px;font-weight:800}.small.edit{background:var(--sage2);color:var(--green)}
+.empty{text-align:center;color:var(--muted);padding:24px 6px}
+.progress{height:10px;background:#e8eee5;border-radius:999px;overflow:hidden;margin-top:8px}
+.progress>div{height:100%;background:linear-gradient(90deg,var(--green),#79957e)}
+.progressrow{margin:12px 0}
+.progresshead{display:flex;justify-content:space-between;color:var(--green);font-weight:800}
+.garden{background:linear-gradient(180deg,#f7fbf4 0%,#edf5e8 54%,#e6d7bc 55%,#dcc9a7 100%);border:1px solid #dfe8da;border-radius:22px;padding:18px}
+.gardengrid{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;margin-top:12px}
+.plot{min-height:62px;background:rgba(255,255,255,.65);border:1px solid rgba(53,90,66,.10);border-radius:12px;text-align:center;padding:8px 2px}
+.plot .plant{font-size:25px}.plot .day{font-size:9px;color:var(--muted);margin-top:3px}
+.gardenmsg{background:rgba(255,255,255,.68);border-radius:14px;padding:12px;color:var(--green);font-weight:800;line-height:1.5}.stagelegend{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.stageitem{background:rgba(255,255,255,.74);border:1px solid rgba(53,90,66,.10);border-radius:12px;padding:10px;text-align:center;font-size:12px;color:var(--green);font-weight:800}.stageitem span{display:block;font-size:23px;margin-bottom:3px}@media(max-width:600px){.stagelegend{grid-template-columns:repeat(2,1fr)}}
+.rangegrid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
+.rangebtn{border:1px solid var(--line);background:#fff;border-radius:11px;padding:10px 3px;color:var(--green);font-weight:800}
+.rangebtn.sel{background:var(--sage)}
+.mapgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.mapcell{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 8px;text-align:center}
+.mapcell strong{display:block;color:var(--green);font-size:20px}
+.certificate{border:10px double #d8c49a;background:#fffdf7;border-radius:10px;padding:32px 24px;text-align:center}
+.certificate .cbrand{color:var(--green);font-weight:900}
+.certificate h2{font-size:34px;margin:13px 0;color:var(--green)}
+.certificate .name{font-size:28px;font-weight:900;border-bottom:1px solid #cdb98f;display:inline-block;padding:6px 30px;margin:12px 0}
+.certificate p{line-height:1.8;color:#5f655f}
+.notice{background:var(--warn);border:1px solid #ead9b7;border-radius:15px;padding:13px 14px;color:#6d614e;font-size:13px;line-height:1.55}
+.status{min-height:20px;color:var(--green);font-weight:800;font-size:13px;margin-top:9px}
+.footer{text-align:center;color:var(--muted);font-size:12px;line-height:1.6;margin-top:25px}
+@media(max-width:760px){
+  .hero h1{font-size:31px}.stats{grid-template-columns:repeat(2,1fr)}
+  .nav{grid-template-columns:repeat(3,1fr)}.toolgrid{grid-template-columns:1fr}
+  .gardengrid{grid-template-columns:repeat(5,1fr)}.mapgrid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:480px){.rangegrid{grid-template-columns:repeat(5,1fr)}.hero{padding:24px 19px}}
+
+.scenario-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.scenario-card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:16px;box-shadow:0 8px 22px rgba(53,90,66,.05)}
+.scenario-card h3{margin:0;color:var(--green);font-size:18px}
+.scenario-card p{color:var(--muted);font-size:13px;line-height:1.55}
+.scenario-card .sym{font-size:28px;margin-bottom:8px}
+.guidebox{background:linear-gradient(135deg,#fffdf8,#edf4e9);border:1px solid var(--line);border-radius:20px;padding:18px;margin-top:14px}
+.guidebox h3{margin:0 0 8px;color:var(--green)}
+.questions{margin:10px 0 0;padding-left:20px;color:var(--ink);line-height:1.8}
+.recommend{margin-top:14px;padding:13px 14px;border-radius:15px;background:var(--sage);color:var(--green);font-weight:900}
+@media(max-width:760px){.scenario-grid{grid-template-columns:1fr}}
+
+@media print{
+  body{background:#fff}.hero,.nav,.top-actions,.stats,.btnrow,.notice,.footer,.toolgrid,.status{display:none!important}
+  .app{max-width:none;padding:0}.view{display:none!important}#certificateView{display:block!important}
+  .card{box-shadow:none;border:none}.certificate{margin-top:40px}
+}
+
+/* Return to 21-day course */
+.return-course-btn{
+  background:#fff!important;
+  color:var(--green)!important;
+  border:1px solid rgba(255,255,255,.55)!important;
+  box-shadow:0 7px 18px rgba(0,0,0,.10);
+}
+@media(max-width:600px){
+  .return-course-btn{
+    width:100%;
+    padding:12px 14px!important;
+    font-size:14px!important;
+    margin-bottom:3px;
+  }
+}
+
+/* ===== V5.2 guided, non-empty tool experience ===== */
+.v52Intro{background:linear-gradient(145deg,#f8fbf5,#fffaf1);border:1px solid var(--line);border-radius:18px;padding:16px;margin:14px 0}
+.v52Intro h3{margin:0 0 7px;color:var(--green);font-size:18px}.v52Intro p{margin:0;line-height:1.65;color:#566158}
+.v52Past{background:#fff;border:1px solid var(--line);border-radius:18px;padding:15px;margin:14px 0}.v52PastTop{display:flex;align-items:center;justify-content:space-between;gap:10px}.v52Past h3{margin:0;color:var(--green);font-size:17px}.v52PastList{display:grid;gap:9px;margin-top:10px}.v52PastItem{background:var(--sage2);border-radius:13px;padding:11px}.v52PastItem b{display:block;color:var(--green);font-size:12px;margin-bottom:4px}.v52PastItem p{margin:0;line-height:1.55}.v52PastSeed{margin-top:6px;color:#47644f;font-size:12px}.v52Empty{font-size:13px;color:var(--muted);line-height:1.55;margin-top:9px}
+.v52Example{background:#fff7e8;border:1px solid #ead9b7;border-radius:18px;padding:15px;margin:14px 0}.v52Example h3{margin:0 0 7px;color:#6f5b36;font-size:17px}.v52Example p{margin:0 0 8px;line-height:1.6}.v52Example details{margin-top:8px}.v52Example summary{cursor:pointer;font-weight:800;color:#6f5b36}
+.v52Stepper{margin-top:16px}.v52StepHead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}.v52StepHead strong{color:var(--green)}.v52StepDots{display:flex;gap:5px;flex-wrap:wrap}.v52Dot{width:8px;height:8px;border-radius:999px;background:#d8e0d5}.v52Dot.on{width:20px;background:var(--green)}
+.v52Field{display:none;background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px}.v52Field.on{display:block}.v52Field>label{display:block;font-weight:900;color:var(--green);font-size:18px;line-height:1.45;margin:0 0 9px}.v52Hint{font-size:12px;color:var(--muted);margin:-2px 0 10px;line-height:1.55}
+.v52Field textarea{min-height:82px!important;height:82px;resize:vertical}.v52Field input[type=text]{min-height:46px}.v52Nav{display:flex;gap:8px;justify-content:space-between;margin-top:12px;flex-wrap:wrap}.v52Nav .btn{min-width:120px}.v52SaveRow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.v52DateRow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 4px}.v52DateRow label{font-weight:800;color:var(--green)}.v52DateRow input{max-width:210px}
+.v52ReviewLink{border:0;background:transparent;color:var(--green);font-weight:900;text-decoration:underline;padding:0;cursor:pointer}
+@media(max-width:600px){.v52Field{padding:14px}.v52Field>label{font-size:17px}.v52Field textarea{min-height:74px!important;height:74px}.v52Nav .btn{flex:1;min-width:0}.v52PastTop{align-items:flex-start;flex-direction:column}}
+
+
+.v53Version{display:inline-flex;margin-top:10px;padding:5px 9px;border-radius:999px;background:#ffffff18;border:1px solid #ffffff33;color:#fff;font-size:11px;font-weight:900;letter-spacing:.4px}
+.v53ToolNav{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}.v53ToolNav .btn{flex:0 0 auto}
+.v53NavNotice{background:#edf3ea;border:1px solid #dbe7d8;border-radius:14px;padding:11px 13px;margin:10px 0 14px;color:#355a42;font-size:13px;line-height:1.55}
+@media(max-width:600px){.v53ToolNav{display:grid;grid-template-columns:1fr 1fr}.v53ToolNav .btn{width:100%}}
+
+#needNowTitle{scroll-margin-top:18px}
+</style>
+
+<style>
+.lang-switch{display:inline-flex;gap:4px;background:rgba(255,255,255,.12);padding:4px;border-radius:999px}
+.lang-switch button{margin:0!important;background:transparent!important;border:0!important;padding:7px 10px!important}
+.lang-switch button.active{background:#fff!important;color:var(--green)!important}
+@media(max-width:600px){.lang-switch{width:100%;justify-content:center}.lang-switch button{flex:1}}
+</style>
+
+<style>
+/* ===== V4 LIFE COACH UPGRADE ===== */
+.assistantEntry{background:linear-gradient(145deg,#f4f8f1,#fffdf8);border:1px solid var(--line);border-radius:20px;padding:17px;margin:0 0 16px}.assistantEntry h3{margin:0;color:var(--green);font-size:20px}.assistantEntry p{color:var(--muted);line-height:1.6;margin:6px 0 12px}.needGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.needBtn{border:1px solid var(--line);background:#fff;border-radius:13px;padding:11px;text-align:left;color:var(--green);font-weight:800;cursor:pointer}.needBtn:hover{background:var(--sage2)}
+.coachResult{display:none;margin-top:14px;background:linear-gradient(145deg,#eef5ea,#fff);border-left:5px solid var(--green);border-radius:15px;padding:15px;line-height:1.7}.coachResult.show{display:block}.coachResult h4{margin:0 0 7px;color:var(--green)}.coachResult .coachAction{margin-top:10px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px}.coachResult .coachAction b{color:var(--green)}
+.followCard{display:none;background:linear-gradient(145deg,#355a42,#52715b);color:#fff;border-radius:18px;padding:16px;margin-bottom:16px}.followCard.show{display:block}.followCard h3{margin:0 0 6px}.followCard p{line-height:1.65;color:#edf5eb}.followAction{background:#ffffff13;border:1px solid #ffffff2b;border-radius:12px;padding:11px;margin:10px 0}.followBtns{display:flex;gap:8px;flex-wrap:wrap}.followBtns button{flex:1;min-width:120px;border:0;border-radius:12px;padding:10px;font-weight:900}.followFeedback{display:none;margin-top:10px;background:#fff;color:var(--ink);border-radius:12px;padding:12px;line-height:1.65}.followFeedback.show{display:block}.toolTip{background:#fff8e9;border:1px solid #ead9b7;border-radius:13px;padding:11px 12px;color:#6d614e;line-height:1.6;margin-top:10px}
+@media(max-width:650px){.needGrid{grid-template-columns:1fr}.followBtns{flex-direction:column}.followBtns button{width:100%}}
+</style>
+
+<style>
+/* ===== V5.2 VISIBLE COMPANION EXPERIENCE ===== */
+.v51CompanionTop{max-width:1100px;margin:14px auto 0;padding:0 0}.v51CompanionTop .v5Companion{margin:0;border:1px solid #cddbc9;background:linear-gradient(145deg,#fffdf8,#edf5e9);box-shadow:0 12px 30px rgba(53,90,66,.08)}
+.v51Why{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:12px 0 0}.v51Why>div{background:#fff;border:1px solid var(--line);border-radius:15px;padding:12px}.v51Why b{display:block;color:var(--green);margin-bottom:4px}.v51Why span{font-size:12px;line-height:1.5;color:var(--muted)}
+.v51SectionTitle{margin:18px 0 7px;color:var(--green);font-size:15px;font-weight:900}.v51ToolDivider{margin:20px 0 8px;border-top:1px dashed #cfdacb;padding-top:16px;color:var(--green);font-size:13px;font-weight:900}
+@media(max-width:700px){.v51CompanionTop{padding:0 12px}.v51Why{grid-template-columns:1fr}.v51CompanionTop .v5Companion{border-radius:20px}}
+/* ===== V5 MY HAPPINESS COMPANION ===== */
+.v5CloudBar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}.v5CloudPill{display:inline-flex;align-items:center;gap:6px;background:#ffffff18;border:1px solid #ffffff33;border-radius:999px;padding:7px 10px;font-size:12px;font-weight:800}.v5CloudPill.local{background:#fff;color:var(--green)}
+.v5Companion{background:linear-gradient(145deg,#355a42,#587660);color:#fff;border-radius:22px;padding:19px;margin:0 0 16px;box-shadow:0 14px 32px rgba(53,90,66,.14)}.v5Companion h3{margin:0 0 5px;font-size:21px}.v5Companion p{color:#edf5eb;line-height:1.65;margin:6px 0}.v5Companion .v5Last{background:#ffffff12;border:1px solid #ffffff24;border-radius:15px;padding:13px;margin:12px 0}.v5Companion .v5Label{font-size:11px;letter-spacing:.7px;font-weight:900;opacity:.78}.v5Companion .v5Quote{font-size:15px;line-height:1.65;font-weight:800;margin-top:4px}.v5Companion .v5Seed{background:#fff;color:var(--ink);border-radius:14px;padding:12px;margin-top:10px}.v5Companion .v5Seed b{color:var(--green)}.v5CompanionActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.v5CompanionActions button{border:0;border-radius:12px;padding:10px 12px;font-weight:900}.v5CompanionActions .main{background:#fff;color:var(--green)}.v5CompanionActions .alt{background:#ffffff16;color:#fff;border:1px solid #ffffff35}
+#coachFollowUp{display:none!important}
+.v5Example{background:linear-gradient(145deg,#f7f9f5,#fffaf1);border:1px solid var(--line);border-radius:18px;padding:15px;margin:14px 0}.v5Example h3{margin:0;color:var(--green);font-size:18px}.v5Example p{line-height:1.65;color:#5f675f}.v5Example .v5Story{background:#fff;border-radius:13px;padding:12px;margin-top:10px;border-left:4px solid var(--gold)}.v5Example .v5Breakdown{background:var(--sage2);border-radius:13px;padding:12px;margin-top:10px;line-height:1.65}.v5Example details{margin-top:10px}.v5Example summary{cursor:pointer;font-weight:900;color:var(--green)}
+.v5Past{border:1px solid var(--line);border-radius:18px;padding:14px;margin:14px 0;background:#fff}.v5PastHead{display:flex;justify-content:space-between;gap:8px;align-items:center}.v5Past h3{margin:0;color:var(--green);font-size:17px}.v5PastItem{border-top:1px solid var(--line);padding:11px 0}.v5PastItem:first-of-type{border-top:0}.v5PastDate{font-size:12px;color:var(--muted);font-weight:800}.v5PastText{margin-top:4px;line-height:1.55}.v5PastSeed{margin-top:6px;color:var(--green);font-weight:800;font-size:13px}
+.v5HistoryTools{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:13px 0}.v5HistoryTools select,.v5HistoryTools input{margin:0}.v5Timeline{position:relative}.v5HistoryCard{background:#fff;border:1px solid var(--line);border-radius:18px;padding:15px;margin:11px 0;box-shadow:0 7px 18px rgba(53,90,66,.04)}.v5HistoryTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.v5HistoryTop h3{margin:0;color:var(--green);font-size:17px}.v5HistoryDate{font-size:12px;color:var(--muted);white-space:nowrap}.v5HistorySummary{background:var(--sage2);border-radius:13px;padding:11px;margin:10px 0;line-height:1.65}.v5HistorySeed{border-left:4px solid var(--green);padding:8px 10px;margin:8px 0;background:#f8fbf6}.v5FollowStatus{display:inline-block;border-radius:999px;padding:5px 8px;background:#f2f5ef;color:var(--green);font-size:11px;font-weight:900}.v5HistoryCard details{margin-top:10px}.v5HistoryCard summary{cursor:pointer;font-weight:900;color:var(--green)}
+.v5AuthModal{position:fixed;inset:0;background:#1732268a;display:none;align-items:center;justify-content:center;padding:18px;z-index:20000}.v5AuthModal.show{display:flex}.v5AuthCard{width:min(480px,96vw);background:#fff;border-radius:22px;padding:20px;box-shadow:0 24px 70px #0004}.v5AuthCard h2{margin:0;color:var(--green)}.v5AuthCard p{color:var(--muted);line-height:1.6}.v5AuthStatus{min-height:20px;margin-top:10px;color:var(--green);font-weight:800}.v5Close{float:right;border:0;background:#eef3eb;border-radius:50%;width:34px;height:34px;font-size:20px;color:var(--green)}
+@media(max-width:650px){.v5HistoryTools{grid-template-columns:1fr}.v5CompanionActions{flex-direction:column}.v5CompanionActions button{width:100%}.v5CloudBar{align-items:stretch}.v5CloudBar button{flex:1}.v5CloudPill{justify-content:center;width:100%}}
+</style>
+
+</head>
+<body>
+<div class="app">
+<section class="hero">
+  <div class="eyebrow" id="brandText">🌱 播种幸福</div>
+  <h1 id="heroTitle">13项幸福人生工具箱</h1>
+  <p id="heroLead">把知道的，慢慢变成生活。每次只做一个小练习，也是在为自己种下一颗幸福种子。</p>
+  <div class="top-actions">
+    <div class="lang-switch"><button id="langZh" onclick="setLanguage('zh')">中文</button><button id="langEn" onclick="setLanguage('en')">English</button></div>
+    <button id="v5CloudBtn" onclick="v5OpenAuth()">☁️ 自动同步</button>
+    <button class="return-course-btn" id="returnCourseBtn" onclick="returnToCourse()">← 回到21天课程</button>
+    <button id="guideBtn" onclick="openGuide()">❓ 第一次使用？查看指南</button>
+    <button id="exportAll">⬇️ 导出全部备份</button>
+    <button id="importBackup">⬆️ 恢复备份</button>
+    <input accept=".json,application/json" id="backupFile" style="display:none" type="file"/>
+    <button id="resetAll">🧹 清除当前资料</button>
+  </div>
+  <div class="v5CloudBar"><span class="v5CloudPill local" id="v5CloudStatus">⏳ 正在读取课程账号…</span></div><div class="v53Version" id="v53Version">V5.5 · TOOL OPEN FIX + GUIDED HISTORY</div>
+</section>
+<section class="v51CompanionTop"><div class="v5Companion" id="v5Companion"></div></section>
+<div class="stats">
+  <div class="stat"><strong id="statDays">0</strong><small id="statDaysLabel">实践天数</small></div>
+  <div class="stat"><strong id="statStreak">0</strong><small id="statStreakLabel">连续天数</small></div>
+  <div class="stat"><strong id="statRecords">0</strong><small id="statRecordsLabel">总记录数</small></div>
+  <div class="stat"><strong id="statGarden">土壤</strong><small id="statGardenLabel">幸福花园</small></div>
+</div>
+<div class="nav">
+  <button class="active" data-view="homeView" id="navHome">🏠 工具首页</button>
+  <button data-view="scenarioView" id="navScenario">🧭 我现在需要什么？</button>
+  <button data-view="progressView" id="navProgress">📊 我的进度</button>
+  <button data-view="gardenView" id="navGarden">🌷 幸福花园</button>
+  <button data-view="historyView" id="navHistory">📚 全部记录</button>
+  <button data-view="certificateView" id="navCert">🏆 完成证书</button>
+</div>
+<section class="view active" id="homeView"><div class="card"><h2 id="homeTitle">🧰 选择今天最需要的工具</h2><div class="sub" id="homeSub">不需要一次做完13项。点击任何一个工具就可以直接开始。</div><div class="followCard" id="coachFollowUp"></div><div class="assistantEntry"><h3 id="needNowTitle">今天发生什么了？</h3><p id="needNowLead">不用先研究13个工具。先选最接近你现在的情况，我会直接带你去适合的练习。</p><div class="needGrid" id="needQuickGrid"></div></div><div class="v51ToolDivider" id="v51AllToolsTitle">如果你已经知道自己需要什么，也可以直接选择工具：</div><div class="toolgrid" id="toolGrid"></div></div></section>
+<section class="view" id="scenarioView"><div class="card"><h2 id="scenarioTitle">🧭 我现在最需要什么帮助？</h2><div class="sub" id="scenarioSub">如果你不知道该使用哪一个工具，可以先从现在的状态开始。选择最接近你目前情况的一项。</div><div class="scenario-grid" id="scenarioCards"></div><div id="scenarioGuide"></div></div></section>
+<section class="view" id="toolView"><div class="card"><div class="v53ToolNav"><button class="btn ghost" id="backHome" type="button" onclick="v53GoHome()">← 工具首页</button><button class="btn secondary" id="v53HistoryBtn" type="button" onclick="v53GoHistory()">📖 我的成长记录</button></div><div class="v53NavNotice" id="v53NavNotice">如果你以前用过这个工具，旧记录会显示在下面的「以前的我写过什么？」；登录会员账号后，也会从云端带回来。</div><div id="toolContent"></div></div></section>
+<section class="view" id="progressView"><div class="card"><h2 id="progressTitle">📊 我的幸福进度</h2><div class="sub" id="progressSub">不是追求完美，而是看见自己愿意持续的每一天。</div>
+  <div class="progressrow"><div class="progresshead"><span id="p7Label">🌱 7天幸福挑战</span><span id="p7t">0 / 7</span></div><div class="progress"><div id="p7b" style="width:0"></div></div></div>
+  <div class="progressrow"><div class="progresshead"><span id="p21Label">🌿 21天幸福实践</span><span id="p21t">0 / 21</span></div><div class="progress"><div id="p21b" style="width:0"></div></div></div>
+  <div class="progressrow"><div class="progresshead"><span id="p30Label">🌳 30天幸福习惯</span><span id="p30t">0 / 30</span></div><div class="progress"><div id="p30b" style="width:0"></div></div></div>
+  <div class="notice" id="progressMsg"></div></div></section>
+<section class="view" id="gardenView"><div class="card"><h2 id="gardenTitle">🌷 我的幸福花园</h2><div class="sub" id="gardenSub">任何工具只要完成并保存，当天就会算作一个实践日。一天最多计算一次。</div><div class="garden"><div class="gardenmsg" id="gardenMsg"></div><div class="stagelegend" id="stageLegend"></div><div class="gardengrid" id="gardenGrid"></div></div></div></section>
+<section class="view" id="historyView"><div class="card"><h2 id="historyTitle">📚 全部幸福记录</h2><div class="sub" id="historySub">这里会汇总你使用13项工具保存过的记录。</div><div class="notice" id="historyNotice" style="margin:12px 0"></div><div class="v5HistoryTools"><select id="v5HistoryFilter"></select><input id="v5HistorySearch" type="search" placeholder="搜索以前写过的内容…"></div><div id="allHistory" class="v5Timeline"></div></div></section>
+<section class="view" id="certificateView"><div class="card"><h2 id="certTitle">🏆 21天完成证书</h2><div class="sub" id="certSub">满21个不同实践日后，可以正式生成自己的完成证书。未满21天也可以预览样式。</div><label id="certNameLabel">学员姓名</label><input id="certName" placeholder="请输入姓名"/><div class="btnrow"><button class="btn primary" id="buildCert">生成 / 更新证书</button><button class="btn secondary" id="printCert">打印 / 存成 PDF</button></div><div class="status" id="certStatus"></div><div id="certificateBox" style="margin-top:16px"></div></div></section>
+<div class="footer" id="footerText">🌱 播种幸福｜我的幸福陪伴系统 · V5.5<br/>更好的自己，从一个小小的决定开始。</div>
+</div>
+
+<div class="v5AuthModal" id="v5AuthModal" role="dialog" aria-modal="true">
+  <div class="v5AuthCard">
+    <button class="v5Close" onclick="v5CloseAuth()">×</button>
+    <h2 id="v5AuthTitle">☁️ 会员登录与云端同步</h2>
+    <p id="v5AuthLead">使用与《播种幸福》21天课程相同的会员 Email 和密码。登录后，这13项工具的记录会跟着你的账号，在不同设备继续使用。</p>
+    <label id="v5EmailLabel">Email</label><input id="v5Email" type="email" autocomplete="email" placeholder="you@example.com">
+    <label id="v5PasswordLabel">密码</label><input id="v5Password" type="password" autocomplete="current-password" placeholder="••••••••">
+    <div class="btnrow"><button class="btn primary" id="v5LoginBtn" onclick="v5Login()">登录并同步</button><button class="btn secondary" id="v5LogoutBtn" onclick="v5Logout()" style="display:none">退出云端账号</button></div>
+    <div class="v5AuthStatus" id="v5AuthMessage"></div>
+  </div>
+</div>
+<script>
+const KEY='bozhongxingfu_13tools_v1';
+const LANG_KEY='bozhongxingfu_lang';
+const $=id=>document.getElementById(id);
+let LANG=(new URLSearchParams(location.search).get('lang')||localStorage.getItem(LANG_KEY)||'zh').toLowerCase()==='en'?'en':'zh';
+const bi=(zh,en)=>({zh,en});
+const L=x=>typeof x==='string'?x:(x?.[LANG]??x?.zh??'');
+const UI={
+ brand:bi('🌱 播种幸福','🌱 Planting Happiness'),
+ heroTitle:bi('我的幸福陪伴系统','My Happiness Companion'),
+ heroLead:bi('这不是13张要做完的表格。生活发生事情时，系统帮你看清发生了什么、记得你以前写过什么，并陪你走出一个下一小步。','These are not 13 forms to complete. When life happens, the system helps you make sense of what is happening, remembers what you wrote before, and guides you toward one useful next step.'),
+ returnCourse:bi('← 回到21天课程','← Back to 21-Day Course'), guide:bi('❓ 第一次使用？查看指南','❓ First time here? View Guide'), export:bi('⬇️ 导出全部备份','⬇️ Export Backup'), import:bi('⬆️ 恢复备份','⬆️ Restore Backup'), reset:bi('🧹 清除当前资料','🧹 Clear Current Data'),
+ practiceDays:bi('实践天数','Practice Days'), streak:bi('连续天数','Streak'), records:bi('总记录数','Total Records'), garden:bi('幸福花园','Happiness Garden'),
+ navHome:bi('🏠 我的今天','🏠 My Today'), navScenario:bi('🧭 我现在需要什么？','🧭 What Do I Need Now?'), navProgress:bi('📊 我的进度','📊 My Progress'), navGarden:bi('🌷 幸福花园','🌷 Happiness Garden'), navHistory:bi('📖 我的成长记录','📖 My Growth Journal'), navCert:bi('🏆 完成证书','🏆 Certificate'),
+ homeTitle:bi('🌱 今天，我需要什么？','🌱 What do I need today?'), homeSub:bi('先不用研究13个工具。告诉系统今天发生什么，它会带你去最适合的练习。','Do not study all 13 tools first. Start with what is happening today and let the system guide you to the most useful practice.'),
+ scenarioTitle:bi('🧭 我现在最需要什么帮助？','🧭 What Kind of Help Do I Need Right Now?'), scenarioSub:bi('如果你不知道该使用哪一个工具，可以先从现在的状态开始。选择最接近你目前情况的一项。','If you are not sure which tool to use, start with your current situation and choose the option that feels closest.'),
+ backHome:bi('← 返回工具箱','← Back to Toolbox'), progressTitle:bi('📊 我的幸福进度','📊 My Happiness Progress'), progressSub:bi('不是追求完美，而是看见自己愿意持续的每一天。','This is not about perfection. It is about noticing every day you choose to keep going.'),
+ p7:bi('🌱 7天幸福挑战','🌱 7-Day Happiness Challenge'),p21:bi('🌿 21天幸福实践','🌿 21-Day Happiness Practice'),p30:bi('🌳 30天幸福习惯','🌳 30-Day Happiness Habit'),
+ gardenTitle:bi('🌷 我的幸福花园','🌷 My Happiness Garden'),gardenSub:bi('任何工具只要完成并保存，当天就会算作一个实践日。一天最多计算一次。','Complete and save any tool to count that date as one practice day. Each calendar day counts once.'),
+ historyTitle:bi('📖 我的幸福成长记录','📖 My Happiness Growth Journal'),historySub:bi('这里不是资料仓库，而是让你回看：以前发生了什么、我当时怎样想、播下什么种子，以及后来怎样。','This is not just a storage page. It lets you look back at what happened, how you responded, what seed you chose, and what happened afterwards.'),historyNotice:bi('☁️ 登录会员账号后，这里的成长记录会同步到云端；JSON 导出仍可作为额外备份。','☁️ After member sign-in, your growth journal syncs to the cloud. JSON export remains available as an extra backup.'),
+ certTitle:bi('🏆 21天完成证书','🏆 21-Day Completion Certificate'),certSub:bi('满21个不同实践日后，可以正式生成自己的完成证书。未满21天也可以预览样式。','After at least 21 different practice days, you can generate your completion certificate. Before that, you can still preview it.'), certName:bi('学员姓名','Participant Name'), certPlaceholder:bi('请输入姓名','Enter your name'), buildCert:bi('生成 / 更新证书','Generate / Update Certificate'), printCert:bi('打印 / 存成 PDF','Print / Save as PDF'),
+ footer:bi('🌱 播种幸福｜我的幸福陪伴系统 · V5.5<br/>看见自己 · 重新选择 · 每天播种','🌱 Planting Happiness | My Happiness Companion · V5.5<br/>Notice yourself · Choose again · Plant one seed at a time'),
+ openTool:bi('打开工具 →','Open Tool →'), viewCert:bi('查看证书','View Certificate'), date:bi('日期','Date'), save:bi('保存这份记录','Save This Record'), update:bi('更新这份记录','Update This Record'), clear:bi('清空','Clear'), editing:bi('正在编辑已保存的记录。','Editing a saved record.'), edit:bi('编辑','Edit'), del:bi('删除','Delete'),
+ noRecords:bi('🌿 还没有记录。先从一个最需要的工具开始吧。','🌿 No records yet. Start with the tool you need most today.'), startPractice:bi('开始这个练习 →','Start This Practice →'), recommended:bi('👉 建议使用：','👉 Recommended tool: ')
+};
+const TOOL_DATA=[
+ {id:'diary',n:'01',icon:'📖',name:bi('幸福日记','Happiness Journal'),desc:bi('每天3分钟，记录幸福、感恩、自己的进步与明天的小行动。','Take 3 minutes to notice happiness, gratitude, your progress, and one small action for tomorrow.')},
+ {id:'seed',n:'02',icon:'🌱',name:bi('我的种子记录','My Seed Record'),desc:bi('把你想要的改变，转化成今天可以真正完成的小行动。','Turn the change you want into one small action you can actually complete today.')},
+ {id:'gratitude',n:'03',icon:'🙏',name:bi('感恩记录','Gratitude Record'),desc:bi('每天看见已经拥有的人、事与支持。','Notice the people, things and support already present in your life.')},
+ {id:'goal',n:'04',icon:'🎯',name:bi('幸福目标','Happiness Goal'),desc:bi('把“我想更幸福”变成一个清楚、具体的方向。','Turn “I want to be happier” into a clear, specific direction.')},
+ {id:'weekly',n:'05',icon:'🗓️',name:bi('每周幸福复盘','Weekly Happiness Review'),desc:bi('回看这一周做得好的地方、调整点与下一周计划。','Review what went well, what to adjust, and what to carry into next week.')},
+ {id:'recovery',n:'06',icon:'🌤️',name:bi('幸福复原卡','Happiness Recovery Card'),desc:bi('生活不顺时，先稳定下来，再找到下一小步。','When life feels difficult, steady yourself first, then find the next small step.')},
+ {id:'relationship',n:'07',icon:'🤝',name:bi('关系修复卡','Relationship Repair Card'),desc:bi('整理事实、感受、需要与下一步沟通方式。','Sort out the facts, feelings, needs, and your next communication step.')},
+ {id:'abundance',n:'08',icon:'💛',name:bi('财富与富足检查','Money & Abundance Check'),desc:bi('重新看见资源、选择与已经拥有的支持。','See your resources, choices, abilities, and existing support more clearly.')},
+ {id:'career',n:'09',icon:'💼',name:bi('事业价值检查','Career Value Check'),desc:bi('思考工作正在创造什么价值，以及哪里值得改善。','Reflect on the value your work creates and what is worth improving.')},
+ {id:'map',n:'10',icon:'🗺️',name:bi('VIP幸福地图','VIP Happiness Map'),desc:bi('从关系、成长、事业、生活与自己，看见幸福全景。','See your overall happiness across self, relationships, life, career and growth.')},
+ {id:'habit',n:'11',icon:'🔄',name:bi('习惯重启卡','Habit Restart Card'),desc:bi('中断没有关系，重新设计一个更小、更容易继续的行动。','If you stopped, redesign the habit into a smaller action that is easier to continue.')},
+ {id:'choice',n:'12',icon:'🧭',name:bi('快速选择卡','Decision Clarity Card'),desc:bi('面对犹豫时，整理选项、影响、价值与下一步。','When you feel stuck between choices, clarify options, trade-offs, values, and the next step.')},
+ {id:'innerdialogue',n:'13',icon:'🧠',name:bi('内在对话重写卡','Inner Dialogue Rewrite Card'),desc:bi('把脑中反复出现的自我否定，整理成更真实、更有帮助的一句话。','Turn a repeating self-critical thought into a more accurate and helpful inner response.')}
+];
+const CHIP_OPTIONS=[['relationship',bi('❤️关系','❤️ Relationships')],['gratitude',bi('🙏感恩','🙏 Gratitude')],['growth',bi('🌱成长','🌱 Growth')],['giving',bi('🤲给予','🤲 Giving')],['action',bi('🎯行动','🎯 Action')]];
+const FORM_DEFS={
+ diary:{title:bi('📖 幸福日记','📖 Happiness Journal'),sub:bi('每天3分钟，看见自己的生活，也看见自己的改变。','Take 3 minutes to notice your life and your changes.'),fields:[['mood',bi('今天的幸福指数','My happiness level today'),'mood'],['happy',bi('今天让我感到幸福的一件事','One thing that made me feel happy today'),'textarea'],['grateful',bi('今天我最想感谢的人 / 事','The person or thing I am most grateful for today'),'textarea'],['good',bi('今天我做得不错的一件事','One thing I did well today'),'textarea'],['next',bi('明天我想做的一个小行动','One small action I want to take tomorrow'),'textarea']]},
+ seed:{title:bi('🌱 我的种子记录','🌱 My Seed Record'),sub:bi('你想要的改变，可以先从自己能够完成的一小步开始。','The change you want can begin with one small step you can complete.'),fields:[['area',bi('这颗种子属于哪一个方向？','Which area does this seed belong to?'),'chips',CHIP_OPTIONS],['improve',bi('我想改善什么？','What do I want to improve?'),'textarea'],['plan',bi('今天我准备做什么小行动？','What small action will I take today?'),'textarea'],['done',bi('我实际做了什么？','What did I actually do?'),'textarea'],['observe',bi('我观察到了什么？','What did I notice?'),'textarea']]},
+ gratitude:{title:bi('🙏 感恩记录','🙏 Gratitude Record'),sub:bi('感恩不是忽略困难，而是提醒自己生活里仍有值得看见的部分。','Gratitude does not ignore difficulties; it helps you notice what is still worth seeing.'),fields:[['g1',bi('今天感谢的第一件事','First thing I am grateful for today'),'textarea'],['g2',bi('第二件事','Second thing'),'textarea'],['g3',bi('第三件事','Third thing'),'textarea'],['person',bi('今天最想感谢谁？为什么？','Who do I most want to thank today, and why?'),'textarea'],['express',bi('我准备怎样表达这份感谢？','How will I express this gratitude?'),'textarea']]},
+ goal:{title:bi('🎯 幸福目标','🎯 Happiness Goal'),sub:bi('目标不是给自己更多压力，而是让方向变得清楚。','A goal is not extra pressure; it helps make your direction clear.'),fields:[['goal',bi('我最想改善的一个幸福目标','The happiness goal I most want to improve'),'textarea'],['why',bi('为什么这件事对我重要？','Why does this matter to me?'),'textarea'],['small',bi('最小的第一步是什么？','What is the smallest first step?'),'textarea'],['when',bi('我准备什么时候开始？','When will I start?'),'text'],['measure',bi('我怎样知道自己正在进步？','How will I know I am making progress?'),'textarea']]},
+ weekly:{title:bi('🗓️ 每周幸福复盘','🗓️ Weekly Happiness Review'),sub:bi('回看，不是批评自己，而是更清楚地决定下一步。','Reviewing is not self-criticism. It helps you choose your next step more clearly.'),fields:[['best',bi('这周最值得珍惜的3件事','3 things I most want to appreciate this week'),'textarea'],['proud',bi('这周我做得不错的地方','What I did well this week'),'textarea'],['challenge',bi('这周最大的挑战','My biggest challenge this week'),'textarea'],['learn',bi('我学到了什么？','What did I learn?'),'textarea'],['nextweek',bi('下周我想继续的一件事','One thing I want to continue next week'),'textarea']]},
+ recovery:{title:bi('🌤️ 幸福复原卡','🌤️ Happiness Recovery Card'),sub:bi('情绪很满的时候，先把自己接回来，再决定下一步。','When emotions feel overwhelming, steady yourself first, then decide the next step.'),fields:[['happen',bi('现在发生了什么？只写事实。','What is happening right now? Write only the facts.'),'textarea'],['feel',bi('我现在有什么感受？','What am I feeling right now?'),'textarea'],['need',bi('我现在最需要什么？','What do I need most right now?'),'textarea'],['control',bi('哪些是我能控制的？','What can I control?'),'textarea'],['step',bi('我可以做的最小下一步','The smallest next step I can take'),'textarea']]},
+ relationship:{title:bi('🤝 关系修复卡','🤝 Relationship Repair Card'),sub:bi('修复关系不等于委屈自己，而是让沟通更清楚、更有边界。','Repairing a relationship does not mean abandoning yourself. It means clearer communication and healthier boundaries.'),fields:[['who',bi('这段关系是谁？','Who is this relationship with?'),'text'],['fact',bi('发生了什么？只写事实。','What happened? Write only the facts.'),'textarea'],['feeling',bi('我的感受是什么？','What am I feeling?'),'textarea'],['need',bi('我真正的需要是什么？','What do I truly need?'),'textarea'],['their',bi('如果站在对方角度，他/她可能在意什么？','From their perspective, what might matter to them?'),'textarea'],['talk',bi('我准备怎样表达或沟通？','How do I want to communicate this?'),'textarea']]},
+ abundance:{title:bi('💛 财富与富足检查','💛 Money & Abundance Check'),sub:bi('富足不只是“更多”，也包括看见资源、能力和选择。','Abundance is not only “more”; it also means seeing your resources, abilities and choices.'),fields:[['have',bi('我现在已经拥有的资源','Resources I already have'),'textarea'],['ability',bi('我已经拥有的能力','Abilities I already have'),'textarea'],['support',bi('目前支持我的人 / 机会','People / opportunities currently supporting me'),'textarea'],['worry',bi('我现在最担心的是什么？','What am I most worried about right now?'),'textarea'],['action',bi('我今天可以做的一个实际行动','One practical action I can take today'),'textarea']]},
+ career:{title:bi('💼 事业价值检查','💼 Career Value Check'),sub:bi('工作不只看忙不忙，也看你正在创造什么价值。','Work is not only about being busy; it is also about the value you create.'),fields:[['value',bi('我的工作 / 事业现在为谁创造价值？','Who benefits from the value my work / business creates?'),'textarea'],['good',bi('目前做得好的地方','What is working well right now'),'textarea'],['gap',bi('最需要改善的一件事','The one thing that most needs improvement'),'textarea'],['serve',bi('我还能怎样更好地帮助客户 / 他人？','How can I better help customers / others?'),'textarea'],['step',bi('未来7天我要完成的一个行动','One action I will complete in the next 7 days'),'textarea']]},
+ map:{title:bi('🗺️ VIP幸福地图','🗺️ VIP Happiness Map'),sub:bi('用5个维度看见自己的整体状态。1分代表很需要照顾，5分代表目前较满意。','See your overall state across five areas. 1 means this area needs a lot of care; 5 means you are relatively satisfied.'),fields:[['self',bi('自己 / 内在状态','Self / Inner state'),'range'],['relationship',bi('关系','Relationships'),'range'],['health',bi('生活与健康','Life & Health'),'range'],['career',bi('事业 / 学习','Career / Learning'),'range'],['growth',bi('成长与方向','Growth & Direction'),'range'],['focus',bi('目前最想优先照顾哪一个维度？','Which area do I most want to care for first?'),'textarea']]},
+ habit:{title:bi('🔄 习惯重启卡','🔄 Habit Restart Card'),sub:bi('中断不是失败。真正重要的是重新设计一个更容易继续的方法。','Stopping does not mean failure. What matters is redesigning a method that is easier to continue.'),fields:[['habit',bi('我想重新开始的习惯','The habit I want to restart'),'text'],['whyStop',bi('之前为什么中断？','Why did I stop before?'),'textarea'],['smaller',bi('怎样把它缩小到更容易完成？','How can I make it smaller and easier?'),'textarea'],['trigger',bi('我会在什么时间 / 情境开始？','When / in what situation will I start?'),'textarea'],['restart',bi('今天重新开始的第一步','My first restart step today'),'textarea']]},
+ choice:{title:bi('🧭 快速选择卡','🧭 Decision Clarity Card'),sub:bi('不是替你做决定，而是把犹豫整理清楚。','This does not decide for you. It helps you organise the uncertainty clearly.'),fields:[['question',bi('我现在要决定什么？','What am I deciding right now?'),'textarea'],['a',bi('选项 A','Option A'),'textarea'],['b',bi('选项 B','Option B'),'textarea'],['important',bi('对我最重要的价值 / 原则是什么？','What value / principle matters most to me?'),'textarea'],['risk',bi('每个选择最大的代价或风险是什么？','What is the biggest cost or risk of each choice?'),'textarea'],['decision',bi('我现在愿意先选择什么？为什么？','What am I willing to choose for now, and why?'),'textarea']]},
+ innerdialogue:{title:bi('🧠 内在对话重写卡','🧠 Inner Dialogue Rewrite Card'),sub:bi('不是强迫自己“正面思考”，而是把脑中的一句话拆开，找回更准确、更有帮助的版本。','This is not forced positive thinking. It helps you examine one recurring thought and replace it with something more accurate and useful.'),fields:[['thought',bi('我脑中一直出现哪一句话？','What sentence keeps repeating in my mind?'),'textarea'],['situation',bi('刚才发生了什么？只写事实。','What happened? Write only the facts.'),'textarea'],['evidenceFor',bi('有什么事实支持我脑中的这句话？','What facts support this thought?'),'textarea'],['evidenceAgainst',bi('有什么事实不支持它，或说明事情没有那么绝对？','What facts do not support it, or show the situation is less absolute?'),'textarea'],['friend',bi('如果是我很在乎的朋友这样说自己，我会怎样回答？','If a close friend said this about themselves, how would I respond?'),'textarea'],['rewrite',bi('换成一句更真实、同时更有帮助的话','Rewrite it as a more accurate and helpful sentence'),'textarea']]}
+};
+const SCENARIOS={
+ emotion:{icon:'😟',code:'A',title:bi('我的情绪很乱','My emotions feel overwhelming'),desc:bi('焦虑、难过、生气、委屈、压力很大，或者脑袋很乱。','Anxious, sad, angry, hurt, under pressure, or mentally overloaded.'),intro:bi('现在先不要急着解决所有事情。先让自己慢一点，把最重要的部分看清楚。','Do not rush to solve everything at once. Slow down first and make the most important part clearer.'),qs:[bi('发生了什么？','What happened?'),bi('我现在最需要什么？','What do I need most right now?'),bi('什么是我能够控制的？','What can I control?'),bi('接下来10分钟，我可以做什么？','What can I do in the next 10 minutes?')],tool:'recovery'},
+ relationship:{icon:'❤️',code:'B',title:bi('我的关系出了问题','A relationship is struggling'),desc:bi('争吵、误会、冷战、不知道怎样表达，或不知道怎样重新开始沟通。','Arguments, misunderstanding, silence, difficulty expressing yourself, or not knowing how to restart communication.'),intro:bi('先不要急着判断谁对谁错。把事实、感受和真正的需要分开来看。','Do not rush to decide who is right or wrong. Separate the facts, feelings, and real needs.'),qs:[bi('真正发生了什么？','What actually happened?'),bi('我现在的感受是什么？','What am I feeling?'),bi('我希望对方理解什么？','What do I want the other person to understand?'),bi('我可以怎样表达得更清楚、更有边界？','How can I express this more clearly and with healthier boundaries?')],tool:'relationship'},
+ money:{icon:'💰',code:'C',title:bi('我最近很担心钱','I have been worried about money'),desc:bi('压力、缺乏感、担心未来，或一直觉得自己拥有得不够。','Financial pressure, scarcity, worry about the future, or a constant sense of not having enough.'),intro:bi('先把“担心”与“可以行动的事情”分开。富足不只是数字，也包括你已经拥有的资源和选择。','Separate worry from what you can act on. Abundance is not only a number; it also includes resources and choices you already have.'),qs:[bi('我现在真正担心的是什么？','What am I truly worried about?'),bi('我已经拥有哪些资源？','What resources do I already have?'),bi('哪些事情是我现在可以控制的？','What can I control right now?'),bi('今天最实际的一步是什么？','What is the most practical step I can take today?')],tool:'abundance'},
+ career:{icon:'💼',code:'D',title:bi('我对工作 / 事业很迷茫','I feel lost about work / career'),desc:bi('没有方向、没有动力、不知道自己的价值，或不知道下一步该做什么。','No direction or motivation, uncertainty about your value, or not knowing what to do next.'),intro:bi('当方向不清楚时，不一定需要马上做大决定。先重新看见你正在创造的价值。','When direction is unclear, you do not need to make a big decision immediately. Start by seeing the value you are already creating.'),qs:[bi('我现在最不满意的是什么？','What am I most dissatisfied with right now?'),bi('我真正想创造什么价值？','What value do I truly want to create?'),bi('谁会因为我的工作而受益？','Who benefits from my work?'),bi('未来7天我可以完成什么？','What can I complete in the next 7 days?')],tool:'career'},
+ habit:{icon:'🔄',code:'E',title:bi('我又坚持不下去了','I stopped again'),desc:bi('拖延、中断、没有动力，或一个好习惯又停掉了。','Procrastination, interruption, low motivation, or a good habit that has stopped.'),intro:bi('中断不代表失败。很多时候只是目标太大、方法太难，或生活节奏发生了变化。','Stopping does not mean failure. Sometimes the goal was too big, the method too difficult, or life simply changed.'),qs:[bi('我为什么停下来？','Why did I stop?'),bi('原来的方法哪里太难？','What was too difficult about the old method?'),bi('怎样把它缩小一半？','How can I cut it in half?'),bi('今天可以重新开始哪一步？','What step can I restart today?')],tool:'habit'},
+ choice:{icon:'🧭',code:'F',title:bi('我不知道该怎么选择','I do not know what to choose'),desc:bi('两个或多个选择之间犹豫，担心选错，脑中一直反复比较。','Feeling stuck between two or more options, afraid of choosing wrongly, and repeatedly comparing them in your mind.'),intro:bi('先不要逼自己马上找到完美答案。把真正重要的价值、代价和下一步整理出来。','Do not force yourself to find a perfect answer immediately. Clarify the values, trade-offs, and next step that matter most.'),qs:[bi('我真正要决定的是什么？','What am I actually deciding?'),bi('每个选择会带来什么？','What could each option bring?'),bi('对我最重要的原则是什么？','What principle matters most to me?'),bi('哪一个选择更接近我想成为的人？','Which choice is closer to the person I want to become?')],tool:'choice'},
+ overthink:{icon:'🧠',code:'G',title:bi('我一直想一件事，停不下来','I cannot stop thinking about something'),desc:bi('脑中反复出现同一句话、同一个担心，越想越累。','The same thought or worry keeps looping and leaves me mentally exhausted.'),intro:bi('先不要和脑中的想法打架。把“发生的事实”和“我脑中正在说的话”分开，再找一个更准确的版本。','Do not fight the thought. Separate what happened from what your mind is saying, then build a more accurate response.'),qs:[bi('脑中一直重复哪句话？','What sentence keeps repeating?'),bi('真正发生的事实是什么？','What are the actual facts?'),bi('这个想法有没有说得太绝对？','Is this thought more absolute than the facts?'),bi('如果是朋友这样说自己，我会怎么回答？','What would I say if a friend spoke about themselves this way?')],tool:'innerdialogue'},
+ okay:{icon:'🌿',code:'H',title:bi('今天其实还不错，我只是想整理自己','I am okay today; I just want to check in with myself'),desc:bi('没有特别大的问题，只想停一下，看看今天的生活与自己。','Nothing is urgently wrong. I simply want to pause and notice my life today.'),intro:bi('不一定要等到出问题才照顾自己。用3分钟看见今天已经拥有的、做得不错的和明天想继续的一小步。','You do not need a crisis to care for yourself. Take three minutes to notice what is already here, what went well, and one step for tomorrow.'),qs:[bi('今天哪一刻让我感觉还不错？','What moment felt good today?'),bi('我今天最感谢什么？','What am I grateful for today?'),bi('我做得不错的是什么？','What did I do well?'),bi('明天我想继续哪一个小行动？','What small action do I want to continue tomorrow?')],tool:'diary'}
+};
+let selectedTool=null,moodValue=0,chipValue='',mapValues={},editingRecordId=null;
+function today(){const d=new Date(),off=d.getTimezoneOffset();return new Date(d.getTime()-off*60000).toISOString().slice(0,10)}
+function db(){try{return JSON.parse(localStorage.getItem(KEY)||'{"records":[]}')}catch(e){return {records:[]}}}
+function saveDB(x){localStorage.setItem(KEY,JSON.stringify(x))}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
+function setText(id,val,html=false){const e=$(id);if(!e)return;if(html)e.innerHTML=L(val);else e.textContent=L(val)}
+function renderStatic(){
+ document.documentElement.lang=LANG==='en'?'en':'zh-Hans';document.title=LANG==='en'?'Planting Happiness | My Happiness Companion':'播种幸福｜我的幸福陪伴系统';
+ [['brandText','brand'],['heroTitle','heroTitle'],['heroLead','heroLead'],['returnCourseBtn','returnCourse'],['guideBtn','guide'],['exportAll','export'],['importBackup','import'],['resetAll','reset'],['statDaysLabel','practiceDays'],['statStreakLabel','streak'],['statRecordsLabel','records'],['statGardenLabel','garden'],['navHome','navHome'],['navScenario','navScenario'],['navProgress','navProgress'],['navGarden','navGarden'],['navHistory','navHistory'],['navCert','navCert'],['homeTitle','homeTitle'],['homeSub','homeSub'],['scenarioTitle','scenarioTitle'],['scenarioSub','scenarioSub'],['backHome','backHome'],['progressTitle','progressTitle'],['progressSub','progressSub'],['p7Label','p7'],['p21Label','p21'],['p30Label','p30'],['gardenTitle','gardenTitle'],['gardenSub','gardenSub'],['historyTitle','historyTitle'],['historySub','historySub'],['historyNotice','historyNotice'],['certTitle','certTitle'],['certSub','certSub'],['certNameLabel','certName'],['buildCert','buildCert'],['printCert','printCert']].forEach(([id,k])=>setText(id,UI[k]));
+ $('certName').placeholder=L(UI.certPlaceholder); $('footerText').innerHTML=L(UI.footer);
+ $('langZh').classList.toggle('active',LANG==='zh');$('langEn').classList.toggle('active',LANG==='en');
+ $('stageLegend').innerHTML=[['🌰',bi('第1–2天<br/>种子','Days 1–2<br/>Seed')],['🌱',bi('第3–7天<br/>发芽','Days 3–7<br/>Sprout')],['🌿',bi('第8–15天<br/>成长','Days 8–15<br/>Growth')],['🪻',bi('第16–20天<br/>花苞','Days 16–20<br/>Bud')],['🌷',bi('第21–29天<br/>开花','Days 21–29<br/>Bloom')],['🌳',bi('第30天<br/>幸福花园','Day 30<br/>Happiness Garden')]].map(([i,x])=>`<div class="stageitem"><span>${i}</span>${L(x)}</div>`).join('');
+ renderScenarioCards();
+ const at=$('v51AllToolsTitle');if(at)at.textContent=LANG==='en'?'If you already know what you need, you can also choose a tool directly:':'如果你已经知道自己需要什么，也可以直接选择工具：';
+}
+function setLanguage(lang){LANG=lang==='en'?'en':'zh';localStorage.setItem(LANG_KEY,LANG);const u=new URL(location.href);u.searchParams.set('lang',LANG);history.replaceState(null,'',u);renderStatic();renderTools();refreshStats();renderProgress();renderGarden();renderHistory();renderCertificate();if(selectedTool&&$('toolView').classList.contains('active')){const existing=editingRecordId?db().records.find(r=>r.id===editingRecordId):null;renderToolForm(existing)}if($('scenarioGuide').innerHTML)$('scenarioGuide').innerHTML='';}
+
+// ===== V5 MY HAPPINESS COMPANION =====
+const V5_SUPABASE_URL='https://sopjtukcrghvgemdishz.supabase.co';
+const V5_SUPABASE_KEY='sb_publishable_ltqt7kjBSZE-YO3SRnnbxg_uqmt6Ooh';
+const V5_SESSION_KEY='bzxf_toolbox_session_v5';
+const V5_SHARED_SESSION_KEY='bzxf_member_session_v96';
+let V5_SESSION=null,V5_USER=null,V5_PROFILE=null,V5_CLOUD_READY=false,V5_HISTORY_FILTER='all',V5_HISTORY_SEARCH='';
+const V5_EXAMPLES={
+ diary:bi('适合：今天没有大问题，只想停下来看看自己的生活。','Use when: Nothing urgent is wrong; you simply want to pause and notice your day.'),
+ seed:bi('适合：你知道自己想改变，但总是停在“我应该”。','Use when: You know what you want to change, but keep getting stuck at “I should”.'),
+ gratitude:bi('适合：最近注意力一直被问题占满，想重新看见仍然存在的支持。','Use when: Problems have taken over your attention and you want to notice support that still exists.'),
+ goal:bi('适合：你想改变很多，却不知道先从哪里开始。','Use when: You want many things to change but do not know where to begin.'),
+ weekly:bi('适合：一周结束时，把经验变成下一周真正有用的调整。','Use when: The week is ending and you want to turn experience into one useful adjustment.'),
+ recovery:bi('适合：焦虑、生气、委屈、压力很满，脑袋一时很乱。','Use when: Anxiety, anger, hurt or stress feels full and your mind is overloaded.'),
+ relationship:bi('适合：争吵、误会、冷战，或你很想被理解却越说越糟。','Use when: There is conflict, misunderstanding, silence, or attempts to be understood keep making things worse.'),
+ abundance:bi('适合：担心钱、觉得不够、未来不确定，想从恐惧回到现实行动。','Use when: Money worries or scarcity are strong and you want to return from fear to practical action.'),
+ career:bi('适合：工作很忙却没方向，或不知道自己真正能创造什么价值。','Use when: Work feels busy but directionless, or you are unsure what value you can create.'),
+ map:bi('适合：没有单一问题，但想看整体生活哪一块最值得优先照顾。','Use when: There is no single crisis, but you want to see which area of life deserves attention first.'),
+ habit:bi('适合：一个习惯又停了，开始怀疑自己是不是没有毅力。','Use when: A habit stopped again and you are starting to doubt your willpower.'),
+ choice:bi('适合：两个选择之间反复比较，越想越怕选错。','Use when: You keep comparing two choices and become more afraid of making the wrong one.'),
+ innerdialogue:bi('适合：脑中一直出现“我不行、我很差、一定会失败”这类反复判断。','Use when: Repeating thoughts such as “I cannot do this,” “I am not good enough,” or “I will fail” keep returning.')
+};
+const V5_STORIES={
+ diary:bi('例如：今天工作很普通，没有特别开心。但回想时，你发现同事帮你留了一杯水、晚餐有人等你、自己也完成了一件拖了很久的小事。','Example: Nothing dramatic happened today. Looking back, a colleague saved you a drink, someone waited for you at dinner, and you finished one task you had delayed.'),
+ seed:bi('例如：你想“改善关系”，但目标太大。把它缩成今天的一颗种子：回家后先听家人说10分钟，不急着给建议。','Example: You want to “improve a relationship,” but the goal is too big. Shrink it into one seed today: listen for 10 minutes without rushing to give advice.'),
+ gratitude:bi('例如：今天被客户拒绝，很失落；同时家人帮你留饭、朋友问你还好吗。两件事都是真的。','Example: A customer rejected you today and you felt disappointed; at the same time, family saved dinner for you and a friend checked in. Both can be true.'),
+ goal:bi('例如：“我要更幸福”很难行动；改成“未来21天，我想减少回家后对家人发脾气”，方向就清楚很多。','Example: “I want to be happier” is hard to act on. “For the next 21 days, I want to reduce snapping at family after work” is much clearer.'),
+ weekly:bi('例如：这周你觉得自己很失败，但回看才发现其实完成了两个重要任务，只是在一个冲突上处理得不好。复盘不是判分，而是找下一步。','Example: You felt the week was a failure, but looking back you completed two important tasks and only handled one conflict poorly. Review is not grading; it is finding the next step.'),
+ recovery:bi('例如：客户突然取消合作。事实是“客户取消了”；脑中马上出现“是不是我能力很差”；感受是担心和失望；现在能控制的是问清原因、调整方案和联系下一位客户。','Example: A client suddenly cancels. Fact: “the client cancelled.” Thought: “maybe I am not good enough.” Feeling: worry and disappointment. What you can control: ask why, adjust the offer, and contact the next lead.'),
+ relationship:bi('例如：伴侣说“你从来不听我说”。你马上想反驳。先拆开：事实是对方说了这句话；你的感受是委屈；你的需要是被公平理解；下一步可以先问“你最希望我听见哪一部分？”','Example: Your partner says, “You never listen.” You want to argue back. Separate it: fact—those words were said; feeling—hurt; need—to be understood fairly; next step—ask, “What do you most want me to hear?”'),
+ abundance:bi('例如：看到银行余额就焦虑。先不说“我要有钱”，而是列出真实收入、固定支出、已有技能、可以减少的一项开销，以及今天能完成的一个动作。','Example: Seeing your bank balance triggers anxiety. Instead of only saying “I need more money,” list real income, fixed expenses, existing skills, one expense to reduce, and one action you can take today.'),
+ career:bi('例如：你说“工作很迷茫”。继续拆：我服务谁？他的问题是什么？我现在做得好的是什么？未来7天哪一个交付可以改善？','Example: You say, “I feel lost at work.” Break it down: Who do I serve? What problem do they have? What is working? What one delivery can I improve in the next 7 days?'),
+ map:bi('例如：事业4分、关系2分、自己2分。重点不是“总分低”，而是你发现现在最值得先照顾的是关系和自己的状态。','Example: Career 4, relationships 2, self 2. The point is not a low total score; it is noticing that relationships and your inner state deserve attention first.'),
+ habit:bi('例如：你规定每天运动1小时，忙两天就停了。重启不是骂自己，而是把最低版本改成“晚饭后走10分钟”。','Example: You planned one hour of exercise daily and stopped after two busy days. Restarting is not self-criticism; redesign the minimum version as “walk 10 minutes after dinner.”'),
+ choice:bi('例如：A工作薪水高但时间少，B工作薪水低一点但更符合长期方向。工具不会替你选，而是帮你看清真正重视的价值、风险和可逆程度。','Example: Job A pays more but leaves little time; Job B pays less but fits your long-term direction. The tool does not choose for you; it clarifies values, trade-offs, and reversibility.'),
+ innerdialogue:bi('例如：一次提案被拒绝后，脑中出现“我就是不行”。事实只是“一次提案被拒绝”。再找支持与不支持这句话的证据，最后改写成：“这次没有成功，但我可以找出原因并改下一版。”','Example: After one proposal is rejected, the thought “I am just not good enough” appears. The fact is only “one proposal was rejected.” Review evidence for and against it, then rewrite: “This version did not work; I can learn why and improve the next one.”')
+};
+function v5FollowLabel(v){return v==='yes'?(LANG==='en'?'✓ Done':'✓ 做到了'):v==='some'?(LANG==='en'?'◐ Partly':'◐ 做到一点'):v==='no'?(LANG==='en'?'○ Not yet':'○ 还没做到'):(LANG==='en'?'Waiting to review':'等待回看')}
+function v5KeyText(r){if(!r)return'';const d=r.data||{};return d.happen||d.fact||d.thought||d.improve||d.goal||d.challenge||d.worry||d.gap||d.question||d.happy||d.g1||d.habit||d.focus||Object.values(d).find(v=>typeof v==='string'&&v.trim())||''}
+function v5RenderCompanion(){
+ const box=$('v5Companion');if(!box)return;
+ const arr=[...db().records].sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id),r=arr[0],en=LANG==='en',name=V5_PROFILE?.display_name||V5_USER?.email?.split('@')[0]||'';
+ const why=`<div class="v51Why"><div><b>${en?'① Tell me what happened':'① 告诉我发生什么'}</b><span>${en?'Start from real life, not from choosing a form.':'从真实生活开始，不是从挑一张表格开始。'}</span></div><div><b>${en?'② Remember my past':'② 记得以前的我'}</b><span>${en?'Bring back what you wrote and the seed you chose before.':'把以前写过的事情和播过的种子带回来。'}</span></div><div><b>${en?'③ One next step':'③ 只走下一小步'}</b><span>${en?'Turn reflection into one small, realistic action.':'把觉察变成一个今天做得到的小行动。'}</span></div></div>`;
+ if(!r){
+   box.innerHTML=`<h3>${en?'🌱 This is not a set of forms. It is your happiness companion.':'🌱 这里不是一堆表格，而是你的幸福陪伴系统。'}</h3><p>${en?'You do not need to know which tool to use. Tell me what is happening today and the system will guide you.':'你不需要先懂13个工具。只要告诉系统今天发生什么，它会带你去适合的练习。'}</p>${why}<div class="v5CompanionActions"><button class="main" onclick="show('homeView');setTimeout(()=>document.getElementById('needQuickGrid').scrollIntoView({behavior:'smooth'}),80)">${en?'What is happening today? →':'今天发生什么了？ →'}</button><button class="alt" onclick="show('historyView')">${en?'My Growth Journal':'我的成长记录'}</button></div>`;
+   return;
+ }
+ const coach=v4CoachResponse(r.tool,r.data||{}),action=v4ActionForRecord(r),key=v5KeyText(r);
+ box.innerHTML=`<h3>${en?'🌱 Welcome back':'🌱 欢迎回来'}${name?'，'+esc(name):''}</h3><p>${en?'The system remembers where you left off. You do not have to start from zero today.':'系统记得你上一次停在哪里。今天不需要重新从零开始。'}</p><div class="v5Last"><div class="v5Label">${esc(r.date)} · ${esc(toolName(r.tool))}</div><div class="v5Quote">${esc(v4Short(key,170)||coach.body)}</div>${action?`<div class="v5Seed"><b>${en?'🌱 The seed you chose last time':'🌱 你上一次播下的种子'}</b><br>${esc(action)}</div>`:''}<div style="margin-top:9px"><span class="v5FollowStatus">${v5FollowLabel(r.followup)}</span></div></div>${why}<div class="v5CompanionActions"><button class="main" onclick="editRecord(${r.id})">${en?'Continue where I left off →':'继续上一次 →'}</button><button class="alt" onclick="show('homeView');setTimeout(()=>document.getElementById('needQuickGrid').scrollIntoView({behavior:'smooth'}),80)">${en?'Something new happened today':'今天有新的事情'}</button><button class="alt" onclick="show('historyView')">${en?'Review my growth':'回看我的成长'}</button></div>`;
+}
+
+function v5ExampleHTML(tool){const en=LANG==='en';return `<div class="v5Example"><h3>${en?'💡 Before you write, see an example':'💡 先不要急着填，看看一个例子'}</h3><p><b>${en?'When this tool helps:':'什么时候适合用：'}</b> ${L(V5_EXAMPLES[tool])}</p><div class="v5Story">${L(V5_STORIES[tool])}</div><details><summary>${en?'Why this matters':'为什么先看例子？'}</summary><div class="v5Breakdown">${en?'Many habits happen too quickly to notice. A story helps you recognise a familiar pattern before asking you to write about yourself. You do not need to copy the example; use it only to help you see your own situation.':'很多习惯发生得太快，我们自己不一定察觉。先看一个生活例子，比较容易产生“原来我也会这样”的共鸣。例子不是标准答案，只是帮助你看见自己的情况。'}</div></details></div>`}
+function v5PastHTML(tool){const arr=[...db().records].filter(r=>r.tool===tool).sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id).slice(0,3),en=LANG==='en';if(!arr.length)return `<div class="v5Past"><h3>${en?'📖 Your past reflections':'📖 以前的我写过什么？'}</h3><div class="sub">${en?'No previous record for this tool yet. Your saved reflections will appear here next time.':'这个工具还没有旧记录。你今天保存以后，下次回来就会在这里看见以前的自己。'}</div></div>`;return `<div class="v5Past"><div class="v5PastHead"><h3>${en?'📖 Your past reflections':'📖 以前的我写过什么？'}</h3><button class="btn ghost" type="button" onclick="v5OpenTopicHistory('${tool}')">${en?'View all':'查看全部'}</button></div>${arr.map(r=>`<div class="v5PastItem"><div class="v5PastDate">${esc(r.date)} · ${v5FollowLabel(r.followup)}</div><div class="v5PastText">${esc(v4Short(v5KeyText(r),140))}</div>${v4ActionForRecord(r)?`<div class="v5PastSeed">🌱 ${esc(v4Short(v4ActionForRecord(r),120))}</div>`:''}</div>`).join('')}</div>`}
+const v5BaseRenderToolForm=renderToolForm;renderToolForm=function(existing=null){v5BaseRenderToolForm(existing);const sub=$('toolContent')?.querySelector('.sub');if(sub){sub.insertAdjacentHTML('afterend',v5ExampleHTML(selectedTool)+v5PastHTML(selectedTool))}}
+function v5PopulateHistoryFilters(){const sel=$('v5HistoryFilter');if(!sel)return;const current=V5_HISTORY_FILTER;sel.innerHTML=`<option value="all">${LANG==='en'?'All topics':'全部主题'}</option>`+TOOL_DATA.map(t=>`<option value="${t.id}">${t.icon} ${L(t.name)}</option>`).join('');sel.value=current;sel.onchange=()=>{V5_HISTORY_FILTER=sel.value;renderHistory()};const q=$('v5HistorySearch');if(q){q.placeholder=LANG==='en'?'Search what I wrote before…':'搜索以前写过的内容…';q.value=V5_HISTORY_SEARCH;q.oninput=()=>{V5_HISTORY_SEARCH=q.value.trim().toLowerCase();renderHistory()}}}
+function v5OpenTopicHistory(tool){V5_HISTORY_FILTER=tool;show('historyView');v5PopulateHistoryFilters();renderHistory()}
+window.v5OpenTopicHistory=v5OpenTopicHistory;
+const v5BaseRenderHistory=renderHistory;renderHistory=function(){v5PopulateHistoryFilters();let arr=[...db().records].sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);if(V5_HISTORY_FILTER!=='all')arr=arr.filter(r=>r.tool===V5_HISTORY_FILTER);if(V5_HISTORY_SEARCH)arr=arr.filter(r=>JSON.stringify(r.data||{}).toLowerCase().includes(V5_HISTORY_SEARCH)||toolName(r.tool).toLowerCase().includes(V5_HISTORY_SEARCH));if(!arr.length){$('allHistory').innerHTML=`<div class="empty">${LANG==='en'?'🌿 No matching records yet.':'🌿 还没有符合的记录。'}</div>`;return}$('allHistory').innerHTML=arr.map(r=>{const coach=v4CoachResponse(r.tool,r.data||{}),action=v4ActionForRecord(r);return `<div class="v5HistoryCard"><div class="v5HistoryTop"><h3>${toolObj(r.tool)?.icon||'🌱'} ${esc(toolName(r.tool))}</h3><div class="v5HistoryDate">${esc(r.date)}</div></div><div class="v5HistorySummary">${esc(coach.body)}</div>${action?`<div class="v5HistorySeed"><b>${LANG==='en'?'🌱 My next step':'🌱 我当时播下的种子'}</b><br>${esc(action)}</div>`:''}<span class="v5FollowStatus">${v5FollowLabel(r.followup)}</span><details><summary>${LANG==='en'?'Review exactly what I wrote':'回看我当时完整写了什么'}</summary>${Object.entries(r.data||{}).filter(([k,v])=>v!==''&&v!==0).map(([k,v])=>`<h4>${esc(fieldLabel(r.tool,k))}</h4><p>${esc(displayValue(r.tool,k,v))}</p>`).join('')}</details><div class="smallactions"><button class="small edit" onclick="editRecord(${r.id})">${LANG==='en'?'Continue / Edit':'继续 / 编辑'}</button><button class="small delete" onclick="deleteRecord(${r.id})">${L(UI.del)}</button></div></div>`}).join('')}
+// Make saved records cloud-aware while preserving the existing local-first behaviour.
+function v5Headers(token,json=true){const h={'apikey':V5_SUPABASE_KEY,'Authorization':'Bearer '+token};if(json)h['Content-Type']='application/json';return h}
+function v5LoadSession(){
+  try{
+    const shared=JSON.parse(localStorage.getItem(V5_SHARED_SESSION_KEY)||'null');
+    if(shared?.access_token)return shared;
+    return JSON.parse(localStorage.getItem(V5_SESSION_KEY)||'null');
+  }catch(e){return null}
+}
+function v5SaveSession(s){
+  V5_SESSION=s;
+  if(s){
+    const raw=JSON.stringify(s);
+    localStorage.setItem(V5_SHARED_SESSION_KEY,raw);
+    localStorage.setItem(V5_SESSION_KEY,raw);
+  }else{
+    localStorage.removeItem(V5_SHARED_SESSION_KEY);
+    localStorage.removeItem(V5_SESSION_KEY);
+  }
+}
+async function v5AuthUser(s){const res=await fetch(V5_SUPABASE_URL+'/auth/v1/user',{headers:v5Headers(s.access_token,false)});if(!res.ok)throw new Error('Session expired');return await res.json()}
+async function v5Refresh(){if(!V5_SESSION?.refresh_token)throw new Error('No refresh token');const res=await fetch(V5_SUPABASE_URL+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{'apikey':V5_SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:V5_SESSION.refresh_token})});if(!res.ok)throw new Error('Unable to refresh session');const s=await res.json();v5SaveSession(s);return s}
+async function v5CheckEnrollment(uid,token){const url=V5_SUPABASE_URL+`/rest/v1/enrollments?user_id=eq.${encodeURIComponent(uid)}&course_code=eq.bozhongxingfu&select=status,start_date,expiry_date&limit=1`;const res=await fetch(url,{headers:v5Headers(token,false)});if(!res.ok)throw new Error('Unable to check membership');const rows=await res.json(),e=rows[0];if(!e||e.status!=='active')throw new Error(LANG==='en'?'This account does not have an active course membership.':'这个账号目前没有有效的课程权限。');if(e.expiry_date&&e.expiry_date<today())throw new Error(LANG==='en'?'This course membership has expired.':'这个课程权限已经到期。');return e}
+async function v5LoadProfile(uid,token){const res=await fetch(V5_SUPABASE_URL+`/rest/v1/profiles?id=eq.${encodeURIComponent(uid)}&select=display_name,email&limit=1`,{headers:v5Headers(token,false)});if(!res.ok)return null;const rows=await res.json();return rows[0]||null}
+function v5CloudStatus(){const pill=$('v5CloudStatus'),btn=$('v5CloudBtn');if(!pill||!btn)return;if(V5_CLOUD_READY){const name=V5_PROFILE?.display_name||V5_USER?.email?.split('@')[0]||'';pill.textContent=(LANG==='en'?'☁️ Synced':'☁️ 已同步')+(name?' · '+name:'');pill.classList.remove('local');btn.textContent=LANG==='en'?'☁️ Synced':'☁️ 已同步'}else{pill.textContent=LANG==='en'?'💻 No active course session · sign in if needed':'💻 未检测到课程登录 · 需要时可登录';pill.classList.add('local');btn.textContent=LANG==='en'?'☁️ Member sign in':'☁️ 会员登录'}v5RenderCompanion()}
+window.v5OpenAuth=()=>{const m=$('v5AuthModal');m.classList.add('show');$('v5LogoutBtn').style.display=V5_CLOUD_READY?'inline-block':'none';$('v5LoginBtn').style.display=V5_CLOUD_READY?'none':'inline-block';$('v5AuthMessage').textContent=V5_CLOUD_READY?(LANG==='en'?'Your records are syncing with your member account.':'你的工具记录正在与会员账号同步。'):'';v5RefreshAuthText()};window.v5CloseAuth=()=>{$('v5AuthModal').classList.remove('show')};
+function v5RefreshAuthText(){const en=LANG==='en';$('v5AuthTitle').textContent=en?'☁️ Member Account & Cloud Sync':'☁️ 会员账号与云端同步';$('v5AuthLead').textContent=en?'When you enter from the 21-day course on this same website, your member session is recognised automatically. Manual sign-in is only a fallback if no active course session is found.':'从同一个网站的21天课程进入时，系统会自动识别已经登录的会员账号，不需要再次输入密码。只有没有检测到课程登录时，才需要在这里手动登录。';$('v5PasswordLabel').textContent=en?'Password':'密码';$('v5LoginBtn').textContent=en?'Sign in & sync':'登录并同步';$('v5LogoutBtn').textContent=en?'Sign out of this system':'退出整个系统'}
+window.v5Login=async()=>{const email=$('v5Email').value.trim(),password=$('v5Password').value,msg=$('v5AuthMessage');if(!email||!password){msg.textContent=LANG==='en'?'Enter email and password.':'请输入 Email 和密码。';return}msg.textContent=LANG==='en'?'Signing in…':'正在登录…';try{const res=await fetch(V5_SUPABASE_URL+'/auth/v1/token?grant_type=password',{method:'POST',headers:{'apikey':V5_SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify({email,password})});if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.error_description||e.msg||e.message||(LANG==='en'?'Login failed.':'登录失败。'))}const s=await res.json();v5SaveSession(s);V5_SESSION=s;V5_USER=await v5AuthUser(s);await v5CheckEnrollment(V5_USER.id,s.access_token);V5_PROFILE=await v5LoadProfile(V5_USER.id,s.access_token);V5_CLOUD_READY=true;await v5CloudMerge();v5CloudStatus();msg.textContent=LANG==='en'?'✓ Signed in. Your saved records have been merged with the cloud.':'✓ 登录成功。本机记录与云端记录已经合并。';$('v5LogoutBtn').style.display='inline-block';$('v5LoginBtn').style.display='none';if(V5_PROFILE?.display_name&&$('certName')&&!$('certName').value)$('certName').value=V5_PROFILE.display_name}catch(e){V5_CLOUD_READY=false;msg.textContent=e.message||String(e)}};
+window.v5Logout=()=>{v5SaveSession(null);V5_SESSION=V5_USER=V5_PROFILE=null;V5_CLOUD_READY=false;v5CloudStatus();$('v5AuthMessage').textContent=LANG==='en'?'Signed out. Local records remain on this device.':'已退出云端账号。本机记录仍会保留。';$('v5LogoutBtn').style.display='none';$('v5LoginBtn').style.display='inline-block'};
+function v5CloudRow(r){return {user_id:V5_USER.id,client_id:Number(r.id),tool:r.tool,record_date:r.date,data:r.data||{},followup:r.followup||'',followup_at:r.followupAt||null,updated_at:r.updatedAt||new Date().toISOString()}}
+async function v5CloudUpsert(r){if(!V5_CLOUD_READY||!r)return;try{const url=V5_SUPABASE_URL+'/rest/v1/happiness_tool_records?on_conflict=user_id,client_id';const res=await fetch(url,{method:'POST',headers:{...v5Headers(V5_SESSION.access_token),'Prefer':'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(v5CloudRow(r))});if(res.status===401){await v5Refresh();return v5CloudUpsert(r)}if(!res.ok)throw new Error(await res.text())}catch(e){console.warn('toolbox cloud upsert',e)}}
+async function v5CloudDelete(id){if(!V5_CLOUD_READY)return;try{await fetch(V5_SUPABASE_URL+`/rest/v1/happiness_tool_records?user_id=eq.${encodeURIComponent(V5_USER.id)}&client_id=eq.${encodeURIComponent(id)}`,{method:'DELETE',headers:v5Headers(V5_SESSION.access_token,false)})}catch(e){console.warn('toolbox cloud delete',e)}}
+async function v5CloudMerge(){if(!V5_CLOUD_READY)return;const res=await fetch(V5_SUPABASE_URL+`/rest/v1/happiness_tool_records?user_id=eq.${encodeURIComponent(V5_USER.id)}&select=id,client_id,tool,record_date,data,followup,followup_at,updated_at&order=record_date.desc,updated_at.desc`,{headers:v5Headers(V5_SESSION.access_token,false)});if(!res.ok)throw new Error(LANG==='en'?'Cloud record table is not ready yet. Please run the V5 SQL setup first.':'云端工具记录表还没有准备好，请先执行 V5 SQL 设置。');const rows=await res.json(),local=[...db().records],map=new Map(local.map(r=>[Number(r.id),r]));for(const row of rows){map.set(Number(row.client_id),{id:Number(row.client_id),tool:row.tool,date:row.record_date,data:row.data||{},followup:row.followup||'',followupAt:row.followup_at||'',updatedAt:row.updated_at||''})}const merged=[...map.values()];saveDB({records:merged});const cloudIds=new Set(rows.map(x=>Number(x.client_id)));for(const r of local){if(!cloudIds.has(Number(r.id)))await v5CloudUpsert(r)}refreshStats();renderProgress();renderGarden();renderHistory();v5RenderCompanion()}
+async function v5InitCloud(){V5_SESSION=v5LoadSession();if(!V5_SESSION){v5CloudStatus();return}try{V5_USER=await v5AuthUser(V5_SESSION)}catch(e){try{V5_SESSION=await v5Refresh();V5_USER=await v5AuthUser(V5_SESSION)}catch(x){v5SaveSession(null);V5_SESSION=null;v5CloudStatus();return}}try{await v5CheckEnrollment(V5_USER.id,V5_SESSION.access_token);V5_PROFILE=await v5LoadProfile(V5_USER.id,V5_SESSION.access_token);V5_CLOUD_READY=true;await v5CloudMerge()}catch(e){console.warn(e);V5_CLOUD_READY=false}v5CloudStatus()}
+// V5 integration wrappers are installed after the V4 base handlers are defined.
+
+
+// ===== V4 LIFE-USEFUL TOOLBOX =====
+const V4_NEEDS=['emotion','relationship','money','career','habit','choice','overthink','okay'];
+function v4RenderNeedQuick(){const g=$('needQuickGrid');if(!g)return;const en=LANG==='en';$('needNowTitle').textContent=en?'What is happening today?':'今天发生什么了？';$('needNowLead').textContent=en?'Do not study all 13 tools first. Choose what feels closest and I will take you directly to a useful practice.':'不用先研究13个工具。先选最接近你现在的情况，我会直接带你去适合的练习。';g.innerHTML=V4_NEEDS.map(id=>{const s=SCENARIOS[id];return `<button class="needBtn" onclick="v4OpenNeed('${id}')">${s.icon} ${L(s.title)}</button>`}).join('')}
+window.v4OpenNeed=id=>{show('scenarioView');setTimeout(()=>showScenario(id),40)};
+function v4Text(v){return String(v||'').trim()}
+function v4Short(v,n=180){v=v4Text(v);return v.length>n?v.slice(0,n)+'…':v}
+function v4CoachResponse(tool,data){const en=LANG==='en',q=(zh,enx)=>en?enx:zh;let title=q('🌿 我帮你整理一下','🌿 Let me organise what you wrote'),body='',action='';
+ if(tool==='diary'){body=q(`今天你已经看见了：${v4Short(data.happy||data.grateful||data.good)||'生活里仍然有值得注意的部分'}。幸福日记的重点不是让每一天都很开心，而是训练注意力不要只停在问题上。`,`You already noticed: ${v4Short(data.happy||data.grateful||data.good)||'there is still something worth noticing today'}. The point is not to force happiness, but to keep attention from being captured only by problems.`);action=data.next||q('明天继续一个很小的行动。','Continue one very small action tomorrow.');}
+ else if(tool==='seed'){body=q(`你想改善的是「${v4Short(data.improve)||'一个生活方向'}」。真正有用的部分不是把目标想得更大，而是把它变成今天做得到的动作。`,`You want to improve “${v4Short(data.improve)||'an area of life'}.” The useful part is not making the goal bigger, but turning it into something doable today.`);action=data.done||data.plan||q('把下一步缩小到今天一定做得到。','Shrink the next step until it is truly doable today.');}
+ else if(tool==='gratitude'){body=q('你记录下的这些感谢，不代表困难不存在。它们只是提醒你：问题存在的同时，支持、关系和已经拥有的东西也可能同时存在。','What you recorded does not deny difficulty. It reminds you that support, relationships and what you already have can exist alongside the problem.');action=data.express||q('把一份感谢表达出去。','Express one piece of gratitude.');}
+ else if(tool==='goal'){body=q(`你的方向是「${v4Short(data.goal)||'让生活更接近自己真正重视的方向'}」。目标真正开始工作的地方，是你已经定义了第一小步。`,`Your direction is “${v4Short(data.goal)||'move life closer to what genuinely matters'}.” A goal starts becoming useful when the first small step is clear.`);action=data.small||q('今天只做最小的第一步。','Do only the smallest first step today.');}
+ else if(tool==='weekly'){body=q('这周不需要只盯着哪里没做好。你已经看见了值得珍惜的、做得不错的，也看见一个挑战。复盘的价值是决定下周少做什么、继续什么。','A review is not only about what went wrong. You have noticed what mattered, what went well and one challenge. The value is deciding what to continue and what to adjust.');action=data.nextweek||q('为下周选一件最值得继续的事。','Choose one thing worth continuing next week.');}
+ else if(tool==='recovery'){body=q(`现在的事实是：「${v4Short(data.happen)||'有一件事正在影响你'}」。你的感受是「${v4Short(data.feel)||'需要被看见'}」，而你真正需要的可能是「${v4Short(data.need)||'先稳定下来'}」。先把“发生什么”和“我怎样回应”分开，你就多了一点空间。`,`The fact is: “${v4Short(data.happen)||'something is affecting you'}.” You feel “${v4Short(data.feel)||'something that deserves to be noticed'},” and you may need “${v4Short(data.need)||'to steady yourself first'}.” Separating what happened from how you respond creates a little space.`);action=data.step||data.control||q('先做一个你能控制的小动作。','Take one small action that is actually within your control.');}
+ else if(tool==='relationship'){body=q(`这段关系里，先把事实「${v4Short(data.fact)||'发生了一件事'}」、感受「${v4Short(data.feeling)||'有情绪'}」和需要「${v4Short(data.need)||'希望被理解'}」分开。理解对方不等于否定自己，界限和沟通可以同时存在。`,`In this relationship, separate the fact “${v4Short(data.fact)||'something happened'},” the feeling “${v4Short(data.feeling)||'emotion is present'},” and the need “${v4Short(data.need)||'to be understood'}.” Understanding the other person does not require abandoning yourself; boundaries and communication can coexist.`);action=data.talk||q('等情绪比较稳定后，用事实 + 感受 + 需要说一次。','When emotion is steadier, communicate once using fact + feeling + need.');}
+ else if(tool==='abundance'){body=q(`你担心的是「${v4Short(data.worry)||'资源与未来'}」，但你也已经列出自己拥有的资源、能力或支持。富足不是假装钱的问题不存在，而是同时看清现实数字和可行动的资源。`,`You are worried about “${v4Short(data.worry)||'resources and the future'},” but you also listed resources, abilities or support you already have. Abundance is not pretending money problems do not exist; it is seeing both the real numbers and usable resources.`);action=data.action||q('今天完成一个现实、可量化的财务动作。','Complete one realistic, measurable financial action today.');}
+ else if(tool==='career'){body=q(`你已经把“我很迷茫”缩小成一个更具体的问题：${v4Short(data.gap)||'哪里最值得改善'}。事业方向往往不会一次想出来，而是从服务谁、创造什么价值和下一步行动逐渐清楚。`,`You have turned “I feel lost” into something more specific: ${v4Short(data.gap)||'what most needs improvement'}. Career direction often becomes clearer through who you serve, what value you create and the next real action.`);action=data.step||q('未来7天只追一个明确行动。','Pursue one clear action in the next seven days.');}
+ else if(tool==='map'){const vals=['self','relationship','health','career','growth'].map(k=>[k,Number(data[k]||0)]).filter(x=>x[1]>0);const low=vals.sort((a,b)=>a[1]-b[1])[0];body=q(`这张地图不是给生活打总分，而是帮你看见哪里最值得先照顾。${low?`目前分数较低的是 ${fieldLabel('map',low[0])}（${low[1]}/5）。`:''}`,`This map is not a grade for your life. It helps identify where care may be most useful first.${low?` The lowest current area is ${fieldLabel('map',low[0])} (${low[1]}/5).`:''}`);action=data.focus||q('先选一个维度，接下来7天只改善一点。','Choose one area and improve it slightly over the next seven days.');}
+ else if(tool==='habit'){body=q(`你不是“没有毅力”。你已经开始看见旧方法为什么中断：「${v4Short(data.whyStop)||'原来的做法不容易持续'}」。真正有效的重启通常是把动作缩小，而不是把要求加大。`,`This is not simply “lack of willpower.” You have started noticing why the old method stopped: “${v4Short(data.whyStop)||'the old approach was hard to sustain'}.” A useful restart usually makes the action smaller, not the pressure bigger.`);action=data.restart||data.smaller||q('今天只做重启后的最小版本。','Do only the smallest restart version today.');}
+ else if(tool==='choice'){body=q(`你真正要决定的是「${v4Short(data.question)||'一个选择'}」。没有工具能替你保证“绝对不会选错”，但你已经把价值、风险和选择分开看了。`,`You are deciding “${v4Short(data.question)||'something important'}.” No tool can guarantee a perfect choice, but you have separated values, trade-offs and options more clearly.`);action=data.decision||q('先做一个可逆的小决定，或收集最关键的一项信息。','Make one reversible small decision, or gather the single most important missing piece of information.');}
+ else if(tool==='innerdialogue'){body=q(`你脑中反复出现的是：「${v4Short(data.thought)||'一句对自己的判断'}」。现在你已经开始把“想法”与“事实”分开。一个想法很强烈，不代表它就是完整事实。`,`The repeating thought is: “${v4Short(data.thought)||'a judgement about yourself'}.” You are beginning to separate a thought from the facts. A thought can feel powerful without being the whole truth.`);action=data.rewrite||data.friend||q('写下一句更准确、也更能帮助你行动的话。','Write one sentence that is more accurate and also helps you act.');}
+ else {body=q('你已经把脑中的东西写出来了。下一步不需要解决全部，只要选择一个现在做得到的动作。','You have made the situation more visible. You do not need to solve everything now; choose one doable next step.');action=q('今天只完成一个小动作。','Complete one small action today.');}
+ return {title,body,action}}
+function v4ShowCoach(tool,data){const box=$('toolCoachResult');if(!box)return;const r=v4CoachResponse(tool,data);box.innerHTML=`<h4>${r.title}</h4><div>${esc(r.body)}</div><div class="coachAction"><b>${LANG==='en'?'Your next small step':'你的下一小步'}</b><br>${esc(r.action)}</div><div class="toolTip">${LANG==='en'?'This is a reflection aid, not medical, legal, financial or mental-health diagnosis. For high-stakes situations, use appropriate professional support.':'这是整理与反思工具，不是医疗、法律、财务或心理诊断。遇到高风险或专业问题，请结合适当的专业协助。'}</div>`;box.classList.add('show')}
+function v4ActionForRecord(r){if(!r)return'';const d=r.data||{};return d.step||d.talk||d.action||d.restart||d.decision||d.rewrite||d.next||d.plan||d.small||d.nextweek||d.express||d.focus||''}
+function v4LatestFollowable(){return [...db().records].filter(r=>r&&r.date&&v4ActionForRecord(r)&&!r.followup).sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id).find(r=>r.date<today())||null}
+function v4RenderFollowup(){const box=$('coachFollowUp');if(!box)return;const r=v4LatestFollowable(),en=LANG==='en';if(!r){box.classList.remove('show');box.innerHTML='';return}const a=v4ActionForRecord(r);box.classList.add('show');box.innerHTML=`<h3>${en?'🌱 Yesterday’s practice — what happened?':'🌱 昨天的练习，后来怎样？'}</h3><p>${en?'You wrote one real next step. You do not need a perfect result; just notice what happened when life became real.':'你昨天写下了一个真实的下一步。现在不用追求完美，只看看真实生活发生时怎么样。'}</p><div class="followAction"><b>${esc(toolName(r.tool))}</b><br>${esc(a)}</div><div class="followBtns"><button onclick="v4SaveFollowup(${r.id},'yes')">${en?'✓ I did it':'✓ 我做到了'}</button><button onclick="v4SaveFollowup(${r.id},'some')">${en?'I did part of it':'我做到一点'}</button><button onclick="v4SaveFollowup(${r.id},'no')">${en?'Not yet':'还没做到'}</button></div><div class="followFeedback" id="followFeedback_${r.id}"></div>`}
+window.v4SaveFollowup=(id,v)=>{const x=db(),r=x.records.find(a=>a.id===id);if(!r)return;r.followup=v;r.followupAt=new Date().toISOString();saveDB(x);const fb=$('followFeedback_'+id),en=LANG==='en';let t=v==='yes'?(en?'Good. Do not rush to add a bigger goal. Notice what helped this action actually happen, because that is what you can repeat.':'很好。先不要马上把目标加大。看看这次为什么真的做得到——那个条件才是你可以重复的。'):v==='some'?(en?'This is still useful progress. Keep the part that worked and make the unfinished part smaller next time.':'这仍然是有用的进步。保留已经做到的部分，把还没做到的部分再缩小一点。'):(en?'“Not yet” is information, not failure. Ask what made the action too difficult, then redesign a smaller version.':'“还没做到”不是失败，而是一条资料：原来的动作哪里太难？下一次把它设计得更小。');if(fb){fb.textContent=t;fb.classList.add('show')}setTimeout(v4RenderFollowup,1400)};
+saveToolRecord=function(){const def=FORM_DEFS[selectedTool],data={};def.fields.forEach(([id,label,type])=>{if(type==='mood')data[id]=moodValue;else if(type==='chips')data[id]=chipValue;else if(type==='range')data[id]=mapValues[id]||0;else data[id]=($('f_'+id)?.value||'').trim()});if(!Object.values(data).some(v=>v!==''&&v!==0)){$('toolStatus').textContent=LANG==='en'?'Please complete at least one field before saving.':'请至少填写一项内容，再保存。';return}const x=db();if(editingRecordId){const i=x.records.findIndex(r=>r.id===editingRecordId);if(i>=0)x.records[i]={...x.records[i],tool:selectedTool,date:$('recordDate').value||today(),data};saveDB(x);$('toolStatus').textContent=LANG==='en'?'✓ Record updated.':'✓ 已更新这份记录。';editingRecordId=null;$('saveTool').textContent=L(UI.save)}else{x.records.push({id:Date.now(),tool:selectedTool,date:$('recordDate').value||today(),data,followup:''});saveDB(x);$('toolStatus').textContent=LANG==='en'?'✓ Saved. Now use the summary below to decide one next step.':'✓ 已保存。现在看看下面的整理，只带走一个下一步。'}v4ShowCoach(selectedTool,data);refreshStats();renderProgress();renderGarden();v4RenderFollowup()};
+const v4BaseRenderStatic=renderStatic;renderStatic=function(){v4BaseRenderStatic();v4RenderNeedQuick();v4RenderFollowup()};
+const v4BaseSetLanguage=setLanguage;setLanguage=function(lang){v4BaseSetLanguage(lang);v4RenderNeedQuick();v4RenderFollowup()};window.setLanguage=setLanguage;
+const v4BaseShow=show;show=function(view){v4BaseShow(view);if(view==='homeView')v4RenderFollowup()};
+function v4AutoOpen(){const p=new URLSearchParams(location.search),tool=p.get('tool');if(tool&&FORM_DEFS[tool])setTimeout(()=>openTool(tool),80)}
+
+
+window.setLanguage=setLanguage;
+function openGuide(){window.location.href='guide.html?lang='+encodeURIComponent(LANG)}
+function returnToCourse(){const params=new URLSearchParams(location.search),target=params.get('return');if(target){try{const u=new URL(target);u.searchParams.set('lang',LANG);if(u.origin===location.origin){location.href=u.href;return}}catch(e){}} location.href=window.location.origin+'/?lang='+encodeURIComponent(LANG)}
+function show(view){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));$(view).classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===view));if(view==='progressView')renderProgress();if(view==='gardenView')renderGarden();if(view==='historyView')renderHistory();if(view==='certificateView')renderCertificate();window.scrollTo({top:0,behavior:'smooth'})}
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>show(b.dataset.view));
+function renderTools(){$('toolGrid').innerHTML=TOOL_DATA.map(t=>`<article class="tool"><div class="tooltop"><span class="num">${t.n}</span><span>${t.icon}</span></div><div class="icon">${t.icon}</div><h3>${L(t.name)}</h3><p>${L(t.desc)}</p><button class="btn primary" style="width:100%;margin-top:13px" onclick="openTool('${t.id}')">${t.id==='certificate'?L(UI.viewCert):L(UI.openTool)}</button></article>`).join('')}
+window.openTool=id=>{if(id==='certificate'){show('certificateView');return}selectedTool=id;moodValue=0;chipValue='';mapValues={};editingRecordId=null;renderToolForm();show('toolView')};$('backHome').onclick=()=>show('homeView');
+function normalizeChip(v){const m={'❤️关系':'relationship','🙏感恩':'gratitude','🌱成长':'growth','🤲给予':'giving','🎯行动':'action','❤️ Relationships':'relationship','🙏 Gratitude':'gratitude','🌱 Growth':'growth','🤲 Giving':'giving','🎯 Action':'action'};return m[v]||v||''}
+function chipLabel(v){v=normalizeChip(v);const o=CHIP_OPTIONS.find(x=>x[0]===v);return o?L(o[1]):v}
+function renderField(f){const [id,label,type,opts]=f;if(type==='textarea')return `<label>${L(label)}</label><textarea id="f_${id}"></textarea>`;if(type==='text')return `<label>${L(label)}</label><input id="f_${id}" type="text">`;if(type==='mood')return `<label>${L(label)}</label><div class="moods">${[1,2,3,4,5].map((n,i)=>`<button type="button" class="mood" data-mood="${n}"><span>${['😔','🙁','😐','🙂','😊'][i]}</span>${n}</button>`).join('')}</div>`;if(type==='chips')return `<label>${L(label)}</label><div class="chips">${opts.map(([v,lab])=>`<button type="button" class="chip" data-chip="${v}">${L(lab)}</button>`).join('')}</div>`;if(type==='range')return `<label>${L(label)}</label><div class="rangegrid">${[1,2,3,4,5].map(n=>`<button type="button" class="rangebtn" data-range="${id}" data-val="${n}">${n}</button>`).join('')}</div>`;return ''}
+function renderToolForm(existing=null){const def=FORM_DEFS[selectedTool];$('toolContent').innerHTML=`<h2>${L(def.title)}</h2><div class="sub">${L(def.sub)}</div><label>${L(UI.date)}</label><input id="recordDate" type="date" value="${existing?.date||today()}">${def.fields.map(renderField).join('')}<div class="btnrow"><button class="btn primary" id="saveTool">${editingRecordId?L(UI.update):L(UI.save)}</button><button class="btn secondary" id="clearTool">${L(UI.clear)}</button></div><div class="status" id="toolStatus">${editingRecordId?L(UI.editing):''}</div><div class="coachResult" id="toolCoachResult"></div>`;document.querySelectorAll('[data-mood]').forEach(b=>b.onclick=()=>{moodValue=Number(b.dataset.mood);document.querySelectorAll('[data-mood]').forEach(x=>x.classList.remove('sel'));b.classList.add('sel')});document.querySelectorAll('[data-chip]').forEach(b=>b.onclick=()=>{chipValue=b.dataset.chip;document.querySelectorAll('[data-chip]').forEach(x=>x.classList.remove('sel'));b.classList.add('sel')});document.querySelectorAll('[data-range]').forEach(b=>b.onclick=()=>{mapValues[b.dataset.range]=Number(b.dataset.val);document.querySelectorAll(`[data-range="${b.dataset.range}"]`).forEach(x=>x.classList.remove('sel'));b.classList.add('sel')});if(existing){def.fields.forEach(([id,label,type])=>{const v=existing.data?.[id];if(type==='mood'){moodValue=Number(v||0);document.querySelectorAll('[data-mood]').forEach(x=>x.classList.toggle('sel',Number(x.dataset.mood)===moodValue))}else if(type==='chips'){chipValue=normalizeChip(v);document.querySelectorAll('[data-chip]').forEach(x=>x.classList.toggle('sel',x.dataset.chip===chipValue))}else if(type==='range'){mapValues[id]=Number(v||0);document.querySelectorAll(`[data-range="${id}"]`).forEach(x=>x.classList.toggle('sel',Number(x.dataset.val)===mapValues[id]))}else if($('f_'+id))$('f_'+id).value=v||''})}$('saveTool').onclick=saveToolRecord;$('clearTool').onclick=()=>{moodValue=0;chipValue='';mapValues={};editingRecordId=null;renderToolForm()}}
+function saveToolRecord(){const def=FORM_DEFS[selectedTool],data={};def.fields.forEach(([id,label,type])=>{if(type==='mood')data[id]=moodValue;else if(type==='chips')data[id]=chipValue;else if(type==='range')data[id]=mapValues[id]||0;else data[id]=($('f_'+id)?.value||'').trim()});if(!Object.values(data).some(v=>v!==''&&v!==0)){$('toolStatus').textContent=LANG==='en'?'Please complete at least one field before saving.':'请至少填写一项内容，再保存。';return}const x=db();if(editingRecordId){const i=x.records.findIndex(r=>r.id===editingRecordId);if(i>=0)x.records[i]={...x.records[i],tool:selectedTool,date:$('recordDate').value||today(),data};saveDB(x);$('toolStatus').textContent=LANG==='en'?'✓ Record updated.':'✓ 已更新这份记录。';editingRecordId=null;$('saveTool').textContent=L(UI.save)}else{x.records.push({id:Date.now(),tool:selectedTool,date:$('recordDate').value||today(),data});saveDB(x);$('toolStatus').textContent=LANG==='en'?'✓ Saved. This date will also count toward your practice progress and garden growth.':'✓ 已保存。这一天也会计入你的幸福实践与花园成长。'}refreshStats();renderProgress();renderGarden()}
+function practiceDates(){return [...new Set(db().records.map(r=>r.date).filter(Boolean))].sort()}
+function streak(){const set=new Set(practiceDates());if(!set.size)return 0;let d=new Date(today()+'T00:00:00'),key=today();if(!set.has(key)){d.setDate(d.getDate()-1);key=new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);if(!set.has(key))return 0}let n=0;while(true){key=new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);if(!set.has(key))break;n++;d.setDate(d.getDate()-1)}return n}
+function gardenStage(n){if(n<=0)return [bi('土壤','Soil'),'🪴',bi('写下第一份记录，就种下第一颗种子。','Save your first record to plant your first seed.')];if(n<=2)return [bi('种子','Seed'),'🌰',bi('第1–2天｜种子阶段：你已经开始播种。先不用急着看到结果。','Days 1–2 | Seed: You have started. There is no need to rush for results.')];if(n<=7)return [bi('发芽','Sprout'),'🌱',bi('第3–7天｜发芽阶段：小小的改变正在出现，继续照顾它。','Days 3–7 | Sprout: Small changes are beginning to appear. Keep caring for them.')];if(n<=15)return [bi('成长','Growth'),'🌿',bi('第8–15天｜成长阶段：持续正在形成力量，你的习惯开始慢慢稳定。','Days 8–15 | Growth: Consistency is building strength and your habits are becoming steadier.')];if(n<=20)return [bi('花苞','Bud'),'🪻',bi('第16–20天｜花苞阶段：你已经走过一段路，新的生活节奏正在形成。','Days 16–20 | Bud: You have come a long way and a new rhythm is forming.')];if(n<=29)return [bi('开花','Bloom'),'🌷',bi('第21–29天｜开花阶段：许多小行动开始累积成看得见的改变。','Days 21–29 | Bloom: Many small actions are becoming visible change.')];return [bi('幸福花园','Happiness Garden'),'🌳',bi('第30天｜幸福花园：你完成了30天实践，继续照顾真正适合你的幸福习惯。','Day 30 | Happiness Garden: You completed 30 practice days. Keep nurturing the habits that truly fit your life.')]} 
+function refreshStats(){const dates=practiceDates(),rec=db().records,gs=gardenStage(dates.length);$('statDays').textContent=dates.length;$('statStreak').textContent=streak();$('statRecords').textContent=rec.length;$('statGarden').textContent=L(gs[0])}
+function recentCount(days){const end=new Date(today()+'T00:00:00'),start=new Date(end);start.setDate(start.getDate()-(days-1));return practiceDates().filter(s=>{const d=new Date(s+'T00:00:00');return d>=start&&d<=end}).length}
+function setP(n,c){const x=Math.min(n,c);$('p'+n+'t').textContent=x+' / '+n;$('p'+n+'b').style.width=(x/n*100)+'%'}
+function renderProgress(){setP(7,recentCount(7));setP(21,recentCount(21));setP(30,recentCount(30));const total=practiceDates().length,s=streak();let m=LANG==='en'?'🌱 One small practice today is already a beginning.':'🌱 今天做一个小练习，就已经是开始。';if(total>=30)m=LANG==='en'?'🎉 You have accumulated 30 practice days. Let these practices continue becoming part of your life.':'🎉 你已经累积30个实践日。让这些练习继续成为生活的一部分。';else if(total>=21)m=LANG==='en'?'🌷 You have accumulated 21 practice days and can generate your completion certificate.':'🌷 你已经累积21个实践日，可以生成正式完成证书。';else if(total>=7)m=LANG==='en'?'🌿 You have passed the 7-day stage. Keep moving forward with small, real actions.':'🌿 你已经跨过7天阶段，继续用小而真的行动前进。';else if(s>=3)m=LANG==='en'?`🌱 You have practiced for ${s} consecutive days. Consistency matters more than perfection.`:`🌱 你已经连续实践 ${s} 天。持续比完美更重要。`;$('progressMsg').textContent=m}
+function renderGarden(){const n=Math.min(practiceDates().length,30),stage=gardenStage(n);$('gardenMsg').textContent=L(stage[2]);$('gardenGrid').innerHTML=Array.from({length:30},(_,i)=>`<div class="plot"><div class="plant">${i<n?stage[1]:'·'}</div><div class="day">DAY ${i+1}</div></div>`).join('')}
+function toolObj(id){return TOOL_DATA.find(t=>t.id===id)}function toolName(id){return L(toolObj(id)?.name)||id}function fieldLabel(toolId,key){const def=FORM_DEFS[toolId];if(!def)return key;const f=def.fields.find(x=>x[0]===key);return f?L(f[1]):key}function displayValue(toolId,key,v){if(toolId==='seed'&&key==='area')return chipLabel(v);return v}
+function renderHistory(){const arr=[...db().records].sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);if(!arr.length){$('allHistory').innerHTML=`<div class="empty">${L(UI.noRecords)}</div>`;return}$('allHistory').innerHTML=arr.map(r=>`<div class="entry"><div class="entryhead"><div class="entrydate">${esc(r.date)}｜${esc(toolName(r.tool))}</div><div class="entrymeta">${new Date(r.id).toLocaleTimeString(LANG==='en'?'en-US':'zh-CN',{hour:'2-digit',minute:'2-digit'})}</div></div>${Object.entries(r.data).filter(([k,v])=>v!==''&&v!==0).map(([k,v])=>`<h4>${esc(fieldLabel(r.tool,k))}</h4><p>${esc(displayValue(r.tool,k,v))}</p>`).join('')}<div class="smallactions"><button class="small edit" onclick="editRecord(${r.id})">${L(UI.edit)}</button><button class="small delete" onclick="deleteRecord(${r.id})">${L(UI.del)}</button></div></div>`).join('')}
+window.editRecord=id=>{const r=db().records.find(x=>x.id===id);if(!r)return;selectedTool=r.tool;editingRecordId=id;moodValue=0;chipValue='';mapValues={};renderToolForm(r);show('toolView')};window.deleteRecord=id=>{if(!confirm(LANG==='en'?'Delete this record?':'确定删除这份记录吗？'))return;const x=db();x.records=x.records.filter(r=>r.id!==id);saveDB(x);renderHistory();refreshStats()}
+function renderCertificate(){const count=practiceDates().length,name=($('certName')?.value||'').trim()||(LANG==='en'?'Participant':'学员'),qualified=count>=21;$('certificateBox').innerHTML=`<div class="certificate"><div class="cbrand">${LANG==='en'?'🌱 Planting Happiness | 21-Day Happiness Practice System':'🌱 播种幸福｜21天幸福人生实践系统'}</div><h2>${LANG==='en'?'Certificate of Completion':'完成证书'}</h2><p>${LANG==='en'?'This certifies that':'兹证明'}</p><div class="name">${esc(name)}</div><p>${qualified?(LANG==='en'?'has completed at least 21 different practice days,':'已完成至少21个不同实践日，'):(LANG==='en'?'is currently completing the 21-day happiness practice,':'正在进行21天幸福实践，')}<br>${LANG==='en'?'May awareness, gratitude, relationships and action continue to grow in your daily life.':'愿你继续把觉察、感恩、关系与行动，慢慢带进生活。'}</p><p><b>${LANG==='en'?`Practice days: ${count}`:`实践天数：${count} 天`}</b><br>${today()}</p></div>`;$('certStatus').textContent=qualified?(LANG==='en'?'✓ 21-day requirement reached. This can be used as your completion certificate.':'✓ 已达到21天，可作为正式完成证书。'):(LANG==='en'?`Current progress: ${count}/21 days. This certificate is a preview.`:`目前 ${count}/21 天。此证书为预览样式。`)}
+$('buildCert').onclick=renderCertificate;$('printCert').onclick=()=>window.print();
+function downloadJSON(data,filename){const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(url),500)}
+$('exportAll').onclick=()=>downloadJSON(db(),(LANG==='en'?'Planting_Happiness_13Tools_Backup_':'播种幸福_13项工具箱_全部备份_')+today()+'.json');$('importBackup').onclick=()=>{$('backupFile').value='';$('backupFile').click()};
+$('backupFile').addEventListener('change',async e=>{const file=e.target.files?.[0];if(!file)return;if(!file.name.toLowerCase().endsWith('.json')){alert(LANG==='en'?'Please select a .json backup file.':'请选择 .json 格式的《播种幸福》备份文件。');return}try{const incoming=JSON.parse(await file.text());if(!incoming||typeof incoming!=='object'||!Array.isArray(incoming.records)){alert(LANG==='en'?'This is not a valid Planting Happiness toolbox backup. Please choose a JSON file created by “Export Backup”.':'这个文件不是有效的《播种幸福》工具箱备份。\n\n请确认你选择的是由「⬇️ 导出全部备份」产生的 JSON 文件。');return}const valid=incoming.records.every(r=>r&&typeof r==='object'&&typeof r.tool==='string'&&typeof r.date==='string'&&r.data&&typeof r.data==='object');if(!valid){alert(LANG==='en'?'Some records in this backup cannot be recognised. Nothing was restored.':'备份文件内有无法识别的记录，因此没有恢复任何资料。');return}const current=db(),incomingCount=incoming.records.length,currentCount=current.records.length,incomingDays=[...new Set(incoming.records.map(r=>r.date).filter(Boolean))].length;const ok=confirm(LANG==='en'?`Restorable backup found:\n\n📚 Backup records: ${incomingCount}\n📅 Practice days: ${incomingDays}\n💻 Records currently in this browser: ${currentCount}\n\nRestoring will replace the current data with this backup. A safety copy of your current data will be downloaded first.\n\nContinue?`:`找到可恢复的备份资料：\n\n📚 备份记录：${incomingCount} 份\n📅 实践天数：${incomingDays} 天\n💻 当前浏览器已有记录：${currentCount} 份\n\n恢复后，将以这个备份内容作为目前资料。\n\n为了安全，系统会先自动保存一份「恢复前安全备份」，所以不会直接丢失你现在的资料。\n\n是否继续恢复？`);if(!ok)return;localStorage.setItem(KEY+'_before_restore',JSON.stringify(current));downloadJSON(current,(LANG==='en'?'Planting_Happiness_PreRestore_Safety_Backup_':'播种幸福_恢复前安全备份_')+today()+'.json');saveDB({records:incoming.records});refreshStats();renderProgress();renderGarden();renderHistory();renderCertificate();show('historyView');alert(LANG==='en'?`✅ Restore successful!\n\nRestored ${incomingCount} records across ${incomingDays} practice days.\n\nA pre-restore safety backup was also downloaded.`:`✅ 恢复成功！\n\n已恢复 ${incomingCount} 份记录，共 ${incomingDays} 个实践日。\n\n恢复前的现有资料也已经自动下载为「恢复前安全备份」。`)}catch(err){alert(LANG==='en'?'Unable to read this backup file. Please check that the file is not damaged and is a valid JSON backup.':'无法读取这个备份文件。\n\n请确认文件没有损坏，而且是正确的 JSON 备份。')}});
+$('resetAll').onclick=()=>{if(!confirm(LANG==='en'?'Clear all Demo records saved in this browser? This cannot be undone. Export a backup first if needed.':'确定清除这个Demo在当前浏览器保存的全部记录吗？这个动作无法复原。建议先按「导出全部备份」。'))return;localStorage.removeItem(KEY);refreshStats();renderProgress();renderGarden();renderHistory();alert(LANG==='en'?'Demo data cleared.':'已清除Demo资料。')};
+function renderScenarioCards(){$('scenarioCards').innerHTML=Object.entries(SCENARIOS).map(([id,s])=>`<article class="scenario-card"><div class="sym">${s.icon}</div><h3>${s.code}｜${L(s.title)}</h3><p>${L(s.desc)}</p><button class="btn primary" onclick="showScenario('${id}')" style="width:100%">${LANG==='en'?'See what I can do now':'看看我现在可以怎么做'}</button></article>`).join('')}
+window.showScenario=id=>{const s=SCENARIOS[id];if(!s)return;const tool=toolObj(s.tool);$('scenarioGuide').innerHTML=`<div class="guidebox"><h3>${s.icon} ${s.code}｜${L(s.title)}</h3><p>${L(s.intro)}</p><ul class="questions">${s.qs.map(q=>`<li>${L(q)}</li>`).join('')}</ul><div class="recommend">${L(UI.recommended)}${tool.icon} ${L(tool.name)}</div><div class="btnrow"><button class="btn primary" onclick="openTool('${s.tool}')">${L(UI.startPractice)}</button></div></div>`;$('scenarioGuide').scrollIntoView({behavior:'smooth',block:'start'})};
+renderStatic();renderTools();refreshStats();renderProgress();renderGarden();renderHistory();renderCertificate();
+
+// ===== V5 CLOUD + COMPANION INTEGRATION (installed after V4 base handlers) =====
+const v5BaseSaveToolRecord=saveToolRecord;saveToolRecord=function(){const editing=editingRecordId;const beforeIds=new Set(db().records.map(r=>r.id));v5BaseSaveToolRecord();let x=db(),r=editing?x.records.find(a=>a.id===editing):x.records.filter(a=>!beforeIds.has(a.id)).sort((a,b)=>b.id-a.id)[0];if(r){r.updatedAt=new Date().toISOString();saveDB(x);v5CloudUpsert(r)}v5RenderCompanion();renderHistory()};
+const v5BaseFollow=window.v4SaveFollowup;window.v4SaveFollowup=function(id,v){if(typeof v5BaseFollow==='function')v5BaseFollow(id,v);const x=db(),r=x.records.find(a=>a.id===id);if(r){r.updatedAt=new Date().toISOString();saveDB(x);v5CloudUpsert(r)}v5RenderCompanion();renderHistory()};
+const v5BaseDelete=window.deleteRecord;window.deleteRecord=function(id){const exists=db().records.find(r=>r.id===id);if(typeof v5BaseDelete==='function')v5BaseDelete(id);if(exists)v5CloudDelete(id);v5RenderCompanion();renderHistory()};
+const v5BaseSetLanguage=setLanguage;setLanguage=function(lang){v5BaseSetLanguage(lang);v5RefreshAuthText();v5CloudStatus();v5RenderCompanion();v5PopulateHistoryFilters();renderHistory()};window.setLanguage=setLanguage;
+const v5BaseShow=show;show=function(view){v5BaseShow(view);if(view==='homeView')v5RenderCompanion();if(view==='historyView'){v5PopulateHistoryFilters();renderHistory()}};
+// Backward-compatible V4 records remain readable; V5 only enriches presentation and optional cloud sync.
+setTimeout(()=>{v5RenderCompanion();v5PopulateHistoryFilters();v5CloudStatus();v5InitCloud();},0);
+
+// ===== V5.2 FINAL TOOL EXPERIENCE PATCH =====
+let V52_STEP=0;
+function v52ToolRecords(tool){return [...db().records].filter(r=>r&&r.tool===tool).sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id)}
+function v52PastBlock(tool){
+  const en=LANG==='en', arr=v52ToolRecords(tool).slice(0,3);
+  if(!arr.length){
+    return `<div class="v52Past"><div class="v52PastTop"><h3>${en?'📖 Your past reflections':'📖 以前的我写过什么？'}</h3></div><div class="v52Empty">${en?'This is your first saved reflection for this tool. After you save today, it will appear here the next time you return.':'这是你第一次使用这个工具。今天保存以后，下次回来就会在这里看见以前写过的自己。'}</div></div>`;
+  }
+  return `<div class="v52Past"><div class="v52PastTop"><h3>${en?'📖 Your past reflections':'📖 以前的我写过什么？'}</h3><button class="v52ReviewLink" type="button" onclick="v5OpenTopicHistory('${tool}')">${en?'View all records →':'查看全部记录 →'}</button></div><div class="v52PastList">${arr.map(r=>{const key=v5KeyText(r),seed=v4ActionForRecord(r);return `<div class="v52PastItem"><b>${esc(r.date)} · ${v5FollowLabel(r.followup)}</b><p>${esc(v4Short(key||v4CoachResponse(r.tool,r.data||{}).body,150))}</p>${seed?`<div class="v52PastSeed">🌱 ${esc(v4Short(seed,120))}</div>`:''}</div>`}).join('')}</div></div>`;
+}
+function v52ExampleBlock(tool){
+  const en=LANG==='en';
+  return `<div class="v52Example"><h3>${en?'💡 See an example before you write':'💡 先看一个例子，再写自己的情况'}</h3><p><b>${en?'When this tool is useful:':'什么时候适合用：'}</b> ${L(V5_EXAMPLES[tool])}</p><p>${L(V5_STORIES[tool])}</p><details><summary>${en?'Why start with an example?':'为什么先看例子？'}</summary><p>${en?'Because habits and automatic reactions can be hard to notice while they are happening. The example is not a correct answer; it simply helps you recognise your own pattern before writing.':'因为很多习惯和自动反应发生得太快，我们当下不一定察觉。例子不是标准答案，只是先帮助你认出自己的模式，再写自己的情况。'}</p></details></div>`;
+}
+function v52FieldHint(tool,id){
+ const en=LANG==='en';
+ const hints={
+  happen:bi('只写摄像机拍得到的事实，先不要解释谁对谁错。','Write only what a camera could observe first, without deciding who was right or wrong.'),
+  fact:bi('先写发生了什么，不急着判断对方的动机。','Write what happened first, before judging the other person’s intention.'),
+  feel:bi('可以写：生气、害怕、委屈、失望、紧张、很累……','Examples: angry, afraid, hurt, disappointed, tense, exhausted…'),
+  feeling:bi('可以写：生气、害怕、委屈、失望、紧张、很累……','Examples: angry, afraid, hurt, disappointed, tense, exhausted…'),
+  need:bi('例如：被听见、安全感、休息、清楚答案、界限、支持。','Examples: to be heard, safety, rest, clarity, boundaries, support.'),
+  control:bi('只写你现在真正能够影响的部分。','Write only what is genuinely within your influence right now.'),
+  step:bi('把动作缩小到今天或接下来10分钟做得到。','Make the action small enough to do today or in the next 10 minutes.'),
+  talk:bi('不需要写得完美，只写你想怎样更清楚地表达。','It does not need to sound perfect; write how you want to communicate more clearly.'),
+  worry:bi('把“我很担心”写成更具体的一句话。','Turn “I am worried” into one more specific sentence.'),
+  action:bi('选择一个现实、可执行、可观察的小动作。','Choose one realistic, observable next action.'),
+  thought:bi('写下脑中最常重复的那句话，即使它听起来不理性也可以。','Write the sentence that keeps repeating in your mind, even if it sounds irrational.'),
+  rewrite:bi('不是强迫正能量，而是写得更准确、更有帮助。','Do not force positivity; make the sentence more accurate and more useful.'),
+  decision:bi('先写你现在愿意尝试的选择，不需要保证永远正确。','Write the choice you are willing to try now; it does not need to be perfect forever.')
+ };
+ return hints[id]?L(hints[id]):(en?'Write what is true for you. There is no perfect answer.':'写真实的就好，没有标准答案。');
+}
+function v52RenderField(f,idx,total){
+ const [id,label,type]=f;
+ return `<div class="v52Field ${idx===0?'on':''}" data-v52-step="${idx}"><label>${L(label)}</label><div class="v52Hint">${v52FieldHint(selectedTool,id)}</div>${renderField(f)}<div class="v52Nav"><button class="btn secondary" type="button" onclick="v52Prev()" ${idx===0?'disabled':''}>${LANG==='en'?'← Previous':'← 上一题'}</button>${idx<total-1?`<button class="btn primary" type="button" onclick="v52Next()">${LANG==='en'?'Next →':'下一题 →'}</button>`:`<span></span>`}</div></div>`;
+}
+function v52RefreshSteps(){
+ const fields=[...document.querySelectorAll('#toolContent .v52Field')];
+ if(!fields.length)return;
+ V52_STEP=Math.max(0,Math.min(V52_STEP,fields.length-1));
+ fields.forEach((x,i)=>x.classList.toggle('on',i===V52_STEP));
+ const dots=document.querySelectorAll('#toolContent .v52Dot');dots.forEach((d,i)=>d.classList.toggle('on',i===V52_STEP));
+ const count=document.getElementById('v52StepCount');if(count)count.textContent=(LANG==='en'?`Question ${V52_STEP+1} of ${fields.length}`:`第 ${V52_STEP+1} / ${fields.length} 题`);
+ fields[V52_STEP]?.scrollIntoView({behavior:'smooth',block:'center'});
+}
+window.v52Next=()=>{V52_STEP++;v52RefreshSteps()};window.v52Prev=()=>{V52_STEP--;v52RefreshSteps()};
+
+// Final override: this runs after all earlier V4/V5 code so the user never lands on a wall of blank fields.
+renderToolForm=function(existing=null){
+ const def=FORM_DEFS[selectedTool],en=LANG==='en';V52_STEP=0;
+ const fields=def.fields||[];
+ $('toolContent').innerHTML=`<h2>${L(def.title)}</h2><div class="sub">${L(def.sub)}</div>
+ <div class="v52Intro"><h3>${en?'🌿 We will do this one question at a time':'🌿 不需要一次填完，我们一题一题来'}</h3><p>${en?'First see an example and your past reflections. Then answer only the current question. The goal is not to write a perfect essay; it is to see one thing more clearly and choose one next step.':'先看例子，也看回以前的自己，然后一次只回答一个问题。目标不是写一篇很完整的文章，而是把一件事看清楚一点，再带走一个下一步。'}</p></div>
+ ${v52PastBlock(selectedTool)}
+ ${v52ExampleBlock(selectedTool)}
+ <div class="v52DateRow"><label>${L(UI.date)}</label><input id="recordDate" type="date" value="${existing?.date||today()}"></div>
+ <div class="v52Stepper"><div class="v52StepHead"><strong id="v52StepCount"></strong><div class="v52StepDots">${fields.map((_,i)=>`<span class="v52Dot ${i===0?'on':''}"></span>`).join('')}</div></div>${fields.map((f,i)=>v52RenderField(f,i,fields.length)).join('')}</div>
+ <div class="v52SaveRow"><button class="btn primary" id="saveTool">${editingRecordId?L(UI.update):L(UI.save)}</button><button class="btn secondary" id="clearTool">${L(UI.clear)}</button></div><div class="status" id="toolStatus">${editingRecordId?L(UI.editing):''}</div><div class="coachResult" id="toolCoachResult"></div>`;
+ document.querySelectorAll('[data-mood]').forEach(b=>b.onclick=()=>{moodValue=Number(b.dataset.mood);document.querySelectorAll('[data-mood]').forEach(x=>x.classList.remove('sel'));b.classList.add('sel')});
+ document.querySelectorAll('[data-chip]').forEach(b=>b.onclick=()=>{chipValue=b.dataset.chip;document.querySelectorAll('[data-chip]').forEach(x=>x.classList.remove('sel'));b.classList.add('sel')});
+ document.querySelectorAll('[data-range]').forEach(b=>b.onclick=()=>{mapValues[b.dataset.range]=Number(b.dataset.val);document.querySelectorAll(`[data-range="${b.dataset.range}"]`).forEach(x=>x.classList.remove('sel'));b.classList.add('sel')});
+ if(existing){
+   fields.forEach(([id,label,type])=>{const v=existing.data?.[id];if(type==='mood'){moodValue=Number(v||0);document.querySelectorAll('[data-mood]').forEach(x=>x.classList.toggle('sel',Number(x.dataset.mood)===moodValue))}else if(type==='chips'){chipValue=normalizeChip(v);document.querySelectorAll('[data-chip]').forEach(x=>x.classList.toggle('sel',x.dataset.chip===chipValue))}else if(type==='range'){mapValues[id]=Number(v||0);document.querySelectorAll(`[data-range="${id}"]`).forEach(x=>x.classList.toggle('sel',Number(x.dataset.val)===mapValues[id]))}else if($('f_'+id))$('f_'+id).value=v||''});
+ }
+ $('saveTool').onclick=saveToolRecord;
+ $('clearTool').onclick=()=>{moodValue=0;chipValue='';mapValues={};editingRecordId=null;renderToolForm()};
+ v52RefreshSteps();
+};
+
+// After cloud records arrive, immediately refresh the open tool so past reflections appear without reopening it.
+const v52BaseCloudMerge=v5CloudMerge;
+v5CloudMerge=async function(){await v52BaseCloudMerge();if(selectedTool&&$('toolView')?.classList.contains('active')){const ex=editingRecordId?db().records.find(r=>r.id===editingRecordId):null;renderToolForm(ex)}};
+
+// Ensure the visible version and companion view refresh after the final patch.
+setTimeout(()=>{if(selectedTool&&$('toolView')?.classList.contains('active')){const ex=editingRecordId?db().records.find(r=>r.id===editingRecordId):null;renderToolForm(ex)}v5RenderCompanion();renderHistory();},0);
+
+
+// ===== V5.3 NAVIGATION + GUIDED HISTORY SAFETY PATCH =====
+// This final layer intentionally owns navigation and tool rendering so older V4/V5 handlers cannot leave the user on a blank-form screen.
+function v53ShowView(view){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  const target=document.getElementById(view); if(!target)return;
+  target.classList.add('active');
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===view));
+  if(view==='progressView')renderProgress();
+  if(view==='gardenView')renderGarden();
+  if(view==='historyView'){v5PopulateHistoryFilters();renderHistory()}
+  if(view==='certificateView')renderCertificate();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+window.v53ShowView=v53ShowView; show=v53ShowView; window.show=v53ShowView;
+window.v53GoHome=function(){v53ShowView('homeView');setTimeout(()=>{const x=document.getElementById('needQuickGrid');if(x)x.scrollIntoView({behavior:'smooth',block:'start'})},60)};
+window.v53GoHistory=function(tool){if(tool)V5_HISTORY_FILTER=tool;v53ShowView('historyView')};
+
+function v53RenderToolForm(existing=null){
+ const def=FORM_DEFS[selectedTool],en=LANG==='en';V52_STEP=0;
+ if(!def){v53GoHome();return}
+ const fields=def.fields||[];
+ $('toolContent').innerHTML=`<h2>${L(def.title)}</h2><div class="sub">${L(def.sub)}</div>
+ <div class="v52Intro"><h3>${en?'🌿 One question at a time':'🌿 一次只整理一个问题'}</h3><p>${en?'Start with your past reflections and a real-life example. Then answer only the current question. You are not writing an essay; you are trying to see one thing more clearly and choose one next step.':'先看回以前的自己，再看一个生活例子，然后一次只回答当前这一题。你不是在写作文，而是在把一件事看清楚一点，再带走一个下一步。'}</p></div>
+ ${v52PastBlock(selectedTool)}
+ ${v52ExampleBlock(selectedTool)}
+ <div class="v52DateRow"><label>${L(UI.date)}</label><input id="recordDate" type="date" value="${existing?.date||today()}"></div>
+ <div class="v52Stepper"><div class="v52StepHead"><strong id="v52StepCount"></strong><div class="v52StepDots">${fields.map((_,i)=>`<span class="v52Dot ${i===0?'on':''}"></span>`).join('')}</div></div>${fields.map((f,i)=>v52RenderField(f,i,fields.length)).join('')}</div>
+ <div class="v52SaveRow"><button class="btn primary" id="saveTool">${editingRecordId?L(UI.update):L(UI.save)}</button><button class="btn secondary" id="clearTool">${L(UI.clear)}</button></div><div class="status" id="toolStatus">${editingRecordId?L(UI.editing):''}</div><div class="coachResult" id="toolCoachResult"></div>`;
+ document.querySelectorAll('[data-mood]').forEach(b=>b.onclick=()=>{moodValue=Number(b.dataset.mood);document.querySelectorAll('[data-mood]').forEach(x=>x.classList.remove('sel'));b.classList.add('sel')});
+ document.querySelectorAll('[data-chip]').forEach(b=>b.onclick=()=>{chipValue=b.dataset.chip;document.querySelectorAll('[data-chip]').forEach(x=>x.classList.remove('sel'));b.classList.add('sel')});
+ document.querySelectorAll('[data-range]').forEach(b=>b.onclick=()=>{mapValues[b.dataset.range]=Number(b.dataset.val);document.querySelectorAll(`[data-range="${b.dataset.range}"]`).forEach(x=>x.classList.remove('sel'));b.classList.add('sel')});
+ if(existing){fields.forEach(([id,label,type])=>{const v=existing.data?.[id];if(type==='mood'){moodValue=Number(v||0);document.querySelectorAll('[data-mood]').forEach(x=>x.classList.toggle('sel',Number(x.dataset.mood)===moodValue))}else if(type==='chips'){chipValue=normalizeChip(v);document.querySelectorAll('[data-chip]').forEach(x=>x.classList.toggle('sel',x.dataset.chip===chipValue))}else if(type==='range'){mapValues[id]=Number(v||0);document.querySelectorAll(`[data-range="${id}"]`).forEach(x=>x.classList.toggle('sel',Number(x.dataset.val)===mapValues[id]))}else if($('f_'+id))$('f_'+id).value=v||''})}
+ $('saveTool').onclick=saveToolRecord;
+ $('clearTool').onclick=()=>{moodValue=0;chipValue='';mapValues={};editingRecordId=null;v53RenderToolForm()};
+ v52RefreshSteps();
+}
+renderToolForm=v53RenderToolForm; window.renderToolForm=v53RenderToolForm;
+
+window.v53OpenTool=function(id){
+ if(id==='certificate'){v53ShowView('certificateView');return}
+ if(!FORM_DEFS[id]){v53GoHome();return}
+ selectedTool=id;moodValue=0;chipValue='';mapValues={};editingRecordId=null;
+ v53RenderToolForm();v53ShowView('toolView');
+ setTimeout(()=>{const top=document.getElementById('toolView');if(top)top.scrollIntoView({behavior:'smooth',block:'start'})},30);
+};
+openTool=window.v53OpenTool;
+
+// Regenerate tool buttons with the final handler.
+renderTools=function(){
+ $('toolGrid').innerHTML=TOOL_DATA.map(t=>`<article class="tool"><div class="tooltop"><span class="num">${t.n}</span><span>${t.icon}</span></div><div class="icon">${t.icon}</div><h3>${L(t.name)}</h3><p>${L(t.desc)}</p><button type="button" class="btn primary" style="width:100%;margin-top:13px" onclick="v53OpenTool('${t.id}')">${t.id==='certificate'?L(UI.viewCert):L(UI.openTool)}</button></article>`).join('')
+};
+window.renderTools=renderTools;
+
+// Quick needs and scenario recommendations also use the final navigation.
+window.v4OpenNeed=function(id){v53ShowView('scenarioView');setTimeout(()=>showScenario(id),40)};
+const v53OldShowScenario=window.showScenario;
+window.showScenario=function(id){
+ const s=SCENARIOS[id];if(!s)return;
+ const tool=toolObj(s.tool);
+ $('scenarioGuide').innerHTML=`<div class="guidebox"><h3>${s.icon} ${s.code}｜${L(s.title)}</h3><p>${L(s.intro)}</p><ul class="questions">${s.qs.map(q=>`<li>${L(q)}</li>`).join('')}</ul><div class="recommend">${L(UI.recommended)}${tool.icon} ${L(tool.name)}</div><div class="btnrow"><button type="button" class="btn primary" onclick="v53OpenTool('${s.tool}')">${L(UI.startPractice)}</button></div></div>`;
+ $('scenarioGuide').scrollIntoView({behavior:'smooth',block:'start'});
+};
+
+// Editing from history always reopens the guided version, not the old form.
+window.editRecord=function(id){const r=db().records.find(x=>x.id===id);if(!r)return;selectedTool=r.tool;editingRecordId=id;moodValue=0;chipValue='';mapValues={};v53RenderToolForm(r);v53ShowView('toolView')};
+
+// Final bilingual labels for V5.3 navigation.
+function v53RefreshLabels(){
+ const en=LANG==='en';
+ const b=document.getElementById('backHome');if(b)b.textContent=en?'← Toolbox Home':'← 工具首页';
+ const h=document.getElementById('v53HistoryBtn');if(h)h.textContent=en?'📖 My Growth Journal':'📖 我的成长记录';
+ const n=document.getElementById('v53NavNotice');if(n)n.textContent=en?'If you have used this tool before, your past entries appear below under “Your past reflections.” Sign in to your member account to bring cloud records back on this device.':'如果你以前用过这个工具，旧记录会显示在下面的「以前的我写过什么？」；登录会员账号后，也会从云端带回来。';
+ const v=document.getElementById('v53Version');if(v)v.textContent='V5.5 · TOOL OPEN FIX + GUIDED HISTORY';
+}
+const v53PrevSetLanguage=setLanguage;
+setLanguage=function(lang){v53PrevSetLanguage(lang);v53RefreshLabels();renderTools();if(selectedTool&&document.getElementById('toolView')?.classList.contains('active')){const r=editingRecordId?db().records.find(x=>x.id===editingRecordId):null;v53RenderToolForm(r)}};window.setLanguage=setLanguage;
+
+// Re-bind all top navigation buttons and visible content after every older patch has finished.
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>v53ShowView(b.dataset.view));
+const bh=document.getElementById('backHome');if(bh)bh.onclick=v53GoHome;
+renderTools();v4RenderNeedQuick();renderScenarioCards();v53RefreshLabels();v5RenderCompanion();renderHistory();
+// Query string ?tool=... remains supported.
+setTimeout(()=>{const p=new URLSearchParams(location.search),tool=p.get('tool');if(tool&&FORM_DEFS[tool])v53OpenTool(tool)},30);
+
+</script>
+
+<script>/* V5.3 deep-link view helper */window.addEventListener('load',()=>{const p=new URLSearchParams(location.search);if(p.get('view')==='historyView'&&typeof v53ShowView==='function')setTimeout(()=>v53ShowView('historyView'),80)});</script>
+
+<style id="v54ClickSafetyStyle">
+/* V5.4: make interactive controls unambiguously clickable above decorative layers */
+.tool .btn,.scenario-card .btn,.guidebox .btn,.needBtn,.v53ToolNav .btn,.v52ReviewLink{
+  position:relative;z-index:20;pointer-events:auto;touch-action:manipulation;
+}
+</style>
+<script id="v54ClickSafetyPatch">
+(function(){
+  const q=id=>document.getElementById(id);
+  function showView(view){
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    const target=q(view); if(target) target.classList.add('active');
+    document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===view));
+    if(view==='progressView' && typeof renderProgress==='function')renderProgress();
+    if(view==='gardenView' && typeof renderGarden==='function')renderGarden();
+    if(view==='historyView'){
+      if(typeof v5PopulateHistoryFilters==='function')v5PopulateHistoryFilters();
+      if(typeof renderHistory==='function')renderHistory();
+    }
+    if(view==='certificateView' && typeof renderCertificate==='function')renderCertificate();
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  window.v54ShowView=showView;
+
+  window.v54OpenTool=function(id){
+    try{
+      if(id==='certificate'){showView('certificateView');return;}
+      if(typeof FORM_DEFS==='undefined' || !FORM_DEFS[id]){
+        throw new Error('Unknown tool: '+id);
+      }
+      selectedTool=id; moodValue=0; chipValue=''; mapValues={}; editingRecordId=null;
+      if(typeof v53RenderToolForm==='function') v53RenderToolForm();
+      else if(typeof renderToolForm==='function') renderToolForm();
+      else throw new Error('Tool renderer unavailable');
+      showView('toolView');
+      setTimeout(()=>{const el=q('toolView');if(el)el.scrollIntoView({behavior:'smooth',block:'start'});},40);
+    }catch(err){
+      console.error('V5.4 open tool error',err);
+      alert((typeof LANG!=='undefined'&&LANG==='en')?'This tool could not open. Please refresh once. If it still fails, contact support.':'这个工具暂时无法打开。请刷新一次；如果仍然无法打开，请联系课程方。');
+    }
+  };
+  try{ openTool=window.v54OpenTool; }catch(e){}
+
+  window.v54OpenScenario=function(id){
+    try{
+      const s=SCENARIOS[id]; if(!s) throw new Error('Unknown scenario: '+id);
+      showView('scenarioView');
+      const tool=toolObj(s.tool);
+      const host=q('scenarioGuide');
+      if(!host) throw new Error('scenarioGuide missing');
+      host.innerHTML=`<div class="guidebox"><h3>${s.icon} ${s.code}｜${L(s.title)}</h3><p>${L(s.intro)}</p><ul class="questions">${s.qs.map(x=>`<li>${L(x)}</li>`).join('')}</ul><div class="recommend">${L(UI.recommended)}${tool.icon} ${L(tool.name)}</div><div class="btnrow"><button type="button" class="btn primary" data-v54-tool="${s.tool}">${L(UI.startPractice)}</button></div></div>`;
+      host.scrollIntoView({behavior:'smooth',block:'start'});
+    }catch(err){console.error('V5.4 scenario error',err);}
+  };
+
+  // Final renderers: no inline onclick. All actions use data attributes + delegated listeners.
+  renderTools=function(){
+    const host=q('toolGrid'); if(!host)return;
+    host.innerHTML=TOOL_DATA.map(t=>`<article class="tool"><div class="tooltop"><span class="num">${t.n}</span><span>${t.icon}</span></div><div class="icon">${t.icon}</div><h3>${L(t.name)}</h3><p>${L(t.desc)}</p><button type="button" class="btn primary" style="width:100%;margin-top:13px" data-v54-tool="${t.id}">${t.id==='certificate'?L(UI.viewCert):L(UI.openTool)}</button></article>`).join('');
+  };
+  window.renderTools=renderTools;
+
+  renderScenarioCards=function(){
+    const host=q('scenarioCards'); if(!host)return;
+    host.innerHTML=Object.entries(SCENARIOS).map(([id,s])=>`<article class="scenario-card"><div class="sym">${s.icon}</div><h3>${s.code}｜${L(s.title)}</h3><p>${L(s.desc)}</p><button type="button" class="btn primary" style="width:100%" data-v54-scenario="${id}">${LANG==='en'?'See what I can do now':'看看我现在可以怎么做'}</button></article>`).join('');
+  };
+  window.renderScenarioCards=renderScenarioCards;
+
+  v4RenderNeedQuick=function(){
+    const host=q('needQuickGrid'); if(!host)return;
+    const en=LANG==='en';
+    if(q('needNowTitle'))q('needNowTitle').textContent=en?'What is happening today?':'今天发生什么了？';
+    if(q('needNowLead'))q('needNowLead').textContent=en?'Do not study all 13 tools first. Choose what feels closest and I will take you directly to a useful practice.':'不用先研究13个工具。先选最接近你现在的情况，我会直接带你去适合的练习。';
+    host.innerHTML=V4_NEEDS.map(id=>{const sc=SCENARIOS[id];return `<button type="button" class="needBtn" data-v54-scenario="${id}">${sc.icon} ${L(sc.title)}</button>`}).join('');
+  };
+  window.v4RenderNeedQuick=v4RenderNeedQuick;
+
+  // Past-reflection block: history link also uses the same safe delegated navigation.
+  const oldPast=typeof v52PastBlock==='function'?v52PastBlock:null;
+  v52PastBlock=function(tool){
+    const en=LANG==='en', arr=v52ToolRecords(tool).slice(0,3);
+    if(!arr.length){
+      return `<div class="v52Past"><div class="v52PastTop"><h3>${en?'📖 Your past reflections':'📖 以前的我写过什么？'}</h3></div><div class="v52Empty">${en?'This is your first saved reflection for this tool. After you save today, it will appear here the next time you return.':'这是你第一次使用这个工具。今天保存以后，下次回来就会在这里看见以前写过的自己。'}</div></div>`;
+    }
+    return `<div class="v52Past"><div class="v52PastTop"><h3>${en?'📖 Your past reflections':'📖 以前的我写过什么？'}</h3><button class="v52ReviewLink" type="button" data-v54-history="${tool}">${en?'View all records →':'查看全部记录 →'}</button></div><div class="v52PastList">${arr.map(r=>{const key=v5KeyText(r),seed=v4ActionForRecord(r);return `<div class="v52PastItem"><b>${esc(r.date)} · ${v5FollowLabel(r.followup)}</b><p>${esc(v4Short(key||v4CoachResponse(r.tool,r.data||{}).body,150))}</p>${seed?`<div class="v52PastSeed">🌱 ${esc(v4Short(seed,120))}</div>`:''}</div>`}).join('')}</div></div>`;
+  };
+  window.v52PastBlock=v52PastBlock;
+
+  // Remove reliance on inline handlers for the two tool-page navigation buttons.
+  const home=q('backHome'); if(home){home.removeAttribute('onclick');home.dataset.v54Home='1';}
+  const hist=q('v53HistoryBtn'); if(hist){hist.removeAttribute('onclick');hist.dataset.v54History='all';}
+
+  // One capture-phase listener owns all tool/scenario navigation, even for dynamically-rendered buttons.
+  document.addEventListener('click',function(ev){
+    const toolBtn=ev.target.closest('[data-v54-tool]');
+    if(toolBtn){ev.preventDefault();ev.stopPropagation();window.v54OpenTool(toolBtn.dataset.v54Tool);return;}
+    const scBtn=ev.target.closest('[data-v54-scenario]');
+    if(scBtn){ev.preventDefault();ev.stopPropagation();window.v54OpenScenario(scBtn.dataset.v54Scenario);return;}
+    const hBtn=ev.target.closest('[data-v54-home]');
+    if(hBtn){ev.preventDefault();ev.stopPropagation();showView('homeView');setTimeout(()=>q('needQuickGrid')?.scrollIntoView({behavior:'smooth',block:'start'}),50);return;}
+    const rBtn=ev.target.closest('[data-v54-history]');
+    if(rBtn){ev.preventDefault();ev.stopPropagation();const tool=rBtn.dataset.v54History;if(tool&&tool!=='all')V5_HISTORY_FILTER=tool;else V5_HISTORY_FILTER='all';showView('historyView');return;}
+  },true);
+
+  // Keep editing from history in the guided experience.
+  window.editRecord=function(id){
+    const r=db().records.find(x=>x.id===id); if(!r)return;
+    selectedTool=r.tool;editingRecordId=id;moodValue=0;chipValue='';mapValues={};
+    if(typeof v53RenderToolForm==='function')v53RenderToolForm(r);else renderToolForm(r);
+    showView('toolView');
+  };
+
+  // Language switch re-renders every clickable region using V5.4 safe buttons.
+  const previousSetLanguage=window.setLanguage;
+  window.setLanguage=function(lang){
+    if(typeof previousSetLanguage==='function')previousSetLanguage(lang);
+    renderTools();v4RenderNeedQuick();renderScenarioCards();
+    const h=q('backHome');if(h){h.removeAttribute('onclick');h.dataset.v54Home='1';}
+    const j=q('v53HistoryBtn');if(j){j.removeAttribute('onclick');j.dataset.v54History='all';}
+    const ver=q('v53Version');if(ver)ver.textContent='V5.5 · TOOL OPEN FIX + GUIDED HISTORY';
+    if(selectedTool&&q('toolView')?.classList.contains('active')){
+      const r=editingRecordId?db().records.find(x=>x.id===editingRecordId):null;
+      if(typeof v53RenderToolForm==='function')v53RenderToolForm(r);
+    }
+  };
+
+  renderTools();v4RenderNeedQuick();renderScenarioCards();
+  const ver=q('v53Version');if(ver)ver.textContent='V5.5 · TOOL OPEN FIX + GUIDED HISTORY';
+  const footer=q('footerText');if(footer)footer.innerHTML=LANG==='en'?'🌱 Planting Happiness | My Happiness Companion · V5.5<br/>A better life can begin with one small decision.':'🌱 播种幸福｜我的幸福陪伴系统 · V5.5<br/>更好的自己，从一个小小的决定开始。';
+})();
+</script>
+
+
+<script>
+// ===== V5.6 NAV SCROLL + DUPLICATE LABEL FIX =====
+(function(){
+  // Build only the input control here. The guided wrapper already renders the field label once.
+  window.v56FieldControl=function(f){
+    const [id,label,type,opts]=f;
+    if(type==='textarea')return `<textarea id="f_${id}"></textarea>`;
+    if(type==='text')return `<input id="f_${id}" type="text">`;
+    if(type==='mood')return `<div class="moods">${[1,2,3,4,5].map((n,i)=>`<button type="button" class="mood" data-mood="${n}"><span>${['😔','🙁','😐','🙂','😊'][i]}</span>${n}</button>`).join('')}</div>`;
+    if(type==='chips')return `<div class="chips">${(opts||[]).map(([v,lab])=>`<button type="button" class="chip" data-chip="${v}">${L(lab)}</button>`).join('')}</div>`;
+    if(type==='range')return `<div class="rangegrid">${[1,2,3,4,5].map(n=>`<button type="button" class="rangebtn" data-range="${id}" data-val="${n}">${n}</button>`).join('')}</div>`;
+    return '';
+  };
+
+  // Override the guided field renderer so each question title appears exactly once in both languages.
+  v52RenderField=function(f,idx,total){
+    const [id,label]=f;
+    return `<div class="v52Field ${idx===0?'on':''}" data-v52-step="${idx}"><label>${L(label)}</label><div class="v52Hint">${v52FieldHint(selectedTool,id)}</div>${window.v56FieldControl(f)}<div class="v52Nav"><button class="btn secondary" type="button" onclick="v52Prev()" ${idx===0?'disabled':''}>${LANG==='en'?'← Previous':'← 上一题'}</button>${idx<total-1?`<button class="btn primary" type="button" onclick="v52Next()">${LANG==='en'?'Next →':'下一题 →'}</button>`:`<span></span>`}</div></div>`;
+  };
+  window.v52RenderField=v52RenderField;
+
+  function scrollMyToday(){
+    const target=document.getElementById('needNowTitle') || document.getElementById('homeView');
+    if(target)setTimeout(()=>target.scrollIntoView({behavior:'smooth',block:'start'}),60);
+  }
+
+  // Make "My Today / 我的今天" behave like a real shortcut to today's action area.
+  const navHome=document.getElementById('navHome');
+  if(navHome){
+    navHome.onclick=function(ev){
+      ev.preventDefault();
+      if(typeof v53ShowView==='function')v53ShowView('homeView');
+      else if(typeof show==='function')show('homeView');
+      scrollMyToday();
+    };
+  }
+
+  // Also keep delegated/click re-renders from replacing the special home behaviour after language changes.
+  const oldSetLanguage=window.setLanguage;
+  window.setLanguage=function(lang){
+    if(typeof oldSetLanguage==='function')oldSetLanguage(lang);
+    const h=document.getElementById('navHome');
+    if(h){
+      h.onclick=function(ev){
+        ev.preventDefault();
+        if(typeof v53ShowView==='function')v53ShowView('homeView');
+        else if(typeof show==='function')show('homeView');
+        scrollMyToday();
+      };
+    }
+    const ver=document.getElementById('v53Version');
+    if(ver)ver.textContent='V5.7 · SINGLE LOGIN + CLOUD SYNC';
+    const footer=document.getElementById('footerText');
+    if(footer)footer.innerHTML=LANG==='en'?'🌱 Planting Happiness | My Happiness Companion · V5.7<br/>A better life can begin with one small decision.':'🌱 播种幸福｜我的幸福陪伴系统 · V5.7<br/>更好的自己，从一个小小的决定开始。';
+  };
+
+  const ver=document.getElementById('v53Version');
+  if(ver)ver.textContent='V5.7 · SINGLE LOGIN + CLOUD SYNC';
+  const footer=document.getElementById('footerText');
+  if(footer)footer.innerHTML=LANG==='en'?'🌱 Planting Happiness | My Happiness Companion · V5.7<br/>A better life can begin with one small decision.':'🌱 播种幸福｜我的幸福陪伴系统 · V5.7<br/>更好的自己，从一个小小的决定开始。';
+})();
+</script>
+
+</body></html>
