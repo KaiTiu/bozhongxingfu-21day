@@ -867,4 +867,73 @@ setTimeout(()=>{const p=new URLSearchParams(location.search),tool=p.get('tool');
 })();
 </script>
 
+
+
+<style id="v58NavScrollStyle">
+/* V5.8: top navigation lands on the actual content heading */
+#homeTitle,#scenarioTitle,#progressTitle,#gardenTitle,#historyTitle,#certTitle{scroll-margin-top:18px}
+</style>
+<script id="v58NavScrollPatch">
+(function(){
+  const MAP={
+    navHome:['homeView','homeTitle'],
+    navScenario:['scenarioView','scenarioTitle'],
+    navProgress:['progressView','progressTitle'],
+    navGarden:['gardenView','gardenTitle'],
+    navHistory:['historyView','historyTitle'],
+    navCert:['certificateView','certTitle']
+  };
+
+  function showView(view){
+    if(typeof window.v54ShowView==='function') window.v54ShowView(view);
+    else if(typeof window.v53ShowView==='function') window.v53ShowView(view);
+    else if(typeof window.show==='function') window.show(view);
+  }
+
+  function land(view,targetId){
+    showView(view);
+    // Older view functions first scroll to page top. Wait until that finishes/rendering settles,
+    // then land on the requested section so the user sees the content, not the navigation bar.
+    setTimeout(()=>{
+      const target=document.getElementById(targetId) || document.getElementById(view);
+      if(target) target.scrollIntoView({behavior:'smooth',block:'start'});
+    },120);
+  }
+
+  function bind(){
+    Object.entries(MAP).forEach(([buttonId,[view,targetId]])=>{
+      const btn=document.getElementById(buttonId);
+      if(!btn)return;
+      btn.onclick=function(ev){
+        ev.preventDefault();
+        ev.stopPropagation();
+        land(view,targetId);
+      };
+    });
+  }
+
+  bind();
+
+  // Language switching re-renders labels in older patches. Re-bind navigation afterwards.
+  const previousSetLanguage=window.setLanguage;
+  window.setLanguage=function(lang){
+    if(typeof previousSetLanguage==='function') previousSetLanguage(lang);
+    setTimeout(bind,0);
+    const ver=document.getElementById('v53Version');
+    if(ver)ver.textContent='V5.8 · SINGLE LOGIN + NAV SCROLL';
+    const footer=document.getElementById('footerText');
+    if(footer)footer.innerHTML=LANG==='en'
+      ?'🌱 Planting Happiness | My Happiness Companion · V5.8<br/>A better life can begin with one small decision.'
+      :'🌱 播种幸福｜我的幸福陪伴系统 · V5.8<br/>更好的自己，从一个小小的决定开始。';
+  };
+
+  const ver=document.getElementById('v53Version');
+  if(ver)ver.textContent='V5.8 · SINGLE LOGIN + NAV SCROLL';
+  const footer=document.getElementById('footerText');
+  if(footer)footer.innerHTML=LANG==='en'
+    ?'🌱 Planting Happiness | My Happiness Companion · V5.8<br/>A better life can begin with one small decision.'
+    :'🌱 播种幸福｜我的幸福陪伴系统 · V5.8<br/>更好的自己，从一个小小的决定开始。';
+})();
+</script>
+
 </body></html>
