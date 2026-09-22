@@ -189,7 +189,8 @@ section.course{scroll-margin-top:12px}
 @media(max-width:720px){.bzFirstUseCard{padding:20px 17px;border-radius:20px}.bzFirstUseCard h2{font-size:23px}.bzFirstUseStep{grid-template-columns:34px 1fr;padding:11px}.bzFirstUseStep span{width:34px;height:34px}}
 </style>
 </head><!-- V10.8.9: all course -> toolbox entries land on #welcome; recommended tool no longer uses ?tool= -->
-<body><section class="freeGate" id="freeGate"><div class="freeShell">
+<body>
+<!-- V10.3.1 FREE-only fix: correct 24-hour action display; paid-member login preserved --><section class="freeGate" id="freeGate"><div class="freeShell">
 <div class="freeTop"><div class="freeBrand">🌱 <span data-i18n="brand">播种幸福</span></div><div class="langSwitch"><button class="langBtn active" data-lang="zh" onclick="setLang('zh')">中文</button><button class="langBtn" data-lang="en" onclick="setLang('en')">English</button></div></div><div class="freeHero"><span class="freeBadge" data-i18n="freeBadge">FREE 深度体验｜约 10–12 分钟</span><h1 data-i18n="freeTitle">先别急着买。先看看这套课程，能不能真的让你看见自己。</h1><p data-i18n="freeLead">这不是试看几页内容。你会完成一套真正的迷你练习：找到自己的自动反应、重新选择一个回应，并带走一个今天就能执行的小行动。</p><div class="freeProof"><div><b data-i18n="proof1b">10–12 分钟</b><span data-i18n="proof1s">完成一次真实练习</span></div><div><b data-i18n="proof2b">5 个步骤</b><span data-i18n="proof2s">从觉察走到行动</span></div><div><b data-i18n="proof3b">0 元体验</b><span data-i18n="proof3s">无需先购买课程</span></div></div><div class="bzAuthInline"><button class="btn" style="margin-top:18px" onclick="startFreeExperience()" data-i18n="freeStart">开始我的 FREE 体验 →</button><button class="btn bzAuthSecondary" style="margin-top:18px" type="button" onclick="bzOpenMemberLogin()" id="bzHeroMemberLogin">已购买？会员登录</button></div></div>
 
 <div class="freeReturnCard" id="freeReturnCard">
@@ -475,7 +476,16 @@ function showFreeStep(n){FREE_STEP=Math.max(1,Math.min(5,n));document.querySelec
 function choosePain(btn,i){FREE_PAIN=i;document.querySelectorAll('#painOptions .freeOption').forEach(x=>x.classList.remove('chosen'));btn.classList.add('chosen');document.getElementById('painInsight').style.display='block';document.getElementById('painNext').disabled=false}
 function chooseScenario(btn,i){FREE_SCENARIO=i;document.querySelectorAll('#scenarioOptions .freeOption').forEach(x=>x.classList.remove('chosen'));btn.classList.add('chosen');const f=document.getElementById('scenarioFeedback');f.innerHTML='<b>🪞 '+tr('awareMoment')+'</b><br>'+tr(i===3?'scenarioGood':'scenarioLearn');f.style.display='block';document.getElementById('scenarioNext').disabled=false}
 function saveTrialReflection(){const a=document.getElementById('trialReflect1').value.trim(),b=document.getElementById('trialReflect2').value.trim();if(!a&&!b){alert(CURRENT_LANG==='en'?'Write at least one honest sentence before continuing.':'先写下至少一句真实的反思，再继续。');return}localStorage.setItem('bzxf_trial_reflect1',a);localStorage.setItem('bzxf_trial_reflect2',b);showFreeStep(4)}
-function chooseTrialAction(btn,i){FREE_ACTION=i;document.querySelectorAll('#trialActions .freeOption').forEach(x=>x.classList.remove('chosen'));btn.classList.add('chosen')}
+function chooseTrialAction(btn,i){
+  FREE_ACTION=i;
+  document.querySelectorAll('#trialActions .freeOption').forEach(x=>x.classList.remove('chosen'));
+  btn.classList.add('chosen');
+
+  // When a preset action is selected, clear any previous custom action
+  // so the result page cannot accidentally show an older custom answer.
+  const custom=document.getElementById('trialCustomAction');
+  if(custom)custom.value='';
+}
 function completeFreeTrial(){const custom=(document.getElementById('trialCustomAction').value||'').trim();if(FREE_ACTION==null&&!custom){alert(CURRENT_LANG==='en'?'Choose one 24-hour action—or write your own—before completing the experience.':'请先选择一个 24 小时行动，或写下自己的小行动，再完成体验。');return}localStorage.setItem('bzxf_free_completed','1');localStorage.setItem('bzxf_trial_pain',FREE_PAIN==null?'':String(FREE_PAIN));localStorage.setItem('bzxf_trial_scenario',FREE_SCENARIO==null?'':String(FREE_SCENARIO));localStorage.setItem('bzxf_trial_action',FREE_ACTION==null?'':String(FREE_ACTION));localStorage.setItem('bzxf_trial_custom',custom);showFreeStep(5)}
 function requestPurchase(){if(PURCHASE_URL){window.location.href=PURCHASE_URL;return}document.getElementById('paywallPanel').classList.add('show');document.getElementById('paywallPanel').scrollIntoView({behavior:'smooth',block:'center'})}
 async function copyPurchaseMessage(){const input=document.getElementById('purchaseMsg');const msg=CURRENT_LANG==='en'?'I want to unlock the full 21-day Planting Happiness course.':'我要开通《播种幸福》21天完整课程';input.value=msg;try{await navigator.clipboard.writeText(msg)}catch(e){input.select();document.execCommand('copy')}document.getElementById('copyOk').textContent=tr('copyDone')}
@@ -1187,7 +1197,28 @@ function bzApplyFreePersona(){const p=bzFreePersona();if(!p)return;const s2=docu
 const bzV102ChoosePain=choosePain;choosePain=function(btn,i){bzV102ChoosePain(btn,i);bzApplyFreePersona()};
 const bzV102ShowFreeStep=showFreeStep;showFreeStep=function(n){bzV102ShowFreeStep(n);if(n>=2&&n<=4)bzApplyFreePersona();if(n===5){renderTrialPersonalResult();bzRenderFreeFollowUp()}};
 chooseScenario=function(btn,i){FREE_SCENARIO=i;document.querySelectorAll('#scenarioOptions .freeOption').forEach(x=>x.classList.remove('chosen'));btn.classList.add('chosen');const p=bzFreePersona();const f=document.getElementById('scenarioFeedback');const txt=p?(i===p.best?p.good:p.learn):tr(i===3?'scenarioGood':'scenarioLearn');f.innerHTML='<b>🪞 '+tr('awareMoment')+'</b><br>'+txt;f.style.display='block';document.getElementById('scenarioNext').disabled=false};
-function bzSelectedFreeAction(){const custom=(document.getElementById('trialCustomAction')?.value||localStorage.getItem('bzxf_trial_custom')||'').trim();if(custom)return custom;let i=FREE_ACTION;if(i==null){const v=localStorage.getItem('bzxf_trial_action');i=v===''||v==null?null:Number(v)}const p=bzFreePersona();return p&&i!=null?p.actions[i]||'':''}
+function bzSelectedFreeAction(){
+  const input=document.getElementById('trialCustomAction');
+  const liveCustom=(input?.value||'').trim();
+  if(liveCustom)return liveCustom;
+
+  const p=bzFreePersona();
+
+  // Current preset choice always has priority over old saved browser data.
+  if(FREE_ACTION!=null){
+    return p?.actions?.[FREE_ACTION]||'';
+  }
+
+  // If this is a restored FREE result, use the saved custom action first.
+  const savedCustom=(localStorage.getItem('bzxf_trial_custom')||'').trim();
+  if(savedCustom)return savedCustom;
+
+  // Otherwise restore the saved preset index safely.
+  const raw=localStorage.getItem('bzxf_trial_action');
+  if(raw===null||raw==='')return '';
+  const i=Number(raw);
+  return Number.isInteger(i)&&i>=0 ? (p?.actions?.[i]||'') : '';
+}
 renderTrialPersonalResult=function(){const box=document.getElementById('trialPersonalResult');if(!box)return;const p=bzFreePersona(),en=CURRENT_LANG==='en';if(!p){box.innerHTML=en?'<b>Your FREE result:</b> You have experienced the method once. The next step is to practise it repeatedly inside real life.':'<b>你的 FREE 体验结果：</b>你已经体验过一次方法。下一步，是把它带回真实生活反复练习。';return}const a=bzSelectedFreeAction();box.innerHTML=`<div class="freePersonaTitle">${en?'This feels like your current pattern':'这比较像你现在的状态'}</div><p>${p.portrait}</p><div class="freePersonaFocus"><b>${en?'What is most worth practising next':'你接下来最值得练习的'}</b><br>${p.focus}</div>${a?`<div class="freeExperimentBox"><b>${en?'Your 24-hour experiment':'你的24小时小实验'}</b><br>${a}<br><span style="font-size:12px;color:#69756d">${en?'Tomorrow, come back for a one-minute check-in: did real life give you one more choice?':'明天回来做1分钟回访：真实情况发生时，你有没有比以前多一个选择？'}</span></div>`:''}`};
 const bzV102CompleteFree=completeFreeTrial;completeFreeTrial=function(){const before=localStorage.getItem('bzxf_free_completed');bzV102CompleteFree();if(localStorage.getItem('bzxf_free_completed')==='1'){localStorage.setItem('bzxf_free_completed_at',new Date().toISOString());localStorage.setItem('bzxf_free_completed_day',new Date().toLocaleDateString('en-CA'));localStorage.setItem('bzxf_trial_action_text',bzSelectedFreeAction());if(!before)localStorage.removeItem('bzxf_free_followup');renderTrialPersonalResult();bzRenderFreeFollowUp()}};
 openWhatsAppDetails=function(){const p=bzFreePersona(),a=localStorage.getItem('bzxf_trial_action_text')||bzSelectedFreeAction();const msg=CURRENT_LANG==='en'?`Hi, I completed the FREE Planting Happiness experience. The area I most want to improve is: ${p?.whatsapp||'my current life pattern'}.${a?` My 24-hour action is: ${a}.`:''} I would like to learn more about the full 21-day course.`:`你好，我完成了《播种幸福》FREE体验。\n我目前最想改善的是：${p?.whatsapp||'我现在的生活模式'}。${a?`\n我的24小时小行动是：${a}。`:''}\n我想了解完整21天课程。`;window.open('https://wa.me/60177483191?text='+encodeURIComponent(msg),'_blank','noopener')};
@@ -1325,4 +1356,29 @@ window.bzBeginFirstUse=bzBeginFirstUse;
 
 (function bzInitAuth(){bzRefreshAuthCopy();const s=bzLoadSession();if(s?.access_token)bzProcessAccess(s,{silent:true})})();
 
-</script></body></html>
+</script>
+<script id="bzxfFreeV1031ActionFix">
+(function(){
+  function bindFreeCustomAction(){
+    const input=document.getElementById('trialCustomAction');
+    if(!input || input.dataset.freeActionFixBound==='1')return;
+    input.dataset.freeActionFixBound='1';
+
+    input.addEventListener('input',()=>{
+      if(input.value.trim()){
+        FREE_ACTION=null;
+        document.querySelectorAll('#trialActions .freeOption')
+          .forEach(x=>x.classList.remove('chosen'));
+      }
+    });
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',bindFreeCustomAction);
+  }else{
+    bindFreeCustomAction();
+  }
+})();
+</script>
+
+</body></html>
