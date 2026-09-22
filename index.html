@@ -450,6 +450,7 @@ function openToolboxWithReturn(e){
   const toolbox=new URL('/tools/', window.location.origin);
   toolbox.searchParams.set('return', returnUrl);
   toolbox.searchParams.set('lang', CURRENT_LANG);
+  toolbox.searchParams.set('entry','course');
   window.location.href=toolbox.href;
 }
 
@@ -1202,7 +1203,7 @@ function renderTodayCard(){const card=document.getElementById('todayCard');if(!c
 function escHtmlV102(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
 function bzOpenToday(){const d=window.BZXF_TODAY_TARGET||bzTargetDay(get());showDay(d);setTimeout(()=>{goGuide(1);document.getElementById('guidedHost')?.scrollIntoView({behavior:'smooth',block:'start'})},50)}
 function bzOpenNight(){const d=window.BZXF_TODAY_TARGET||bzTargetDay(get());showDay(d);setTimeout(()=>{goGuide(5);document.getElementById('guidedHost')?.scrollIntoView({behavior:'smooth',block:'start'})},50)}
-function bzOpenRecommendedTool(){const d=window.BZXF_TODAY_TARGET||bzTargetDay(get()),tool=BZXF_TOOL_MAP[d-1]||'diary';const returnUrl=window.location.href,u=new URL('/tools/',window.location.origin);u.searchParams.set('return',returnUrl);u.searchParams.set('lang',CURRENT_LANG);u.searchParams.set('tool',tool);window.location.href=u.href}
+function bzOpenRecommendedTool(){const d=window.BZXF_TODAY_TARGET||bzTargetDay(get()),tool=BZXF_TOOL_MAP[d-1]||'diary';const returnUrl=window.location.href,u=new URL('/tools/',window.location.origin);u.searchParams.set('return',returnUrl);u.searchParams.set('lang',CURRENT_LANG);u.searchParams.set('entry','course');u.searchParams.set('tool',tool);window.location.href=u.href}
 function bzRenderPersonalOpening(n){const wrap=document.querySelector('#guidedHost .guidedWrap');if(!wrap)return;wrap.querySelector('.personalOpening')?.remove();const s=get(),en=CURRENT_LANG==='en',mem=bzCourseMemory(s,n),goal=s.goal||s.whyGoal||'';if(!mem&&!goal)return;const div=document.createElement('div');div.className='personalOpening';let html=`<b>${en?'Before today starts':'今天开始以前'}</b><br>`;if(mem)html+=`${en?`On DAY ${String(mem.day).padStart(2,'0')}, you wrote:`:`DAY ${String(mem.day).padStart(2,'0')}，你写过：`}<div class="memoryQuote">“${escHtmlV102(mem.text).slice(0,240)}${mem.text.length>240?'…':''}”</div>${en?'Today’s lesson is not separate from that person. See whether you can notice the same pattern a little earlier.':'今天这一课不是和过去的你无关。看看同一个模式出现时，你能不能比以前早一点看见。'}`;else html+=`${en?'You began these 21 days with this direction:':'你开始21天时写下：'}<div class="memoryQuote">${escHtmlV102(goal)}</div>`;div.innerHTML=html;wrap.insertBefore(div,wrap.firstChild)}
 const bzV102RenderGuide=renderGuide;renderGuide=function(n){bzV102RenderGuide(n);bzRenderPersonalOpening(n)};
 const bzV102RenderSide=renderSide;renderSide=function(){bzV102RenderSide();renderTodayCard()};
