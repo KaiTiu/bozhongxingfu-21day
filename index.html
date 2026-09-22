@@ -105,7 +105,6 @@ section.course{scroll-margin-top:12px}
 /* Production build: owner-test bypass removed. */
 .ownerTestBar{background:#fff4d8;border:1px solid #e4c87f;border-radius:16px;padding:12px 14px;margin:0 0 14px;color:#654d19;display:flex;gap:8px;align-items:center;flex-wrap:wrap}.ownerTestBar b{margin-right:auto}.ownerTestBar .btn{padding:9px 11px}.ownerPreviewBanner{display:none;background:#7a5b21;color:#fff;text-align:center;padding:8px 12px;font-weight:900;font-size:12px}.ownerPreviewBanner.show{display:block}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head><body><section class="freeGate" id="freeGate"><div class="freeShell">
 <div class="freeTop"><div class="freeBrand">🌱 <span data-i18n="brand">播种幸福</span></div><div class="langSwitch"><button class="langBtn active" data-lang="zh" onclick="setLang('zh')">中文</button><button class="langBtn" data-lang="en" onclick="setLang('en')">English</button></div></div><div class="freeHero"><span class="freeBadge" data-i18n="freeBadge">FREE 深度体验｜约 10–12 分钟</span><h1 data-i18n="freeTitle">先别急着买。先看看这套课程，能不能真的让你看见自己。</h1><p data-i18n="freeLead">这不是试看几页内容。你会完成一套真正的迷你练习：找到自己的自动反应、重新选择一个回应，并带走一个今天就能执行的小行动。</p><div class="freeProof"><div><b data-i18n="proof1b">10–12 分钟</b><span data-i18n="proof1s">完成一次真实练习</span></div><div><b data-i18n="proof2b">5 个步骤</b><span data-i18n="proof2s">从觉察走到行动</span></div><div><b data-i18n="proof3b">0 元体验</b><span data-i18n="proof3s">无需先购买课程</span></div></div><div class="authInline"><button class="btn" onclick="startFreeExperience()" data-i18n="freeStart">开始我的 FREE 体验 →</button><button class="btn loginSecondary" type="button" onclick="openMemberLogin()" id="heroMemberLogin">已购买？会员登录</button></div></div>
 <div class="freeCard" id="freeExperience" style="display:none">
@@ -125,7 +124,7 @@ section.course{scroll-margin-top:12px}
     <label for="memberLoginPassword" id="authPasswordLabel">密码</label><input id="memberLoginPassword" type="password" autocomplete="current-password" placeholder="••••••••">
     <div class="authActions"><button class="btn" id="authLoginBtn" type="button" onclick="memberLogin()">登录并检查课程权限</button><button class="btn soft" type="button" onclick="closeMemberLogin()" id="authCancelBtn">取消</button></div>
     <div class="authStatus" id="authStatus"></div>
-    <div class="authDivider"></div><div class="authHint" id="authSupportHint">如果你已经付款但还没有账号，请联系课程方为你开通。</div><div style="margin-top:8px;font-size:10px;color:#9aa29a;text-align:right">Member Gate V9.3</div>
+    <div class="authDivider"></div><div class="authHint" id="authSupportHint">如果你已经付款但还没有账号，请联系课程方为你开通。</div><div style="margin-top:8px;font-size:10px;color:#9aa29a;text-align:right">Member Gate V9.4 Direct Auth</div>
   </div>
 </div>
 <div class="tempPassModal" id="tempPassModal" role="dialog" aria-modal="true" aria-labelledby="tempPassTitle">
@@ -592,11 +591,11 @@ function exportData(){let s=get(),date=new Date().toISOString().slice(0,10);down
 function restoreData(event){const file=event.target.files&&event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=function(){try{const incoming=JSON.parse(reader.result);if(!isValidBackup(incoming)){alert(CURRENT_LANG==='en'?'This is not a valid Planting Happiness 21-day backup file.':'这个文件不是有效的《播种幸福》21天课程备份，请选择正确的 JSON 备份文件。');event.target.value='';return}const incomingDays=incoming.completed.length,incomingRecords=Object.keys(incoming.records||{}).length;const msg=CURRENT_LANG==='en'?`Restore course records?\n\nBackup contains:\n• ${incomingDays}/21 completed days\n• ${incomingRecords} saved daily records\n\nThis will replace the records currently stored in this browser. A safety backup will be downloaded first.`:`准备恢复课程记录。\n\n备份文件包含：\n• 已完成 ${incomingDays}/21 天\n• 已保存 ${incomingRecords} 天记录\n\n恢复后会覆盖目前这个浏览器里的课程记录。\n系统会先自动下载一份“恢复前安全备份”。`;if(!confirm(msg)){event.target.value='';return}const current=get(),date=new Date().toISOString().slice(0,10);downloadJSON(current,CURRENT_LANG==='en'?`Planting_Happiness_PreRestore_Backup_${date}.json`:`播种幸福_恢复前安全备份_${date}.json`);const clean={goal:typeof incoming.goal==='string'?incoming.goal:'',whyGoal:typeof incoming.whyGoal==='string'?incoming.whyGoal:'',completed:[...new Set(incoming.completed)].sort((a,b)=>a-b),records:incoming.records||{},last:Number.isInteger(incoming.last)&&incoming.last>=1&&incoming.last<=21?incoming.last:1,guide:incoming.guide||{},meditation:incoming.meditation||{}};put(clean);cur=clean.last||1;renderSide();showDay(cur);updateBackupInfo();alert(CURRENT_LANG==='en'?'Learning records restored successfully.':'学习记录已恢复成功。你的课程进度、幸福花园和每日记录已经更新。')}catch(e){alert(CURRENT_LANG==='en'?'Unable to read this backup file. Please choose a JSON file exported by this course.':'无法读取这个备份文件。请确认你选择的是由本课程导出的 JSON 备份。')}finally{event.target.value=''}};reader.readAsText(file,'utf-8')}
 function updateBackupInfo(){let s=get();const el=$('backupInfo');if(!el)return;el.textContent=CURRENT_LANG==='en'?`Current: ${s.completed.length}/21 days completed · ${Object.keys(s.records||{}).length} daily records saved`:`目前：完成 ${s.completed.length}/21 天｜已保存 ${Object.keys(s.records||{}).length} 天记录`}
 
-// ===== V9.0 Supabase Auth + Enrollment Gate =====
+// ===== V9.4 Direct Supabase Auth + Edge Enrollment Gate =====
 const BZXF_SUPABASE_URL='https://sopjtukcrghvgemdishz.supabase.co';
 const BZXF_SUPABASE_PUBLISHABLE_KEY='sb_publishable_ltqt7kjBSZE-YO3SRnnbxg_uqmt6Ooh';
 const BZXF_MEMBER_ACCESS_URL=BZXF_SUPABASE_URL+'/functions/v1/member-access';
-let BZXF_SB=null;
+const BZXF_SESSION_KEY='bzxf_member_session_v94';
 let BZXF_CURRENT_USER=null;
 let BZXF_CURRENT_ENROLLMENT=null;
 
@@ -616,14 +615,77 @@ function localDateISO(){const d=new Date(),off=d.getTimezoneOffset();return new 
 function enrollmentIsUsable(en){if(!en||en.status!=='active')return {ok:false,reason:'inactive'};const today=localDateISO();if(en.start_date&&en.start_date>today)return {ok:false,reason:'future'};if(en.expiry_date&&en.expiry_date<today)return {ok:false,reason:'expired'};return {ok:true}}
 function unlockPaidCourse(user,enrollment){BZXF_CURRENT_USER=user;BZXF_CURRENT_ENROLLMENT=enrollment;document.body.classList.add('paid-member');const fg=document.getElementById('freeGate');if(fg)fg.style.display='none';const h=document.getElementById('mainHeader'),m=document.getElementById('mainApp');if(h)h.classList.remove('mainAppHidden');if(m)m.classList.remove('mainAppHidden');const em=document.getElementById('memberEmail');if(em)em.textContent=user?.email||'';const badge=document.getElementById('memberAccessBadge');if(badge)badge.textContent='ACTIVE';closeMemberLogin();setLang(CURRENT_LANG);cur=(get().last||1);showDay(cur);updateBackupInfo();if(typeof loadMeditationNote==='function')loadMeditationNote();window.scrollTo({top:0,behavior:'smooth'})}
 function lockPaidCourse(){BZXF_CURRENT_USER=null;BZXF_CURRENT_ENROLLMENT=null;document.body.classList.remove('paid-member');const h=document.getElementById('mainHeader'),m=document.getElementById('mainApp'),fg=document.getElementById('freeGate');if(h)h.classList.add('mainAppHidden');if(m)m.classList.add('mainAppHidden');if(fg)fg.style.display='block'}
+
+function saveDirectSession(session){
+  try{localStorage.setItem(BZXF_SESSION_KEY,JSON.stringify(session||{}))}catch(e){}
+}
+function loadDirectSession(){
+  try{return JSON.parse(localStorage.getItem(BZXF_SESSION_KEY)||'null')}catch(e){return null}
+}
+function clearDirectSession(){
+  try{localStorage.removeItem(BZXF_SESSION_KEY)}catch(e){}
+}
+async function authFetch(path,{method='GET',token='',body=null}={}){
+  const headers={'apikey':BZXF_SUPABASE_PUBLISHABLE_KEY,'Content-Type':'application/json'};
+  if(token)headers['Authorization']='Bearer '+token;
+  const res=await fetch(BZXF_SUPABASE_URL+path,{method,headers,body:body===null?undefined:JSON.stringify(body)});
+  const payload=await res.json().catch(()=>({}));
+  return {res,payload};
+}
+async function directPasswordSignIn(email,password){
+  const {res,payload}=await authFetch('/auth/v1/token?grant_type=password',{method:'POST',body:{email,password}});
+  if(!res.ok)throw new Error(payload?.msg||payload?.error_description||payload?.error||('Auth '+res.status));
+  if(!payload?.access_token||!payload?.user)throw new Error('No access token returned.');
+  const session={
+    access_token:payload.access_token,
+    refresh_token:payload.refresh_token||'',
+    expires_at:payload.expires_at||Math.floor(Date.now()/1000)+(payload.expires_in||3600),
+    user:payload.user
+  };
+  saveDirectSession(session);
+  return session;
+}
+async function directRefreshSession(session){
+  if(!session?.refresh_token)return null;
+  const {res,payload}=await authFetch('/auth/v1/token?grant_type=refresh_token',{method:'POST',body:{refresh_token:session.refresh_token}});
+  if(!res.ok||!payload?.access_token)return null;
+  const next={
+    access_token:payload.access_token,
+    refresh_token:payload.refresh_token||session.refresh_token,
+    expires_at:payload.expires_at||Math.floor(Date.now()/1000)+(payload.expires_in||3600),
+    user:payload.user||session.user
+  };
+  saveDirectSession(next);
+  return next;
+}
+async function ensureDirectSession(){
+  let s=loadDirectSession();
+  if(!s?.access_token)return null;
+  const now=Math.floor(Date.now()/1000);
+  if(!s.expires_at||s.expires_at<now+60){
+    const refreshed=await directRefreshSession(s);
+    if(!refreshed){clearDirectSession();return null}
+    s=refreshed;
+  }
+  const {res,payload}=await authFetch('/auth/v1/user',{token:s.access_token});
+  if(!res.ok||!payload?.id){
+    const refreshed=await directRefreshSession(s);
+    if(!refreshed){clearDirectSession();return null}
+    s=refreshed;
+    const again=await authFetch('/auth/v1/user',{token:s.access_token});
+    if(!again.res.ok||!again.payload?.id){clearDirectSession();return null}
+    s.user=again.payload;saveDirectSession(s);return s;
+  }
+  s.user=payload;saveDirectSession(s);return s;
+}
+
 async function fetchMemberAccessState({silent=false}={}){
   const t=authCopy();
-  if(!BZXF_SB)return null;
   if(!silent)setAuthStatus(t.checking);
   try{
-    const {data:{session},error:sessionError}=await BZXF_SB.auth.getSession();
-    if(sessionError||!session?.access_token){
-      if(!silent)setAuthStatus(t.accessError+' [SESSION]','err');
+    const session=await ensureDirectSession();
+    if(!session?.access_token){
+      if(!silent)setAuthStatus(t.accessError+' [NO SESSION]','err');
       return null;
     }
     const res=await fetch(BZXF_MEMBER_ACCESS_URL,{
@@ -635,7 +697,9 @@ async function fetchMemberAccessState({silent=false}={}){
       },
       body:'{}'
     });
-    const payload=await res.json().catch(()=>({}));
+    const raw=await res.text();
+    let payload={};
+    try{payload=raw?JSON.parse(raw):{}}catch(e){payload={error:raw||'Invalid response'}}
     if(!res.ok){
       console.error('member-access failed',res.status,payload);
       if(!silent)setAuthStatus(t.accessError+' ['+res.status+': '+(payload.error||'member-access')+']','err');
@@ -644,19 +708,19 @@ async function fetchMemberAccessState({silent=false}={}){
     return payload;
   }catch(err){
     console.error('member-access request failed',err);
-    if(!silent)setAuthStatus(t.accessError+' [NETWORK]','err');
+    if(!silent)setAuthStatus(t.accessError+' [NETWORK: '+(err?.message||'request failed')+']','err');
     return null;
   }
 }
 
 async function handleMemberAccess(user,{silent=false}={}){
   const t=authCopy();
-  if(!BZXF_SB||!user)return false;
+  if(!user)return false;
   const state=await fetchMemberAccessState({silent});
   if(!state)return false;
-  BZXF_CURRENT_USER=user;
+  BZXF_CURRENT_USER=state.user||user;
   if(state.user?.must_change_password===true){
-    openTemporaryPasswordChange(user);
+    openTemporaryPasswordChange(BZXF_CURRENT_USER);
     return false;
   }
   const enrollment=state.enrollment||null;
@@ -667,54 +731,63 @@ async function handleMemberAccess(user,{silent=false}={}){
     return false;
   }
   if(!silent)setAuthStatus(t.active,'ok');
-  setTimeout(()=>unlockPaidCourse(user,enrollment),silent?0:350);
+  setTimeout(()=>unlockPaidCourse(BZXF_CURRENT_USER,enrollment),silent?0:350);
   return true;
 }
 
-function needsTemporaryPasswordChange(user){const v=user&&user.user_metadata?user.user_metadata.must_change_password:null;return v===true||v==='true'||v===1||v==='1'}
 function setTempPassStatus(message,kind=''){const e=document.getElementById('tempPassStatus');if(!e)return;e.textContent=message;e.className='authStatus'+(kind?' '+kind:'')}
 function openTemporaryPasswordChange(user){lockPaidCourse();BZXF_CURRENT_USER=user||BZXF_CURRENT_USER;renderAuthLanguage();closeMemberLogin();const m=document.getElementById('tempPassModal');if(m)m.classList.add('show');const a=document.getElementById('newMemberPassword'),b=document.getElementById('confirmMemberPassword');if(a)a.value='';if(b)b.value='';setTempPassStatus('');if(a)setTimeout(()=>a.focus(),50)}
 function closeTemporaryPasswordChange(){const m=document.getElementById('tempPassModal');if(m)m.classList.remove('show')}
 async function submitTemporaryPasswordChange(){
   const t=authCopy();
-  if(!BZXF_SB)return;
   const p1=(document.getElementById('newMemberPassword')?.value||''),p2=(document.getElementById('confirmMemberPassword')?.value||'');
   if(p1.length<8){setTempPassStatus(t.tempShort,'err');return}
   if(p1!==p2){setTempPassStatus(t.tempMismatch,'err');return}
   setTempPassStatus(t.tempSaving);
+  const session=await ensureDirectSession();
+  if(!session?.access_token){setTempPassStatus(t.tempError+' [NO SESSION]','err');return}
   const currentMeta={...(BZXF_CURRENT_USER?.user_metadata||{}),must_change_password:false};
-  const {data,error}=await BZXF_SB.auth.updateUser({password:p1,data:currentMeta});
-  if(error||!data?.user){console.error('Password update failed',error);setTempPassStatus(t.tempError,'err');return}
-  BZXF_CURRENT_USER=data.user;
+  const {res,payload}=await authFetch('/auth/v1/user',{method:'PUT',token:session.access_token,body:{password:p1,data:currentMeta}});
+  if(!res.ok||!payload?.id){console.error('Password update failed',payload);setTempPassStatus(t.tempError+' ['+res.status+': '+(payload?.msg||payload?.error||'update failed')+']','err');return}
+  session.user=payload;saveDirectSession(session);BZXF_CURRENT_USER=payload;
   setTempPassStatus(t.tempDone,'ok');
-  setTimeout(async()=>{
-    closeTemporaryPasswordChange();
-    await handleMemberAccess(data.user);
-  },500)
+  setTimeout(async()=>{closeTemporaryPasswordChange();await handleMemberAccess(payload)},500)
 }
 
 async function memberLogin(){
   const t=authCopy();
-  if(!BZXF_SB){setAuthStatus(t.accessError,'err');return}
   const email=(document.getElementById('memberLoginEmail').value||'').trim();
   const password=document.getElementById('memberLoginPassword').value||'';
   if(!email||!password){setAuthStatus(CURRENT_LANG==='en'?'Enter both Email and password.':'请输入 Email 和密码。','err');return}
   setAuthStatus(t.signing);
-  const {data,error}=await BZXF_SB.auth.signInWithPassword({email,password});
-  if(error||!data?.user){console.error('Login failed',error);setAuthStatus(t.badLogin,'err');return}
-  BZXF_CURRENT_USER=data.user;
-  await handleMemberAccess(data.user);
+  try{
+    const session=await directPasswordSignIn(email,password);
+    BZXF_CURRENT_USER=session.user;
+    await handleMemberAccess(session.user);
+  }catch(err){
+    console.error('Login failed',err);
+    setAuthStatus(t.badLogin+' ['+(err?.message||'AUTH ERROR')+']','err');
+  }
 }
-async function memberLogout(){if(BZXF_SB)await BZXF_SB.auth.signOut();closeTemporaryPasswordChange();lockPaidCourse();const fg=document.getElementById('freeGate');if(fg)fg.style.display='block';setLang(CURRENT_LANG);window.scrollTo({top:0,behavior:'smooth'})}
+async function memberLogout(){
+  const s=loadDirectSession();
+  if(s?.access_token){
+    try{await authFetch('/auth/v1/logout',{method:'POST',token:s.access_token})}catch(e){}
+  }
+  clearDirectSession();closeTemporaryPasswordChange();lockPaidCourse();const fg=document.getElementById('freeGate');if(fg)fg.style.display='block';setLang(CURRENT_LANG);window.scrollTo({top:0,behavior:'smooth'})
+}
 async function initSupabaseMemberGate(){
   renderAuthLanguage();
   try{
-    if(!window.supabase||!window.supabase.createClient)throw new Error('Supabase library unavailable');
-    BZXF_SB=window.supabase.createClient(BZXF_SUPABASE_URL,BZXF_SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
-    const {data:{session}}=await BZXF_SB.auth.getSession();
-    if(session?.user){BZXF_CURRENT_USER=session.user;const ok=await handleMemberAccess(session.user,{silent:true});if(!ok&&!document.getElementById('tempPassModal')?.classList.contains('show'))lockPaidCourse()}
-    BZXF_SB.auth.onAuthStateChange((event)=>{if(event==='SIGNED_OUT'){closeTemporaryPasswordChange();lockPaidCourse()}})
-  }catch(err){console.error('Member gate init failed',err);lockPaidCourse()}
+    const session=await ensureDirectSession();
+    if(session?.user){
+      BZXF_CURRENT_USER=session.user;
+      const ok=await handleMemberAccess(session.user,{silent:true});
+      if(!ok&&!document.getElementById('tempPassModal')?.classList.contains('show'))lockPaidCourse()
+    }else{
+      lockPaidCourse()
+    }
+  }catch(err){console.error('Member gate init failed',err);clearDirectSession();lockPaidCourse()}
 }
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMemberLogin()});
 
