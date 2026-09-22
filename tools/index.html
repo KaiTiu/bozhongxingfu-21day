@@ -268,7 +268,7 @@ input:focus,textarea:focus,select:focus{border-color:#91aa8e;box-shadow:0 0 0 3p
   </div>
   <div class="v5CloudBar"><span class="v5CloudPill local" id="v5CloudStatus">⏳ 正在读取课程账号…</span></div><div class="v53Version" id="v53Version">V5.5 · TOOL OPEN FIX + GUIDED HISTORY</div>
 </section>
-<section class="v51CompanionTop" id="toolboxWelcome"><div class="v5Companion" id="v5Companion"></div></section>
+<section class="v51CompanionTop" id="welcome"><div class="v5Companion" id="v5Companion"></div></section>
 <div class="stats">
   <div class="stat"><strong id="statDays">0</strong><small id="statDaysLabel">实践天数</small></div>
   <div class="stat"><strong id="statStreak">0</strong><small id="statStreakLabel">连续天数</small></div>
@@ -1189,7 +1189,7 @@ setTimeout(()=>{const p=new URLSearchParams(location.search),tool=p.get('tool');
 
 
 <style id="v514NativeWelcomeStyle">
-#toolboxWelcome{scroll-margin-top:12px}
+#welcome{scroll-margin-top:12px}
 </style>
 <script id="v514NativeWelcomeLanding">
 (function(){
@@ -1200,7 +1200,7 @@ setTimeout(()=>{const p=new URLSearchParams(location.search),tool=p.get('tool');
   try{ if('scrollRestoration' in history) history.scrollRestoration='manual'; }catch(e){}
 
   function land(){
-    const el=document.getElementById('toolboxWelcome');
+    const el=document.getElementById('welcome');
     if(!el)return;
     el.scrollIntoView({behavior:'auto',block:'start'});
   }
@@ -1231,6 +1231,42 @@ setTimeout(()=>{const p=new URLSearchParams(location.search),tool=p.get('tool');
     if(f)f.innerHTML=(typeof LANG!=='undefined'&&LANG==='en')
       ?'🌱 Planting Happiness | My Happiness Companion · V5.14<br/>A better life can begin with one small decision.'
       :'🌱 播种幸福｜我的幸福陪伴系统 · V5.14<br/>更好的自己，从一个小小的决定开始。';
+  });
+})();
+</script>
+
+
+<script id="v515ExactNativeAnchorFix">
+(function(){
+  const p = new URLSearchParams(location.search);
+  const isNormalToolboxEntry = !p.get('tool') && !p.get('view');
+
+  function goWelcome(){
+    if(!isNormalToolboxEntry) return;
+    const el = document.getElementById('welcome');
+    if(!el) return;
+    el.scrollIntoView({behavior:'auto', block:'start'});
+  }
+
+  // #welcome now matches a real element ID, so the browser can natively land here.
+  // These calls only protect against late cloud rendering / mobile browser scroll restoration.
+  if(location.hash === '#welcome'){
+    requestAnimationFrame(goWelcome);
+    window.addEventListener('load', () => {
+      goWelcome();
+      setTimeout(goWelcome, 150);
+      setTimeout(goWelcome, 700);
+    });
+    window.addEventListener('pageshow', () => setTimeout(goWelcome, 50));
+  }
+
+  window.addEventListener('load',()=>{
+    const v=document.getElementById('v53Version');
+    if(v)v.textContent='V5.15 · EXACT #WELCOME ANCHOR';
+    const f=document.getElementById('footerText');
+    if(f)f.innerHTML=(typeof LANG!=='undefined'&&LANG==='en')
+      ?'🌱 Planting Happiness | My Happiness Companion · V5.15<br/>A better life can begin with one small decision.'
+      :'🌱 播种幸福｜我的幸福陪伴系统 · V5.15<br/>更好的自己，从一个小小的决定开始。';
   });
 })();
 </script>
