@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>播种幸福｜Admin Dashboard V2.2 Sales + Ops</title>
+<title>播种幸福｜Admin Dashboard V2.3 Sales + Renewal</title>
 <style>
 :root{--g:#355a42;--g2:#4e725a;--sage:#e4ede0;--paper:#fffdf8;--cream:#f4f0e7;--ink:#30362f;--muted:#707870;--gold:#bd995c;--line:#dce5d9;--warn:#fff4d7;--danger:#a6473d;--shadow:0 14px 38px rgba(53,90,66,.09)}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:linear-gradient(180deg,#f7f3ea,#edf3e9);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","Noto Sans SC",sans-serif}button,input,select{font:inherit}button{cursor:pointer}.shell{max-width:1480px;margin:auto;padding:18px}.hidden{display:none!important}
@@ -38,10 +38,20 @@ label{display:block;font-weight:900;color:var(--g);margin:13px 0 6px}input,selec
 @media(max-width:1280px){.stats{grid-template-columns:repeat(3,1fr)}.opsToolbar{grid-template-columns:repeat(3,1fr)}.searchWrap{grid-column:1/-1}}
 @media(max-width:650px){.stats{grid-template-columns:1fr 1fr}.opsToolbar{grid-template-columns:1fr 1fr}.searchWrap{grid-column:1/-1}}
 
+
+/* ===== V2.3 RENEWAL REMINDER ===== */
+.renewalBtn{background:#fff7e8!important;color:#7a5b21!important;border:1px solid #ead7af!important}
+.renewalBtn:hover{background:#ffefc9!important}
+.renewalDue{font-size:10px;font-weight:900;color:#8a631f;margin-top:4px}
+.renewalExpired{font-size:10px;font-weight:900;color:#9a433b;margin-top:4px}
+.renewalActions{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+.renewalActions .btn{margin:0}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+<!-- V2.3: 30-day renewal reminder tools; no new SQL required -->
 <div class="shell">
 <section id="loginView" class="loginWrap">
   <div class="loginCard">
@@ -57,14 +67,14 @@ label{display:block;font-weight:900;color:var(--g);margin:13px 0 6px}input,selec
 
 <section id="dashboardView" class="hidden">
   <div class="top">
-    <div><h1>🌱 播种幸福｜学员管理 V2.2</h1><p>一年制课程 · 学员权限 · 收款记录 · 客户来源 · 续费提醒</p></div>
+    <div><h1>🌱 播种幸福｜学员管理 V2.3</h1><p>一年制课程 · 学员权限 · 收款记录 · 30天续费提醒</p></div>
     <div class="topActions"><button class="btn" onclick="refreshMembers()">刷新名单</button><button class="btn" onclick="window.open('./index.html','_blank')">打开课程</button><button class="btn" onclick="adminLogout()">退出</button></div>
   </div>
 
   <div class="stats">
     <div class="stat"><strong id="statTotal">0</strong><span>全部学员</span></div>
     <div class="stat"><strong id="statActive">0</strong><span>ACTIVE</span></div>
-    <div class="stat"><strong id="statSoon">0</strong><span>30天内到期</span></div>
+    <div class="stat" style="cursor:pointer" title="点击查看30天内到期学员" onclick="showSoonExpiring()"><strong id="statSoon">0</strong><span>30天内到期</span></div>
     <div class="stat"><strong id="statExpired">0</strong><span>已到期</span></div>
     <div class="stat moneyStat"><strong id="statRevenue">RM 0.00</strong><span>累计已付款收入</span></div>
     <div class="stat"><strong id="statPendingPay">0</strong><span>待确认付款</span></div>
@@ -147,6 +157,11 @@ label{display:block;font-weight:900;color:var(--g);margin:13px 0 6px}input,selec
       <label>营运备注</label><input id="editNotes">
       <div class="checkboxLine"><input id="editWelcomeSent" type="checkbox"><label for="editWelcomeSent">欢迎讯息已发送</label></div>
     </div>
+    <div class="renewalActions">
+      <button class="btn renewalBtn" type="button" onclick="copyRenewalMessage($('editUserId').value,'zh')">复制中文续费提醒</button>
+      <button class="btn renewalBtn" type="button" onclick="copyRenewalMessage($('editUserId').value,'en')">Copy English Renewal</button>
+      <button class="btn renewalBtn" type="button" onclick="openRenewalWhatsApp($('editUserId').value,'zh')">WhatsApp 续费提醒</button>
+    </div>
     <div class="modalActions">
       <button class="btn" onclick="saveEdit()">保存修改</button>
       <button class="btn warn" onclick="renewOneYear()">🔄 续费 1 年</button>
@@ -206,6 +221,78 @@ function paymentPill(s){
   if(!s)return '<span class="opsPill pending">未登记</span>';
   const st=s.payment_status||'pending';
   return `<span class="opsPill ${esc(st)}">${esc(st.toUpperCase())}</span><div class="salesMeta">${money(s.payment_amount)}${s.payment_date?'<br>'+fmt(s.payment_date):''}</div>`;
+}
+
+function renewalDaysText(m,lang='zh'){
+  if(!m?.expiry_date)return'';
+  const d=daysBetween(today(),m.expiry_date);
+  if(lang==='en'){
+    if(d<0)return `expired ${Math.abs(d)} day${Math.abs(d)===1?'':'s'} ago`;
+    if(d===0)return 'expires today';
+    return `${d} day${d===1?'':'s'} remaining`;
+  }
+  if(d<0)return `已到期 ${Math.abs(d)} 天`;
+  if(d===0)return '今天到期';
+  return `还剩 ${d} 天`;
+}
+function buildRenewalMessage(uid,lang='zh'){
+  const m=memberById(uid);if(!m)return'';
+  const name=m.display_name||m.email||'';
+  const expiry=fmt(m.expiry_date);
+  const left=renewalDaysText(m,lang);
+  if(lang==='en')return `🌱 Planting Happiness | Membership Renewal Reminder
+
+Hi ${name} 😊
+
+A quick reminder that your current 21-Day Happiness Practice System membership ${left}.
+Current expiry date: ${expiry}
+
+If you would like to continue keeping access to the course, your saved progress and the 13 Happiness Tools, just reply:
+
+"I want to renew"
+
+We will send you the renewal details.
+
+Thank you for being part of Planting Happiness. 💚`;
+  return `🌱《播种幸福》会员续费提醒
+
+你好，${name} 😊
+
+温馨提醒：你的《播种幸福｜21天幸福人生实践系统》会员权限${left}。
+目前到期日期：${expiry}
+
+如果你想继续保留课程、学习记录与13项幸福工具箱的使用权限，只要回复：
+
+「我要续费」
+
+我们会把续费资料发给你。
+
+谢谢你一路以来的参与与练习。💚`;
+}
+async function copyRenewalMessage(uid,lang='zh'){
+  const msg=buildRenewalMessage(uid,lang);
+  if(!msg)return;
+  const ok=await copyText(msg);
+  alert(ok?(lang==='en'?'✓ English renewal reminder copied.':'✓ 中文续费提醒已复制。'):'复制失败，请手动复制。');
+}
+function normalizeWhatsappNumber(v){
+  let n=String(v||'').replace(/\D/g,'');
+  if(!n)return'';
+  if(n.startsWith('0'))n='60'+n.slice(1);
+  return n;
+}
+function openRenewalWhatsApp(uid,lang='zh'){
+  const s=saleOf(uid);
+  const n=normalizeWhatsappNumber(s?.whatsapp);
+  if(!n){alert('这个学员还没有登记 WhatsApp 号码。请先到「编辑」补上。');return}
+  const msg=buildRenewalMessage(uid,lang);
+  window.open(`https://wa.me/${n}?text=${encodeURIComponent(msg)}`,'_blank','noopener');
+}
+function showSoonExpiring(){
+  if($('expiryFilter'))$('expiryFilter').value='soon';
+  CURRENT_PAGE=1;
+  renderAll();
+  document.querySelector('.tableWrap')?.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 async function adminLogin(){setStatus('loginStatus','正在登录…');const email=$('adminEmail').value.trim(),password=$('adminPassword').value;const {data,error}=await sb.auth.signInWithPassword({email,password});if(error||!data?.user){setStatus('loginStatus','登录失败，请检查 Email 与密码。','err');return}try{await refreshMembers();$('loginView').classList.add('hidden');$('dashboardView').classList.remove('hidden')}catch(e){await sb.auth.signOut();setStatus('loginStatus','这个账号不是管理员，或 Admin Function 尚未部署。\n'+e.message,'err')}}
@@ -378,7 +465,7 @@ function filteredMembers(){
 function renderStats(){const total=MEMBERS.length,active=MEMBERS.filter(m=>effectiveStatus(m)==='active').length,soon=MEMBERS.filter(isSoon).length,expired=MEMBERS.filter(m=>effectiveStatus(m)==='expired').length,revenue=SALES.filter(s=>s.payment_status==='paid').reduce((n,s)=>n+Number(s.payment_amount||0),0),pending=SALES.filter(s=>s.payment_status==='pending').length;$('statTotal').textContent=total;$('statActive').textContent=active;$('statSoon').textContent=soon;$('statExpired').textContent=expired;$('statRevenue').textContent=money(revenue);$('statPendingPay').textContent=pending}
 function renderAll(){renderStats();renderMembers()}
 function statusPill(m){const st=effectiveStatus(m),soon=isSoon(m);return `<span class="pill ${st}">${st.toUpperCase()}</span>${soon?'<br><span class="pill soon" style="margin-top:4px">即将到期</span>':''}`}
-function renderMembers(){const arr=filteredMembers(),size=Number($('pageSize')?.value||20),pages=Math.max(1,Math.ceil(arr.length/size));if(CURRENT_PAGE>pages)CURRENT_PAGE=pages;const start=(CURRENT_PAGE-1)*size,view=arr.slice(start,start+size);$('memberCount').textContent=`${arr.length} 位 / 共 ${MEMBERS.length} 位`;$('memberRows').innerHTML=view.length?view.map(m=>{const s=saleOf(m.user_id);return `<tr><td class="nameCell"><b>${esc(m.display_name||'未填写姓名')}</b><small>${esc(m.user_id.slice(0,8))}…${s?.whatsapp?'<br>'+esc(s.whatsapp):''}</small></td><td>${esc(m.email||'')}</td><td>${paymentPill(s)}</td><td>${s?.source?esc(s.source):'—'}</td><td>${statusPill(m)}</td><td>${fmt(m.start_date)}</td><td>${fmt(m.expiry_date)}</td><td class="actionsCell"><button class="btn small" onclick="openEdit('${m.user_id}')">编辑</button><button class="btn soft small" onclick="quickRenew('${m.user_id}')">续费1年</button></td></tr>`}).join(''):`<tr><td colspan="8" class="empty">没有符合条件的学员。</td></tr>`;$('pageInfo').textContent=`第 ${CURRENT_PAGE} / ${pages} 页`;$('pageBtns').innerHTML=`<button onclick="gotoPage(${Math.max(1,CURRENT_PAGE-1)})" ${CURRENT_PAGE===1?'disabled':''}>‹</button>${pageNumbers(pages).map(p=>`<button class="${p===CURRENT_PAGE?'active':''}" onclick="gotoPage(${p})">${p}</button>`).join('')}<button onclick="gotoPage(${Math.min(pages,CURRENT_PAGE+1)})" ${CURRENT_PAGE===pages?'disabled':''}>›</button>`}
+function renderMembers(){const arr=filteredMembers(),size=Number($('pageSize')?.value||20),pages=Math.max(1,Math.ceil(arr.length/size));if(CURRENT_PAGE>pages)CURRENT_PAGE=pages;const start=(CURRENT_PAGE-1)*size,view=arr.slice(start,start+size);$('memberCount').textContent=`${arr.length} 位 / 共 ${MEMBERS.length} 位`;$('memberRows').innerHTML=view.length?view.map(m=>{const s=saleOf(m.user_id),st=effectiveStatus(m),due=isSoon(m)||st==='expired',d=m.expiry_date?daysBetween(today(),m.expiry_date):null,dueText=d==null?'':(d<0?`<div class="renewalExpired">已到期 ${Math.abs(d)} 天</div>`:d===0?'<div class="renewalDue">今天到期</div>':due?`<div class="renewalDue">还剩 ${d} 天</div>`:'');const renewalBtns=due?`<button class="btn small renewalBtn" onclick="copyRenewalMessage('${m.user_id}','zh')">复制续费提醒</button>${s?.whatsapp?`<button class="btn small renewalBtn" onclick="openRenewalWhatsApp('${m.user_id}','zh')">WhatsApp提醒</button>`:''}`:'';return `<tr><td class="nameCell"><b>${esc(m.display_name||'未填写姓名')}</b><small>${esc(m.user_id.slice(0,8))}…${s?.whatsapp?'<br>'+esc(s.whatsapp):''}</small></td><td>${esc(m.email||'')}</td><td>${paymentPill(s)}</td><td>${s?.source?esc(s.source):'—'}</td><td>${statusPill(m)}${dueText}</td><td>${fmt(m.start_date)}</td><td>${fmt(m.expiry_date)}</td><td class="actionsCell"><button class="btn small" onclick="openEdit('${m.user_id}')">编辑</button><button class="btn soft small" onclick="quickRenew('${m.user_id}')">续费1年</button>${renewalBtns}</td></tr>`}).join(''):`<tr><td colspan="8" class="empty">没有符合条件的学员。</td></tr>`;$('pageInfo').textContent=`第 ${CURRENT_PAGE} / ${pages} 页`;$('pageBtns').innerHTML=`<button onclick="gotoPage(${Math.max(1,CURRENT_PAGE-1)})" ${CURRENT_PAGE===1?'disabled':''}>‹</button>${pageNumbers(pages).map(p=>`<button class="${p===CURRENT_PAGE?'active':''}" onclick="gotoPage(${p})">${p}</button>`).join('')}<button onclick="gotoPage(${Math.min(pages,CURRENT_PAGE+1)})" ${CURRENT_PAGE===pages?'disabled':''}>›</button>`}
 function pageNumbers(pages){const out=[];let a=Math.max(1,CURRENT_PAGE-2),b=Math.min(pages,a+4);a=Math.max(1,b-4);for(let i=a;i<=b;i++)out.push(i);return out}
 function gotoPage(p){CURRENT_PAGE=p;renderMembers();document.querySelector('.tableWrap')?.scrollIntoView({behavior:'smooth',block:'start'})}
 function memberById(uid){return MEMBERS.find(m=>m.user_id===uid)}
