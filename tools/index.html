@@ -241,7 +241,7 @@ input:focus,textarea:focus,select:focus{border-color:#91aa8e;box-shadow:0 0 0 3p
   try{
     if('scrollRestoration' in history) history.scrollRestoration='manual';
     const p=new URLSearchParams(location.search);
-    const fromCourse = p.get('entry')==='course' || p.has('return');
+    const fromCourse = false; // V5.14 uses the native #welcome anchor instead
     if(fromCourse && !p.get('tool') && !p.get('view')){
       window.scrollTo(0,0);
     }
@@ -268,7 +268,7 @@ input:focus,textarea:focus,select:focus{border-color:#91aa8e;box-shadow:0 0 0 3p
   </div>
   <div class="v5CloudBar"><span class="v5CloudPill local" id="v5CloudStatus">⏳ 正在读取课程账号…</span></div><div class="v53Version" id="v53Version">V5.5 · TOOL OPEN FIX + GUIDED HISTORY</div>
 </section>
-<section class="v51CompanionTop"><div class="v5Companion" id="v5Companion"></div></section>
+<section class="v51CompanionTop" id="toolboxWelcome"><div class="v5Companion" id="v5Companion"></div></section>
 <div class="stats">
   <div class="stat"><strong id="statDays">0</strong><small id="statDaysLabel">实践天数</small></div>
   <div class="stat"><strong id="statStreak">0</strong><small id="statStreakLabel">连续天数</small></div>
@@ -1116,7 +1116,7 @@ setTimeout(()=>{const p=new URLSearchParams(location.search),tool=p.get('tool');
   const params=new URLSearchParams(location.search);
   let sameOriginReferrer=false;
   try{ sameOriginReferrer=!!document.referrer && new URL(document.referrer).origin===location.origin; }catch(e){}
-  const fromCourse=params.get('entry')==='course' || params.has('return') || sameOriginReferrer;
+  const fromCourse=false; // V5.14 uses the native #welcome anchor instead
   const deepLink=!!params.get('tool') || !!params.get('view');
   if(!fromCourse || deepLink) return;
 
@@ -1178,11 +1178,59 @@ setTimeout(()=>{const p=new URLSearchParams(location.search),tool=p.get('tool');
 
   window.addEventListener('load',()=>{
     const v=document.getElementById('v53Version');
-    if(v)v.textContent='V5.13 · RETURN-AWARE WELCOME LANDING';
+    if(v)v.textContent='V5.14 · NATIVE WELCOME ANCHOR';
     const f=document.getElementById('footerText');
     if(f)f.innerHTML=(typeof LANG!=='undefined'&&LANG==='en')
       ?'🌱 Planting Happiness | My Happiness Companion · V5.13<br/>A better life can begin with one small decision.'
       :'🌱 播种幸福｜我的幸福陪伴系统 · V5.13<br/>更好的自己，从一个小小的决定开始。';
+  });
+})();
+</script>
+
+
+<style id="v514NativeWelcomeStyle">
+#toolboxWelcome{scroll-margin-top:12px}
+</style>
+<script id="v514NativeWelcomeLanding">
+(function(){
+  const p=new URLSearchParams(location.search);
+  const normalWelcome=(location.hash==='#welcome') && !p.get('tool') && !p.get('view');
+  if(!normalWelcome) return;
+
+  try{ if('scrollRestoration' in history) history.scrollRestoration='manual'; }catch(e){}
+
+  function land(){
+    const el=document.getElementById('toolboxWelcome');
+    if(!el)return;
+    el.scrollIntoView({behavior:'auto',block:'start'});
+  }
+
+  // Native hash handles the first landing. These re-assert it after cloud/profile rendering
+  // without depending on browser scroll restoration.
+  window.addEventListener('DOMContentLoaded',()=>requestAnimationFrame(land));
+  window.addEventListener('load',()=>{land();setTimeout(land,120);setTimeout(land,500)});
+  window.addEventListener('pageshow',()=>setTimeout(land,30));
+
+  const box=document.getElementById('v5Companion');
+  if(box && 'MutationObserver' in window){
+    const ob=new MutationObserver(()=>{
+      const t=(box.textContent||'').trim();
+      if(t.includes('欢迎回来') || t.includes('Welcome back')){
+        land();
+        ob.disconnect();
+      }
+    });
+    ob.observe(box,{childList:true,subtree:true,characterData:true});
+    setTimeout(()=>ob.disconnect(),3000);
+  }
+
+  window.addEventListener('load',()=>{
+    const v=document.getElementById('v53Version');
+    if(v)v.textContent='V5.14 · NATIVE WELCOME ANCHOR';
+    const f=document.getElementById('footerText');
+    if(f)f.innerHTML=(typeof LANG!=='undefined'&&LANG==='en')
+      ?'🌱 Planting Happiness | My Happiness Companion · V5.14<br/>A better life can begin with one small decision.'
+      :'🌱 播种幸福｜我的幸福陪伴系统 · V5.14<br/>更好的自己，从一个小小的决定开始。';
   });
 })();
 </script>
