@@ -420,11 +420,11 @@ function v5RenderCompanion(){
  const arr=[...db().records].sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id),r=arr[0],en=LANG==='en',name=V5_PROFILE?.display_name||V5_USER?.email?.split('@')[0]||'';
  const why=`<div class="v51Why"><div><b>${en?'① Tell me what happened':'① 告诉我发生什么'}</b><span>${en?'Start from real life, not from choosing a form.':'从真实生活开始，不是从挑一张表格开始。'}</span></div><div><b>${en?'② Remember my past':'② 记得以前的我'}</b><span>${en?'Bring back what you wrote and the seed you chose before.':'把以前写过的事情和播过的种子带回来。'}</span></div><div><b>${en?'③ One next step':'③ 只走下一小步'}</b><span>${en?'Turn reflection into one small, realistic action.':'把觉察变成一个今天做得到的小行动。'}</span></div></div>`;
  if(!r){
-   box.innerHTML=`<h3>${en?'🌱 This is not a set of forms. It is your happiness companion.':'🌱 这里不是一堆表格，而是你的幸福陪伴系统。'}</h3><p>${en?'You do not need to know which tool to use. Tell me what is happening today and the system will guide you.':'你不需要先懂13个工具。只要告诉系统今天发生什么，它会带你去适合的练习。'}</p>${why}<div class="v5CompanionActions"><button class="main" onclick="show('homeView');setTimeout(()=>document.getElementById('needQuickGrid').scrollIntoView({behavior:'smooth'}),80)">${en?'What is happening today? →':'今天发生什么了？ →'}</button><button class="alt" onclick="show('historyView')">${en?'My Growth Journal':'我的成长记录'}</button></div>`;
+   box.innerHTML=`<h3>${en?'🌱 This is not a set of forms. It is your happiness companion.':'🌱 这里不是一堆表格，而是你的幸福陪伴系统。'}</h3><p>${en?'You do not need to know which tool to use. Tell me what is happening today and the system will guide you.':'你不需要先懂13个工具。只要告诉系统今天发生什么，它会带你去适合的练习。'}</p>${why}<div class="v5CompanionActions"><button class="main" onclick="show('homeView');setTimeout(()=>document.getElementById('needQuickGrid').scrollIntoView({behavior:'smooth'}),80)">${en?'What is happening today? →':'今天发生什么了？ →'}</button><button class="alt" onclick="v511ReviewGrowth()">${en?'My Growth Journal':'我的成长记录'}</button></div>`;
    return;
  }
  const coach=v4CoachResponse(r.tool,r.data||{}),action=v4ActionForRecord(r),key=v5KeyText(r);
- box.innerHTML=`<h3>${en?'🌱 Welcome back':'🌱 欢迎回来'}${name?'，'+esc(name):''}</h3><p>${en?'The system remembers where you left off. You do not have to start from zero today.':'系统记得你上一次停在哪里。今天不需要重新从零开始。'}</p><div class="v5Last"><div class="v5Label">${esc(r.date)} · ${esc(toolName(r.tool))}</div><div class="v5Quote">${esc(v4Short(key,170)||coach.body)}</div>${action?`<div class="v5Seed"><b>${en?'🌱 The seed you chose last time':'🌱 你上一次播下的种子'}</b><br>${esc(action)}</div>`:''}<div style="margin-top:9px"><span class="v5FollowStatus">${v5FollowLabel(r.followup)}</span></div></div>${why}<div class="v5CompanionActions"><button class="main" onclick="editRecord(${r.id})">${en?'Continue where I left off →':'继续上一次 →'}</button><button class="alt" onclick="show('homeView');setTimeout(()=>document.getElementById('needQuickGrid').scrollIntoView({behavior:'smooth'}),80)">${en?'Something new happened today':'今天有新的事情'}</button><button class="alt" onclick="show('historyView')">${en?'Review my growth':'回看我的成长'}</button></div>`;
+ box.innerHTML=`<h3>${en?'🌱 Welcome back':'🌱 欢迎回来'}${name?'，'+esc(name):''}</h3><p>${en?'The system remembers where you left off. You do not have to start from zero today.':'系统记得你上一次停在哪里。今天不需要重新从零开始。'}</p><div class="v5Last"><div class="v5Label">${esc(r.date)} · ${esc(toolName(r.tool))}</div><div class="v5Quote">${esc(v4Short(key,170)||coach.body)}</div>${action?`<div class="v5Seed"><b>${en?'🌱 The seed you chose last time':'🌱 你上一次播下的种子'}</b><br>${esc(action)}</div>`:''}<div style="margin-top:9px"><span class="v5FollowStatus">${v5FollowLabel(r.followup)}</span></div></div>${why}<div class="v5CompanionActions"><button class="main" onclick="v511ContinueLast(${r.id})">${en?'Continue where I left off →':'继续上一次 →'}</button><button class="alt" onclick="show('homeView');setTimeout(()=>document.getElementById('needQuickGrid').scrollIntoView({behavior:'smooth'}),80)">${en?'Something new happened today':'今天有新的事情'}</button><button class="alt" onclick="v511ReviewGrowth()">${en?'Review my growth':'回看我的成长'}</button></div>`;
 }
 
 function v5ExampleHTML(tool){const en=LANG==='en';return `<div class="v5Example"><h3>${en?'💡 Before you write, see an example':'💡 先不要急着填，看看一个例子'}</h3><p><b>${en?'When this tool helps:':'什么时候适合用：'}</b> ${L(V5_EXAMPLES[tool])}</p><div class="v5Story">${L(V5_STORIES[tool])}</div><details><summary>${en?'Why this matters':'为什么先看例子？'}</summary><div class="v5Breakdown">${en?'Many habits happen too quickly to notice. A story helps you recognise a familiar pattern before asking you to write about yourself. You do not need to copy the example; use it only to help you see your own situation.':'很多习惯发生得太快，我们自己不一定察觉。先看一个生活例子，比较容易产生“原来我也会这样”的共鸣。例子不是标准答案，只是帮助你看见自己的情况。'}</div></details></div>`}
@@ -975,6 +975,121 @@ setTimeout(()=>{const p=new URLSearchParams(location.search),tool=p.get('tool');
   if(footer)footer.innerHTML=LANG==='en'
     ?'🌱 Planting Happiness | My Happiness Companion · V5.9<br/>A better life can begin with one small decision.'
     :'🌱 播种幸福｜我的幸福陪伴系统 · V5.9<br/>更好的自己，从一个小小的决定开始。';
+})();
+</script>
+
+
+<script id="v510EntryWelcomeScrollPatch">
+/* V5.10 — On normal toolbox entry, land on the Welcome Back companion card.
+   Deep links (?tool=... or ?view=...) keep their own destination. */
+(function(){
+  try{ if('scrollRestoration' in history) history.scrollRestoration='manual'; }catch(e){}
+
+  const params=new URLSearchParams(location.search);
+  const normalEntry=!params.get('tool') && !params.get('view');
+  if(!normalEntry) return;
+
+  let landed=false;
+  function companion(){
+    return document.querySelector('.v51CompanionTop') || document.getElementById('v5Companion');
+  }
+  function land(){
+    if(landed) return;
+    const el=companion();
+    if(!el) return;
+    landed=true;
+    el.scrollIntoView({behavior:'auto',block:'start'});
+  }
+
+  // Prevent the browser from restoring an old deep scroll position first.
+  window.addEventListener('pageshow',()=>{
+    window.scrollTo(0,0);
+    setTimeout(land,180);
+  });
+
+  // Cloud merge may repaint "Welcome back" a little later.
+  const box=document.getElementById('v5Companion');
+  if(box && 'MutationObserver' in window){
+    const obs=new MutationObserver(()=>{
+      const t=(box.textContent||'').trim();
+      if(!landed && (t.includes('欢迎回来') || t.includes('Welcome back'))){
+        setTimeout(land,40);
+        obs.disconnect();
+      }
+    });
+    obs.observe(box,{childList:true,subtree:true,characterData:true});
+    setTimeout(()=>{ if(!landed) land(); obs.disconnect(); },1400);
+  }else{
+    window.addEventListener('load',()=>setTimeout(land,350));
+  }
+
+  // Visible version marker.
+  window.addEventListener('load',()=>{
+    const v=document.getElementById('v53Version');
+    if(v) v.textContent='V5.10 · WELCOME START + CLOUD SYNC';
+    const f=document.getElementById('footerText');
+    if(f) f.innerHTML=(typeof LANG!=='undefined'&&LANG==='en')
+      ?'🌱 Planting Happiness | My Happiness Companion · V5.10<br/>A better life can begin with one small decision.'
+      :'🌱 播种幸福｜我的幸福陪伴系统 · V5.10<br/>更好的自己，从一个小小的决定开始。';
+  });
+})();
+</script>
+
+
+<style id="v511CompanionScrollStyle">
+#toolContent .v52Stepper,#historyTitle{scroll-margin-top:18px}
+</style>
+<script id="v511CompanionScrollPatch">
+(function(){
+  function showView(view){
+    if(typeof window.v54ShowView==='function') window.v54ShowView(view);
+    else if(typeof window.v53ShowView==='function') window.v53ShowView(view);
+    else if(typeof window.show==='function') window.show(view);
+  }
+
+  window.v511ContinueLast=function(id){
+    const r=(typeof db==='function'?db().records:[]).find(x=>x.id===id);
+    if(!r)return;
+
+    selectedTool=r.tool;
+    editingRecordId=id;
+    moodValue=0;
+    chipValue='';
+    mapValues={};
+
+    if(typeof window.v53RenderToolForm==='function') window.v53RenderToolForm(r);
+    else if(typeof window.renderToolForm==='function') window.renderToolForm(r);
+
+    showView('toolView');
+
+    // Older view functions may scroll to page top. Land on the actual question area last.
+    setTimeout(()=>{
+      const target=
+        document.querySelector('#toolContent .v52Stepper') ||
+        document.querySelector('#toolContent .v52Field.on') ||
+        document.getElementById('toolContent');
+      if(target) target.scrollIntoView({behavior:'smooth',block:'start'});
+    },180);
+  };
+
+  window.v511ReviewGrowth=function(){
+    if(typeof V5_HISTORY_FILTER!=='undefined') V5_HISTORY_FILTER='all';
+    showView('historyView');
+
+    setTimeout(()=>{
+      const target=document.getElementById('historyTitle') || document.getElementById('historyView');
+      if(target) target.scrollIntoView({behavior:'smooth',block:'start'});
+    },180);
+  };
+
+  window.addEventListener('load',()=>{
+    const v=document.getElementById('v53Version');
+    if(v)v.textContent='V5.11 · COMPANION BUTTON SCROLL';
+    const f=document.getElementById('footerText');
+    if(f)f.innerHTML=(typeof LANG!=='undefined'&&LANG==='en')
+      ?'🌱 Planting Happiness | My Happiness Companion · V5.11<br/>A better life can begin with one small decision.'
+      :'🌱 播种幸福｜我的幸福陪伴系统 · V5.11<br/>更好的自己，从一个小小的决定开始。';
+  });
 })();
 </script>
 
