@@ -2,92 +2,153 @@
 <html lang="zh-Hans">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>播种幸福｜Admin Dashboard</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>播种幸福｜Admin Dashboard V2</title>
 <style>
-:root{--g:#355a42;--g2:#55725c;--sage:#e5eee1;--cream:#f5f0e7;--paper:#fffdf8;--ink:#30362f;--muted:#707870;--line:#dce5d9;--warn:#fff4d8;--danger:#9a4747}
-*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#f7f2e9,#edf3e9);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}button,input,select{font:inherit}button{cursor:pointer}.shell{max-width:1180px;margin:auto;padding:18px}.top{display:flex;justify-content:space-between;gap:12px;align-items:center;background:linear-gradient(145deg,var(--g),var(--g2));color:#fff;border-radius:24px;padding:20px 22px;box-shadow:0 16px 45px rgba(53,90,66,.13)}.top h1{margin:0;font-size:28px}.top p{margin:5px 0 0;color:#e9f2e6}.topActions{display:flex;gap:8px;flex-wrap:wrap}.btn{border:0;border-radius:12px;padding:10px 13px;font-weight:900;background:var(--g);color:#fff}.btn.soft{background:var(--sage);color:var(--g)}.btn.light{background:#fff;color:var(--g)}.btn.danger{background:#f7e8e8;color:var(--danger)}.grid{display:grid;grid-template-columns:360px 1fr;gap:16px;margin-top:16px}.card{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:0 10px 30px rgba(53,90,66,.06)}.card h2{margin:0 0 6px;color:var(--g)}.sub{color:var(--muted);font-size:13px;line-height:1.55;margin-bottom:13px}label{display:block;font-weight:850;color:var(--g);margin:11px 0 6px}input,select{width:100%;border:1px solid var(--line);border-radius:11px;padding:11px;background:#fff}.row2{display:grid;grid-template-columns:1fr 1fr;gap:9px}.status{min-height:22px;margin-top:9px;font-size:13px;line-height:1.5;white-space:pre-wrap}.ok{color:#2f6b49}.err{color:#a14444}.loginWrap{min-height:78vh;display:grid;place-items:center}.loginCard{width:min(430px,100%);background:var(--paper);border:1px solid var(--line);border-radius:24px;padding:24px;box-shadow:0 20px 60px rgba(53,90,66,.12)}.loginCard h1{color:var(--g);margin:0 0 8px}.hidden{display:none!important}.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}.toolbar input{max-width:330px}.memberList{display:grid;gap:10px}.member{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px}.memberHead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.memberName{font-weight:900;color:var(--g);font-size:16px}.memberEmail{font-size:12px;color:var(--muted);margin-top:3px}.pill{border-radius:999px;padding:5px 9px;font-size:11px;font-weight:900;background:var(--sage);color:var(--g)}.pill.inactive{background:#f4e7e4;color:#8a483f}.memberGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:11px}.memberGrid label{margin:0 0 5px;font-size:12px}.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}.tempResult{display:none;margin-top:12px;background:var(--warn);border:1px solid #ead19a;border-radius:14px;padding:13px}.tempResult.show{display:block}.tempCode{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:18px;font-weight:900;word-break:break-all;margin:7px 0}.note{background:#eef4eb;border-radius:13px;padding:12px;font-size:12px;line-height:1.55;color:#536058}@media(max-width:860px){.grid{grid-template-columns:1fr}.memberGrid{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}}
+:root{--g:#355a42;--g2:#4e725a;--sage:#e4ede0;--paper:#fffdf8;--cream:#f4f0e7;--ink:#30362f;--muted:#707870;--gold:#bd995c;--line:#dce5d9;--warn:#fff4d7;--danger:#a6473d;--shadow:0 14px 38px rgba(53,90,66,.09)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:linear-gradient(180deg,#f7f3ea,#edf3e9);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","Noto Sans SC",sans-serif}button,input,select{font:inherit}button{cursor:pointer}.shell{max-width:1480px;margin:auto;padding:18px}.hidden{display:none!important}
+.loginWrap{min-height:90vh;display:grid;place-items:center}.loginCard{width:min(560px,100%);background:var(--paper);border:1px solid var(--line);border-radius:28px;padding:28px;box-shadow:0 20px 60px rgba(53,90,66,.12)}.loginCard h1{color:var(--g);font-size:40px;margin:6px 0}.sub{color:var(--muted);line-height:1.6;font-size:14px}.status{min-height:22px;margin-top:9px;font-size:13px;font-weight:800;white-space:pre-wrap}.status.ok{color:#2d6a48}.status.err{color:#b33e32}
+label{display:block;font-weight:900;color:var(--g);margin:13px 0 6px}input,select{width:100%;border:1px solid var(--line);background:#fff;border-radius:13px;padding:11px 12px;color:var(--ink)}input:focus,select:focus{outline:none;border-color:#98b198;box-shadow:0 0 0 3px rgba(53,90,66,.09)}.btn{border:0;border-radius:12px;padding:10px 14px;font-weight:900;background:var(--g);color:#fff}.btn.soft{background:var(--sage);color:var(--g)}.btn.light{background:#fff;color:var(--g)}.btn.warn{background:#fff0cf;color:#775619}.btn.danger{background:#f8e4e1;color:#91372f}.btn.small{padding:8px 10px;font-size:12px}.btn:disabled{opacity:.5;cursor:not-allowed}
+.top{background:linear-gradient(145deg,#355a42,#55765f);color:white;border-radius:27px;padding:24px 27px;display:flex;justify-content:space-between;gap:18px;align-items:center;box-shadow:var(--shadow)}.top h1{margin:0;font-size:34px}.top p{margin:6px 0 0;color:#edf5eb}.topActions{display:flex;gap:8px;flex-wrap:wrap}.topActions .btn{background:#fff;color:var(--g)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0}.stat{background:#fff;border:1px solid var(--line);border-radius:18px;padding:15px;text-align:center;box-shadow:var(--shadow)}.stat strong{display:block;color:var(--g);font-size:28px}.stat span{color:var(--muted);font-size:12px}
+.grid{display:grid;grid-template-columns:370px 1fr;gap:16px}.card{background:var(--paper);border:1px solid var(--line);border-radius:23px;padding:19px;box-shadow:var(--shadow)}.card h2{color:var(--g);margin:0 0 5px}.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.planBox{background:#edf4ea;border:1px solid #d9e7d7;border-radius:14px;padding:12px;margin-top:12px;color:var(--g);font-size:13px;line-height:1.6}.planBox b{display:block;font-size:15px}.tempResult{display:none;margin-top:13px;background:var(--warn);border:1px solid #ead19a;border-radius:15px;padding:13px}.tempResult.show{display:block}.tempCode{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:18px;font-weight:900;word-break:break-all;margin:7px 0}
+.toolbar{display:grid;grid-template-columns:minmax(220px,1fr) 155px 170px 170px 110px;gap:8px;align-items:end;margin:14px 0}.toolbar label{font-size:11px;margin:0 0 4px}.searchWrap{position:relative}.searchWrap input{padding-left:38px}.searchWrap:before{content:'🔎';position:absolute;left:12px;top:34px}.countBadge{display:inline-flex;align-items:center;justify-content:center;background:var(--sage);color:var(--g);border-radius:999px;padding:7px 10px;font-weight:900;font-size:12px;white-space:nowrap}
+.tableWrap{overflow:auto;border:1px solid var(--line);border-radius:16px;background:#fff}.memberTable{width:100%;border-collapse:collapse;min-width:880px}.memberTable th,.memberTable td{padding:12px 11px;border-bottom:1px solid #edf0eb;text-align:left;vertical-align:middle}.memberTable th{position:sticky;top:0;background:#f5f8f2;color:var(--g);font-size:12px;z-index:1}.memberTable tr:hover td{background:#fcfdfb}.nameCell b{display:block;color:var(--g)}.nameCell small{color:var(--muted)}.pill{display:inline-block;border-radius:999px;padding:5px 9px;font-size:10px;font-weight:900}.pill.active{background:#e2eddf;color:#28583d}.pill.expired{background:#f4e1de;color:#8d3d35}.pill.inactive,.pill.cancelled{background:#efefed;color:#656962}.pill.soon{background:#fff0cf;color:#7d5c1c}.actionsCell{display:flex;gap:6px;flex-wrap:wrap}
+.pagination{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:12px;color:var(--muted);font-size:12px}.pageBtns{display:flex;gap:5px;align-items:center}.pageBtns button{border:1px solid var(--line);background:#fff;color:var(--g);border-radius:9px;padding:7px 10px;font-weight:800}.pageBtns button.active{background:var(--g);color:#fff}.empty{padding:28px;text-align:center;color:var(--muted)}
+.modal{position:fixed;inset:0;background:rgba(28,40,31,.48);display:none;align-items:center;justify-content:center;padding:18px;z-index:50}.modal.show{display:flex}.modalCard{width:min(680px,100%);max-height:92vh;overflow:auto;background:var(--paper);border-radius:24px;padding:22px;border:1px solid var(--line);box-shadow:0 24px 80px rgba(0,0,0,.18)}.modalHead{display:flex;justify-content:space-between;gap:10px;align-items:start}.modalHead h2{color:var(--g);margin:0}.closeBtn{border:0;background:var(--sage);color:var(--g);width:39px;height:39px;border-radius:50%;font-size:20px;font-weight:900}.modalActions{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}.renewPreview{margin-top:12px;background:#eef4eb;border-radius:14px;padding:12px;color:#4a5b4d;font-size:13px;line-height:1.6}.muted{color:var(--muted);font-size:12px}.dangerText{color:var(--danger);font-size:12px}
+@media(max-width:1100px){.grid{grid-template-columns:1fr}.toolbar{grid-template-columns:1fr 1fr 1fr}.searchWrap{grid-column:1/-1}.stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:650px){.shell{padding:10px}.top{align-items:flex-start;flex-direction:column}.top h1{font-size:27px}.stats{grid-template-columns:1fr 1fr}.toolbar{grid-template-columns:1fr 1fr}.searchWrap{grid-column:1/-1}.row2{grid-template-columns:1fr}.modalCard{padding:17px}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <div class="shell">
-  <section id="loginView" class="loginWrap">
-    <div class="loginCard">
-      <div style="font-weight:900;color:#b18a4f">🌱 播种幸福</div>
-      <h1>Admin Dashboard</h1>
-      <p class="sub">只有已登记为管理员的账号才能管理学员。</p>
-      <label>Email</label><input id="adminEmail" type="email" autocomplete="email">
-      <label>Password</label><input id="adminPassword" type="password" autocomplete="current-password">
-      <button class="btn" style="width:100%;margin-top:14px" onclick="adminLogin()">管理员登录</button>
-      <div id="loginStatus" class="status"></div>
-    </div>
-  </section>
+<section id="loginView" class="loginWrap">
+  <div class="loginCard">
+    <div style="font-weight:900;color:#b18a4f">🌱 播种幸福</div>
+    <h1>Admin Dashboard</h1>
+    <p class="sub">只有已登记为管理员的账号才能管理学员。</p>
+    <label>Email</label><input id="adminEmail" type="email" autocomplete="email">
+    <label>Password</label><input id="adminPassword" type="password" autocomplete="current-password">
+    <button class="btn" style="width:100%;margin-top:14px" onclick="adminLogin()">管理员登录</button>
+    <div id="loginStatus" class="status"></div>
+  </div>
+</section>
 
-  <section id="dashboardView" class="hidden">
-    <div class="top">
-      <div><h1>🌱 播种幸福｜学员管理</h1><p>新增学员、开通权限、重置临时密码。</p></div>
-      <div class="topActions"><button class="btn light" onclick="refreshMembers()">刷新名单</button><button class="btn light" onclick="window.open('./index.html','_blank')">打开课程</button><button class="btn light" onclick="adminLogout()">退出</button></div>
-    </div>
+<section id="dashboardView" class="hidden">
+  <div class="top">
+    <div><h1>🌱 播种幸福｜学员管理 V2</h1><p>一年制课程 · 自动到期 · 一键续费 · 快速搜索与编辑</p></div>
+    <div class="topActions"><button class="btn" onclick="refreshMembers()">刷新名单</button><button class="btn" onclick="window.open('./index.html','_blank')">打开课程</button><button class="btn" onclick="adminLogout()">退出</button></div>
+  </div>
 
-    <div class="grid">
-      <div class="card">
-        <h2>＋ 新增学员</h2>
-        <div class="sub">系统会自动建立 Supabase Auth 账号、课程权限，并生成一次临时密码。</div>
-        <label>学员姓名</label><input id="newName" placeholder="例如：王小美">
-        <label>Email</label><input id="newEmail" type="email" placeholder="student@example.com">
-        <div class="row2">
-          <div><label>开始日期</label><input id="newStart" type="date"></div>
-          <div><label>课程期限</label>
-            <select id="newDuration" onchange="durationChanged()">
-              <option value="permanent">不限期</option>
-              <option value="30">30 天</option>
-              <option value="365">365 天</option>
-              <option value="custom">自订到期日</option>
-            </select>
-          </div>
-        </div>
-        <div id="customExpiryWrap" class="hidden"><label>到期日期</label><input id="newExpiry" type="date"></div>
-        <button class="btn" style="width:100%;margin-top:14px" onclick="createMember()">建立学员 + 临时密码</button>
-        <div id="createStatus" class="status"></div>
-        <div id="tempResult" class="tempResult">
-          <b>临时密码（请复制后交给学员）</b>
-          <div id="tempPassword" class="tempCode"></div>
-          <button class="btn soft" onclick="copyTempPassword()">复制临时密码</button>
-          <div class="note" style="margin-top:10px">学员第一次登录课程时，会被强制要求更换自己的新密码，然后才可以进入 21 天课程。</div>
-        </div>
-      </div>
+  <div class="stats">
+    <div class="stat"><strong id="statTotal">0</strong><span>全部学员</span></div>
+    <div class="stat"><strong id="statActive">0</strong><span>ACTIVE</span></div>
+    <div class="stat"><strong id="statSoon">0</strong><span>30天内到期</span></div>
+    <div class="stat"><strong id="statExpired">0</strong><span>已到期</span></div>
+  </div>
 
-      <div class="card">
-        <h2>学员名单</h2>
-        <div class="sub">可以修改 ACTIVE 状态、开始日、到期日，也可以重新生成临时密码。</div>
-        <div class="toolbar"><input id="searchMember" placeholder="搜索姓名或 Email" oninput="renderMembers()"><span id="memberCount" class="pill">0</span></div>
-        <div id="listStatus" class="status"></div>
-        <div id="memberList" class="memberList"></div>
+  <div class="grid">
+    <div class="card">
+      <h2>＋ 新增学员</h2>
+      <div class="sub">课程固定一年。只需要填开始日期，系统会自动计算到期日。</div>
+      <label>学员姓名</label><input id="newName" placeholder="例如：王小美">
+      <label>Email</label><input id="newEmail" type="email" placeholder="student@example.com">
+      <label>开始日期</label><input id="newStart" type="date" onchange="updateNewExpiryPreview()">
+      <div class="planBox"><b>课程期限：1 年</b><span id="newExpiryPreview">到期日期会自动计算。</span></div>
+      <button class="btn" style="width:100%;margin-top:14px" onclick="createMember()">建立学员 + 临时密码</button>
+      <div id="createStatus" class="status"></div>
+      <div id="tempResult" class="tempResult">
+        <b>临时密码（请复制后交给学员）</b>
+        <div id="tempPassword" class="tempCode"></div>
+        <div class="muted" id="createdDates"></div>
+        <button class="btn soft" style="margin-top:8px" onclick="copyTempPassword()">复制临时密码</button>
+        <div class="planBox" style="margin-top:10px">学员第一次登录课程时，会被要求更换自己的新密码，然后才可进入 21 天课程。</div>
       </div>
     </div>
-  </section>
+
+    <div class="card">
+      <h2>学员名单</h2>
+      <div class="sub">使用搜索、筛选和分页管理大量学员。点击「编辑」才打开详细资料。</div>
+      <div class="toolbar">
+        <div class="searchWrap"><label>搜索</label><input id="searchMember" placeholder="姓名或 Email" oninput="filtersChanged()"></div>
+        <div><label>状态</label><select id="statusFilter" onchange="filtersChanged()"><option value="all">全部状态</option><option value="active">ACTIVE</option><option value="expired">EXPIRED</option><option value="inactive">INACTIVE</option><option value="cancelled">CANCELLED</option></select></div>
+        <div><label>期限</label><select id="expiryFilter" onchange="filtersChanged()"><option value="all">全部期限</option><option value="soon">30天内到期</option><option value="expired">已到期</option></select></div>
+        <div><label>排序</label><select id="sortMode" onchange="filtersChanged()"><option value="newest">最新加入</option><option value="name">姓名 A–Z</option><option value="expiry">最早到期</option></select></div>
+        <div><label>每页</label><select id="pageSize" onchange="filtersChanged()"><option value="20">20</option><option value="50">50</option><option value="100">100</option></select></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:9px"><span id="memberCount" class="countBadge">0 位</span><span id="listStatus" class="status" style="margin:0"></span></div>
+      <div class="tableWrap">
+        <table class="memberTable">
+          <thead><tr><th>姓名</th><th>Email</th><th>状态</th><th>开始日期</th><th>到期日期</th><th>操作</th></tr></thead>
+          <tbody id="memberRows"></tbody>
+        </table>
+      </div>
+      <div class="pagination"><span id="pageInfo"></span><div id="pageBtns" class="pageBtns"></div></div>
+    </div>
+  </div>
+</section>
 </div>
+
+<div class="modal" id="editModal" onclick="modalBackdrop(event)">
+  <div class="modalCard">
+    <div class="modalHead"><div><h2>编辑学员</h2><div class="muted" id="editUid"></div></div><button class="closeBtn" onclick="closeEdit()">×</button></div>
+    <input id="editUserId" type="hidden">
+    <div class="row2"><div><label>姓名</label><input id="editName"></div><div><label>Email（登录账号）</label><input id="editEmail" type="email"></div></div>
+    <div class="row2"><div><label>状态</label><select id="editStatus"><option value="active">active</option><option value="inactive">inactive</option><option value="expired">expired</option><option value="cancelled">cancelled</option></select></div><div><label>开始日期</label><input id="editStart" type="date"></div></div>
+    <label>到期日期</label><input id="editExpiry" type="date">
+    <div class="renewPreview" id="renewPreview"></div>
+    <div class="modalActions">
+      <button class="btn" onclick="saveEdit()">保存修改</button>
+      <button class="btn warn" onclick="renewOneYear()">🔄 续费 1 年</button>
+      <button class="btn soft" onclick="resetTempFromModal()">重置临时密码</button>
+      <button class="btn light" onclick="closeEdit()">取消</button>
+    </div>
+    <div id="editStatusMsg" class="status"></div>
+    <div id="editTempResult" class="tempResult"><b>新的临时密码</b><div id="editTempPassword" class="tempCode"></div><button class="btn soft" onclick="copyEditTemp()">复制临时密码</button></div>
+  </div>
+</div>
+
 <script>
 const SUPABASE_URL='https://sopjtukcrghvgemdishz.supabase.co';
 const SUPABASE_KEY='sb_publishable_ltqt7kjBSZE-YO3SRnnbxg_uqmt6Ooh';
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
-let MEMBERS=[];
+let MEMBERS=[];let CURRENT_PAGE=1;let CURRENT_EDIT=null;
 const $=id=>document.getElementById(id);
 function today(){const d=new Date(),o=d.getTimezoneOffset();return new Date(d.getTime()-o*60000).toISOString().slice(0,10)}
+function addYear(ds){if(!ds)return'';const [y,m,d]=ds.split('-').map(Number),ty=y+1,last=new Date(ty,m,0).getDate(),dd=Math.min(d,last);return `${ty}-${String(m).padStart(2,'0')}-${String(dd).padStart(2,'0')}`}
+function daysBetween(a,b){const A=new Date(a+'T00:00:00'),B=new Date(b+'T00:00:00');return Math.ceil((B-A)/86400000)}
+function fmt(ds){if(!ds)return'—';const [y,m,d]=ds.split('-');return `${d}/${m}/${y}`}
 function setStatus(id,msg,kind=''){const e=$(id);e.textContent=msg;e.className='status'+(kind?' '+kind:'')}
-function calcExpiry(start,duration){if(duration==='permanent')return null;if(duration==='custom')return $('newExpiry').value||null;const d=new Date(start+'T00:00:00');d.setDate(d.getDate()+Number(duration)-1);return d.toISOString().slice(0,10)}
-function durationChanged(){$('customExpiryWrap').classList.toggle('hidden',$('newDuration').value!=='custom')}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
 async function invoke(body){const {data,error}=await sb.functions.invoke('admin-members',{body});if(error)throw new Error(error.message||'Function error');if(data?.error)throw new Error(data.error);return data}
 async function adminLogin(){setStatus('loginStatus','正在登录…');const email=$('adminEmail').value.trim(),password=$('adminPassword').value;const {data,error}=await sb.auth.signInWithPassword({email,password});if(error||!data?.user){setStatus('loginStatus','登录失败，请检查 Email 与密码。','err');return}try{await refreshMembers();$('loginView').classList.add('hidden');$('dashboardView').classList.remove('hidden')}catch(e){await sb.auth.signOut();setStatus('loginStatus','这个账号不是管理员，或 Admin Function 尚未部署。\n'+e.message,'err')}}
 async function adminLogout(){await sb.auth.signOut();$('dashboardView').classList.add('hidden');$('loginView').classList.remove('hidden')}
-async function createMember(){const name=$('newName').value.trim(),email=$('newEmail').value.trim().toLowerCase(),start=$('newStart').value||today(),duration=$('newDuration').value,expiry=calcExpiry(start,duration);if(!email){setStatus('createStatus','请输入 Email。','err');return}if(duration==='custom'&&!expiry){setStatus('createStatus','请选择自订到期日期。','err');return}setStatus('createStatus','正在建立账号…');$('tempResult').classList.remove('show');try{const r=await invoke({action:'create',display_name:name,email,start_date:start,expiry_date:expiry});$('tempPassword').textContent=r.temporary_password;$('tempResult').classList.add('show');setStatus('createStatus','✓ 学员账号与课程权限已建立。','ok');$('newName').value='';$('newEmail').value='';await refreshMembers()}catch(e){setStatus('createStatus',e.message,'err')}}
-function copyTempPassword(){navigator.clipboard.writeText($('tempPassword').textContent||'');setStatus('createStatus','✓ 临时密码已复制。','ok')}
-async function refreshMembers(){setStatus('listStatus','正在读取学员名单…');try{const r=await invoke({action:'list'});MEMBERS=r.members||[];setStatus('listStatus','');renderMembers()}catch(e){setStatus('listStatus',e.message,'err');throw e}}
-function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
-function renderMembers(){const q=($('searchMember')?.value||'').trim().toLowerCase();const arr=MEMBERS.filter(m=>!q||String(m.display_name||'').toLowerCase().includes(q)||String(m.email||'').toLowerCase().includes(q));$('memberCount').textContent=arr.length+' 位';$('memberList').innerHTML=arr.length?arr.map(m=>`<div class="member"><div class="memberHead"><div><div class="memberName">${esc(m.display_name||'未填写姓名')}</div><div class="memberEmail">${esc(m.email||'')}</div></div><span class="pill ${m.status==='active'?'':'inactive'}">${esc((m.status||'').toUpperCase())}</span></div><div class="memberGrid"><div><label>状态</label><select id="st_${m.user_id}"><option value="active" ${m.status==='active'?'selected':''}>active</option><option value="inactive" ${m.status==='inactive'?'selected':''}>inactive</option><option value="expired" ${m.status==='expired'?'selected':''}>expired</option><option value="cancelled" ${m.status==='cancelled'?'selected':''}>cancelled</option></select></div><div><label>开始日期</label><input id="sd_${m.user_id}" type="date" value="${m.start_date||''}"></div><div><label>到期日期</label><input id="ed_${m.user_id}" type="date" value="${m.expiry_date||''}"></div></div><div class="actions"><button class="btn" onclick="saveAccess('${m.user_id}')">保存权限</button><button class="btn soft" onclick="resetTemp('${m.user_id}','${esc((m.email||'').replace(/'/g,''))}')">重置临时密码</button></div><div id="msg_${m.user_id}" class="status"></div></div>`).join(''):'<div class="note">目前没有符合条件的学员。</div>'}
-async function saveAccess(uid){const status=$('st_'+uid).value,start_date=$('sd_'+uid).value||null,expiry_date=$('ed_'+uid).value||null,id='msg_'+uid;setStatus(id,'正在保存…');try{await invoke({action:'update_access',user_id:uid,status,start_date,expiry_date});setStatus(id,'✓ 已更新课程权限。','ok');await refreshMembers()}catch(e){setStatus(id,e.message,'err')}}
-async function resetTemp(uid,email){if(!confirm('确定要为 '+email+' 重新生成临时密码吗？'))return;const id='msg_'+uid;setStatus(id,'正在生成临时密码…');try{const r=await invoke({action:'reset_password',user_id:uid});setStatus(id,'临时密码：'+r.temporary_password+'（已尝试复制）','ok');await navigator.clipboard.writeText(r.temporary_password).catch(()=>{})}catch(e){setStatus(id,e.message,'err')}}
-(async()=>{$('newStart').value=today();const {data:{session}}=await sb.auth.getSession();if(session?.user){try{await refreshMembers();$('loginView').classList.add('hidden');$('dashboardView').classList.remove('hidden')}catch(e){await sb.auth.signOut()}}})();
+function updateNewExpiryPreview(){const s=$('newStart').value||today();$('newExpiryPreview').textContent=`开始 ${fmt(s)} → 自动到期 ${fmt(addYear(s))}`}
+async function createMember(){const name=$('newName').value.trim(),email=$('newEmail').value.trim().toLowerCase(),start=$('newStart').value||today();if(!email){setStatus('createStatus','请输入 Email。','err');return}setStatus('createStatus','正在建立账号…');$('tempResult').classList.remove('show');try{const r=await invoke({action:'create',display_name:name,email,start_date:start});$('tempPassword').textContent=r.temporary_password;$('createdDates').textContent=`开始：${fmt(r.start_date)} ｜ 到期：${fmt(r.expiry_date)}`;$('tempResult').classList.add('show');setStatus('createStatus','✓ 学员账号与一年课程权限已建立。','ok');$('newName').value='';$('newEmail').value='';await refreshMembers()}catch(e){setStatus('createStatus',e.message,'err')}}
+function copyTempPassword(){navigator.clipboard.writeText($('tempPassword').textContent||'').then(()=>setStatus('createStatus','✓ 临时密码已复制。','ok')).catch(()=>{})}
+async function refreshMembers(){setStatus('listStatus','正在读取…');try{const r=await invoke({action:'list'});MEMBERS=r.members||[];setStatus('listStatus','');CURRENT_PAGE=1;renderAll()}catch(e){setStatus('listStatus',e.message,'err');throw e}}
+function effectiveStatus(m){const t=today();if(m.expiry_date&&m.expiry_date<t)return'expired';return m.status||'inactive'}
+function isSoon(m){const st=effectiveStatus(m);if(st!=='active'||!m.expiry_date)return false;const d=daysBetween(today(),m.expiry_date);return d>=0&&d<=30}
+function filtersChanged(){CURRENT_PAGE=1;renderAll()}
+function filteredMembers(){const q=($('searchMember')?.value||'').trim().toLowerCase(),sf=$('statusFilter')?.value||'all',ef=$('expiryFilter')?.value||'all',sort=$('sortMode')?.value||'newest';let arr=MEMBERS.filter(m=>{const st=effectiveStatus(m);if(q&&!String(m.display_name||'').toLowerCase().includes(q)&&!String(m.email||'').toLowerCase().includes(q))return false;if(sf!=='all'&&st!==sf)return false;if(ef==='soon'&&!isSoon(m))return false;if(ef==='expired'&&st!=='expired')return false;return true});arr.sort((a,b)=>{if(sort==='name')return String(a.display_name||a.email||'').localeCompare(String(b.display_name||b.email||''),'zh-Hans');if(sort==='expiry')return String(a.expiry_date||'9999-12-31').localeCompare(String(b.expiry_date||'9999-12-31'));return String(b.created_at||'').localeCompare(String(a.created_at||''))});return arr}
+function renderStats(){const total=MEMBERS.length,active=MEMBERS.filter(m=>effectiveStatus(m)==='active').length,soon=MEMBERS.filter(isSoon).length,expired=MEMBERS.filter(m=>effectiveStatus(m)==='expired').length;$('statTotal').textContent=total;$('statActive').textContent=active;$('statSoon').textContent=soon;$('statExpired').textContent=expired}
+function renderAll(){renderStats();renderMembers()}
+function statusPill(m){const st=effectiveStatus(m),soon=isSoon(m);return `<span class="pill ${st}">${st.toUpperCase()}</span>${soon?'<br><span class="pill soon" style="margin-top:4px">即将到期</span>':''}`}
+function renderMembers(){const arr=filteredMembers(),size=Number($('pageSize')?.value||20),pages=Math.max(1,Math.ceil(arr.length/size));if(CURRENT_PAGE>pages)CURRENT_PAGE=pages;const start=(CURRENT_PAGE-1)*size,view=arr.slice(start,start+size);$('memberCount').textContent=`${arr.length} 位 / 共 ${MEMBERS.length} 位`;$('memberRows').innerHTML=view.length?view.map(m=>`<tr><td class="nameCell"><b>${esc(m.display_name||'未填写姓名')}</b><small>${esc(m.user_id.slice(0,8))}…</small></td><td>${esc(m.email||'')}</td><td>${statusPill(m)}</td><td>${fmt(m.start_date)}</td><td>${fmt(m.expiry_date)}</td><td class="actionsCell"><button class="btn small" onclick="openEdit('${m.user_id}')">编辑</button><button class="btn soft small" onclick="quickRenew('${m.user_id}')">续费1年</button></td></tr>`).join(''):`<tr><td colspan="6" class="empty">没有符合条件的学员。</td></tr>`;$('pageInfo').textContent=`第 ${CURRENT_PAGE} / ${pages} 页`;$('pageBtns').innerHTML=`<button onclick="gotoPage(${Math.max(1,CURRENT_PAGE-1)})" ${CURRENT_PAGE===1?'disabled':''}>‹</button>${pageNumbers(pages).map(p=>`<button class="${p===CURRENT_PAGE?'active':''}" onclick="gotoPage(${p})">${p}</button>`).join('')}<button onclick="gotoPage(${Math.min(pages,CURRENT_PAGE+1)})" ${CURRENT_PAGE===pages?'disabled':''}>›</button>`}
+function pageNumbers(pages){const out=[];let a=Math.max(1,CURRENT_PAGE-2),b=Math.min(pages,a+4);a=Math.max(1,b-4);for(let i=a;i<=b;i++)out.push(i);return out}
+function gotoPage(p){CURRENT_PAGE=p;renderMembers();document.querySelector('.tableWrap')?.scrollIntoView({behavior:'smooth',block:'start'})}
+function memberById(uid){return MEMBERS.find(m=>m.user_id===uid)}
+function openEdit(uid){const m=memberById(uid);if(!m)return;CURRENT_EDIT=m;$('editUserId').value=uid;$('editUid').textContent='User ID: '+uid;$('editName').value=m.display_name||'';$('editEmail').value=m.email||'';$('editStatus').value=effectiveStatus(m);$('editStart').value=m.start_date||'';$('editExpiry').value=m.expiry_date||'';$('editTempResult').classList.remove('show');setStatus('editStatusMsg','');updateRenewPreview();$('editModal').classList.add('show')}
+function closeEdit(){$('editModal').classList.remove('show');CURRENT_EDIT=null}
+function modalBackdrop(e){if(e.target.id==='editModal')closeEdit()}
+function updateRenewPreview(){if(!CURRENT_EDIT)return;const exp=$('editExpiry').value||CURRENT_EDIT.expiry_date,base=(exp&&exp>=today())?exp:today(),newExp=addYear(base);$('renewPreview').innerHTML=`<b>续费规则</b><br>未到期：从现有到期日再加 1 年。<br>已到期：从续费当天重新计算 1 年。<br><b>现在续费预计新到期日：${fmt(newExp)}</b>`}
+$('editExpiry')?.addEventListener?.('change',updateRenewPreview)
+async function saveEdit(){const uid=$('editUserId').value,name=$('editName').value.trim(),email=$('editEmail').value.trim().toLowerCase(),status=$('editStatus').value,start=$('editStart').value||null,expiry=$('editExpiry').value||null;setStatus('editStatusMsg','正在保存…');try{await invoke({action:'update_member',user_id:uid,display_name:name,email});await invoke({action:'update_access',user_id:uid,status,start_date:start,expiry_date:expiry});setStatus('editStatusMsg','✓ 姓名、Email 与课程权限已更新。','ok');await refreshMembers();const fresh=memberById(uid);if(fresh){CURRENT_EDIT=fresh;$('editName').value=fresh.display_name||'';$('editEmail').value=fresh.email||'';$('editStatus').value=effectiveStatus(fresh);$('editStart').value=fresh.start_date||'';$('editExpiry').value=fresh.expiry_date||'';updateRenewPreview()}}catch(e){setStatus('editStatusMsg',e.message,'err')}}
+async function renewOneYear(){const uid=$('editUserId').value;if(!confirm('确定为这个学员续费 1 年吗？'))return;setStatus('editStatusMsg','正在续费…');try{const r=await invoke({action:'renew_one_year',user_id:uid,renewal_date:today()});setStatus('editStatusMsg',`✓ 已续费 1 年，新到期日：${fmt(r.expiry_date)}`,'ok');await refreshMembers();const fresh=memberById(uid);if(fresh){CURRENT_EDIT=fresh;$('editStatus').value=effectiveStatus(fresh);$('editStart').value=fresh.start_date||'';$('editExpiry').value=fresh.expiry_date||'';updateRenewPreview()}}catch(e){setStatus('editStatusMsg',e.message,'err')}}
+async function quickRenew(uid){const m=memberById(uid);if(!m)return;const base=(m.expiry_date&&m.expiry_date>=today())?m.expiry_date:today(),next=addYear(base);if(!confirm(`${m.display_name||m.email}\n\n续费 1 年后预计到期：${fmt(next)}\n\n确定继续？`))return;try{await invoke({action:'renew_one_year',user_id:uid,renewal_date:today()});await refreshMembers()}catch(e){alert(e.message)}}
+async function resetTempFromModal(){const uid=$('editUserId').value,email=$('editEmail').value;if(!confirm('确定要为 '+email+' 重新生成临时密码吗？'))return;setStatus('editStatusMsg','正在生成临时密码…');try{const r=await invoke({action:'reset_password',user_id:uid});$('editTempPassword').textContent=r.temporary_password;$('editTempResult').classList.add('show');setStatus('editStatusMsg','✓ 已生成新的临时密码。','ok');navigator.clipboard.writeText(r.temporary_password).catch(()=>{})}catch(e){setStatus('editStatusMsg',e.message,'err')}}
+function copyEditTemp(){navigator.clipboard.writeText($('editTempPassword').textContent||'').then(()=>setStatus('editStatusMsg','✓ 临时密码已复制。','ok')).catch(()=>{})}
+(async()=>{$('newStart').value=today();updateNewExpiryPreview();const {data:{session}}=await sb.auth.getSession();if(session?.user){try{await refreshMembers();$('loginView').classList.add('hidden');$('dashboardView').classList.remove('hidden')}catch(e){await sb.auth.signOut()}}})();
 </script>
 </body></html>
