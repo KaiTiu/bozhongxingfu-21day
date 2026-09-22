@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>播种幸福｜Admin Dashboard V2.3 Sales + Renewal</title>
+<title>播种幸福｜Admin Dashboard V2.4 Sales Scripts</title>
 <style>
 :root{--g:#355a42;--g2:#4e725a;--sage:#e4ede0;--paper:#fffdf8;--cream:#f4f0e7;--ink:#30362f;--muted:#707870;--gold:#bd995c;--line:#dce5d9;--warn:#fff4d7;--danger:#a6473d;--shadow:0 14px 38px rgba(53,90,66,.09)}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:linear-gradient(180deg,#f7f3ea,#edf3e9);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","Noto Sans SC",sans-serif}button,input,select{font:inherit}button{cursor:pointer}.shell{max-width:1480px;margin:auto;padding:18px}.hidden{display:none!important}
@@ -47,10 +47,29 @@ label{display:block;font-weight:900;color:var(--g);margin:13px 0 6px}input,selec
 .renewalActions{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
 .renewalActions .btn{margin:0}
 
+
+/* ===== V2.4 SALES SCRIPT LIBRARY ===== */
+.scriptLibrary{margin-top:18px;background:#fffdf8;border:1px solid var(--line);border-radius:20px;padding:18px}
+.scriptLibraryHead{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+.scriptLibraryHead h2{margin:0;color:var(--g);font-size:22px}
+.scriptLibraryHead p{margin:4px 0 0;color:var(--muted);font-size:13px;line-height:1.55}
+.scriptGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}
+.scriptQuick{border:1px solid var(--line);background:#fff;color:var(--g);border-radius:12px;padding:10px 11px;font-weight:850;cursor:pointer;text-align:left}
+.scriptQuick:hover,.scriptQuick.active{background:var(--sage);border-color:#9fb9a5}
+.scriptViewer{margin-top:12px;background:#f8faf7;border:1px solid var(--line);border-radius:16px;padding:14px}
+.scriptTitle{font-weight:900;color:var(--g);margin-bottom:8px}
+.scriptText{width:100%;min-height:220px;border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff;line-height:1.65;resize:vertical}
+.scriptActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.scriptActions .btn{margin:0}
+.scriptCopyStatus{font-size:12px;color:#2f6b47;font-weight:800;align-self:center}
+@media(max-width:980px){.scriptGrid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.scriptGrid{grid-template-columns:1fr}.scriptText{min-height:260px}}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+<!-- V2.4: built-in copyable sales script library -->
 <!-- V2.3: 30-day renewal reminder tools; no new SQL required -->
 <div class="shell">
 <section id="loginView" class="loginWrap">
@@ -67,7 +86,7 @@ label{display:block;font-weight:900;color:var(--g);margin:13px 0 6px}input,selec
 
 <section id="dashboardView" class="hidden">
   <div class="top">
-    <div><h1>🌱 播种幸福｜学员管理 V2.3</h1><p>一年制课程 · 学员权限 · 收款记录 · 30天续费提醒</p></div>
+    <div><h1>🌱 播种幸福｜学员管理 V2.4</h1><p>一年制课程 · 学员权限 · 收款记录 · 续费提醒 · 成交话术库</p></div>
     <div class="topActions"><button class="btn" onclick="refreshMembers()">刷新名单</button><button class="btn" onclick="window.open('./index.html','_blank')">打开课程</button><button class="btn" onclick="adminLogout()">退出</button></div>
   </div>
 
@@ -114,6 +133,30 @@ label{display:block;font-weight:900;color:var(--g);margin:13px 0 6px}input,selec
         <div class="planBox" style="margin-top:10px">学员第一次登录课程时，会被要求更换自己的新密码，然后才可进入 21 天课程。</div>
       </div>
     </div>
+
+  <div class="scriptLibrary" id="scriptLibrary">
+    <div class="scriptLibraryHead">
+      <div>
+        <h2>💬 成交话术库</h2>
+        <p>客户回复到哪一步，就点对应按钮。话术会自动出现，再按「复制话术」即可。</p>
+      </div>
+      <button class="btn soft" type="button" onclick="toggleScriptLibrary()">收起 / 展开</button>
+    </div>
+
+    <div id="scriptLibraryBody">
+      <div class="scriptGrid" id="scriptQuickGrid"></div>
+      <div class="scriptViewer">
+        <div class="scriptTitle" id="scriptTitle">想了解</div>
+        <textarea class="scriptText" id="scriptText" readonly></textarea>
+        <div class="scriptActions">
+          <button class="btn" type="button" onclick="copyCurrentSalesScript()">📋 复制话术</button>
+          <button class="btn soft" type="button" onclick="openGeneralWhatsApp()">💬 打开 WhatsApp</button>
+          <span class="scriptCopyStatus" id="scriptCopyStatus"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
 
     <div class="card">
       <h2>学员名单</h2>
@@ -179,6 +222,242 @@ const SUPABASE_KEY='sb_publishable_ltqt7kjBSZE-YO3SRnnbxg_uqmt6Ooh';
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
 let MEMBERS=[];let SALES=[];let SALES_MAP=new Map();let CURRENT_PAGE=1;let CURRENT_EDIT=null;let LAST_CREATED_MEMBER=null;
 const $=id=>document.getElementById(id);
+
+const SALES_SCRIPTS = [
+  {
+    key:'了解',
+    title:'1｜客户说：想了解',
+    text:`你好 😊 谢谢你对《播种幸福｜21天幸福人生实践系统》有兴趣。🌱
+
+这不是一套只讲道理的课程，而是一套每天大约10分钟的实践系统，帮助你慢慢练习：
+
+看见自己 → 理解自己的反应 → 重新选择 → 做一个小行动 → 晚上回看。
+
+你可以先完成一次 FREE 深度体验，不需要先购买。
+
+如果你愿意，我可以把 FREE 体验链接发给你。😊`
+  },
+  {
+    key:'FREE完成',
+    title:'2｜客户完成 FREE 后跟进',
+    text:`你好 😊 想问一下，你刚才完成《播种幸福》的 FREE 体验后，有没有哪一个部分让你特别有感觉？🌱
+
+完整版会把刚才这种练习方式延续21天，让你不是只“知道”，而是在真实生活里慢慢练习。
+
+目前首发会员价是 RM99，完整正式售价之后会调整到 RM199。
+
+如果你想继续，我可以直接把完整内容和付款方式发给你。`
+  },
+  {
+    key:'多少钱',
+    title:'3｜客户问：RM99有什么？',
+    text:`RM99 是《播种幸福》目前的首发会员价。🌱
+
+你会获得：
+21天完整实践系统
+13项幸福工具箱
+每日行动与回看
+个人21天目标
+个人成长记录
+云端保存学习进度
+手机和电脑都可以继续使用
+中文 / English 双语
+一年会员使用权限
+
+之后正式售价会调整至 RM199。
+
+如果你想加入，我可以直接把付款方式发给你。😊`
+  },
+  {
+    key:'考虑',
+    title:'4｜客户说：我考虑一下',
+    text:`可以的 😊
+
+我反而建议你不要因为优惠而急着决定。
+
+你可以先想一个问题：
+
+刚才 FREE 体验里面，有没有让你发现一个以前没有真正留意到的自己？
+
+如果有，而你也想把这种觉察继续练习下去，完整21天系统才会比较适合你。🌱
+
+目前首发会员价是 RM99，你决定好了再告诉我就可以。`
+  },
+  {
+    key:'有点贵',
+    title:'5｜客户说：有点贵',
+    text:`明白 😊
+
+《播种幸福》不是一次看完就结束的电子书或影片课程。
+
+RM99 包含完整21天实践、13项幸福工具、个人记录、云端保存，而且会员权限可以使用一年。
+
+所以重点不是“21天看完”，而是你之后遇到情绪、关系、压力或生活卡住的时候，还可以回来使用这些工具。🌱
+
+如果你觉得现在还不适合，也可以先继续用你刚才 FREE 体验学到的那个小行动。`
+  },
+  {
+    key:'有用吗',
+    title:'6｜客户问：真的有用吗？',
+    text:`每个人的情况都会不一样，所以我们不会保证21天后一定会变成怎样。😊
+
+《播种幸福》真正提供的是一套每天可以实际练习的方法。
+
+它不是要求你强迫自己正面，而是帮助你慢慢学会：
+
+事情发生时，先看见自己的反应，再决定自己真正想怎样回应。
+
+所以我会建议你先用 FREE 体验判断：
+
+这种练习方式适不适合你。
+
+如果你觉得有帮助，再加入完整21天，会比较安心。`
+  },
+  {
+    key:'为什么21天',
+    title:'7｜客户问：为什么需要21天？',
+    text:`因为看懂一个道理通常很快，但真正遇到事情时，我们还是很容易回到旧习惯。
+
+所以完整系统不是让你连续21天“听课”，而是每天用不同生活主题重复练习：
+
+觉察 → 理解 → 选择 → 行动 → 回看
+
+目的是让这种新的回应方式越来越熟悉。🌱`
+  },
+  {
+    key:'加入',
+    title:'8｜客户说：我要加入',
+    text:`太好了 🌱
+
+《播种幸福｜21天幸福人生实践系统》
+
+首发会员价：RM99
+
+完成付款后，请把以下资料发给我：
+
+① 姓名
+② Email
+③ 付款截图
+
+收到后我们会为你建立个人会员账号，并发送登录资料给你。😊`
+  },
+  {
+    key:'付款后',
+    title:'9｜客户付款后',
+    text:`✅ 已收到你的付款，谢谢你加入《播种幸福》。🌱
+
+我们现在会为你建立个人会员账号。
+
+稍后你会收到：
+
+• 登录网址
+• 登录 Email
+• 临时密码
+• 第一次使用说明
+
+第一次登录后，系统会请你更换自己的密码，并设定你的21天目标。
+
+完成后就可以正式开始 DAY 01。😊`
+  },
+  {
+    key:'开通',
+    title:'10｜账号已经开通',
+    text:`🌱 你的《播种幸福》个人会员账号已经开通。
+
+请按照接下来发送给你的登录资料进入系统。
+
+第一次登录后：
+
+① 更换自己的密码
+② 阅读第一次使用指南
+③ 写下你的21天目标
+④ 开始 DAY 01
+
+不需要一次看完所有内容，每天完成当天的练习就可以了。😊`
+  },
+  {
+    key:'当天跟进',
+    title:'11｜当天晚上跟进',
+    text:`你好 😊 想简单确认一下，你今天有成功登录《播种幸福》吗？🌱
+
+如果已经进入 DAY 01，就按照系统一步一步完成即可。
+
+不需要做很多，每天认真完成一点，比一次看很多更重要。`
+  },
+  {
+    key:'未开始',
+    title:'12｜客户买了但还没开始',
+    text:`你好 😊 最近还好吗？
+
+看到你已经加入《播种幸福》，想提醒你一件小事：
+
+不需要等到自己“状态很好”才开始。
+
+今天只要打开系统，完成一个小步骤，也算是在重新开始。🌱
+
+你可以直接从目前停下来的地方继续。`
+  },
+  {
+    key:'续费',
+    title:'13｜到期前30天续费',
+    text:`🌱《播种幸福》会员续费提醒
+
+你好 😊
+
+温馨提醒，你的《播种幸福｜21天幸福人生实践系统》会员权限即将在近期到期。
+
+如果你想继续保留课程、个人学习记录和13项幸福工具箱的使用权限，可以直接回复：
+
+我要续费
+
+我们会把续费资料发给你。💚`
+  },
+  {
+    key:'最短成交',
+    title:'14｜最短成交版',
+    text:`目前《播种幸福》首发会员价是 RM99，之后正式售价会调整到 RM199。
+
+包含完整21天实践系统、13项幸福工具箱、个人成长记录、云端保存和一年会员权限。🌱
+
+如果你想开始，我可以直接把付款方式发给你。😊`
+  }
+];
+
+let CURRENT_SCRIPT_INDEX = 0;
+
+function renderSalesScripts(){
+  const grid=$('scriptQuickGrid');
+  if(!grid)return;
+  grid.innerHTML=SALES_SCRIPTS.map((s,i)=>`<button type="button" class="scriptQuick ${i===CURRENT_SCRIPT_INDEX?'active':''}" onclick="selectSalesScript(${i})">${esc(s.title)}</button>`).join('');
+  selectSalesScript(CURRENT_SCRIPT_INDEX);
+}
+
+function selectSalesScript(i){
+  CURRENT_SCRIPT_INDEX=i;
+  const s=SALES_SCRIPTS[i];
+  if(!s)return;
+  $('scriptTitle').textContent=s.title;
+  $('scriptText').value=s.text;
+  $('scriptCopyStatus').textContent='';
+  document.querySelectorAll('.scriptQuick').forEach((b,idx)=>b.classList.toggle('active',idx===i));
+}
+
+async function copyCurrentSalesScript(){
+  const t=$('scriptText').value;
+  const ok=await copyText(t);
+  $('scriptCopyStatus').textContent=ok?'✓ 已复制':'复制失败';
+}
+
+function toggleScriptLibrary(){
+  const b=$('scriptLibraryBody');
+  if(!b)return;
+  b.style.display=b.style.display==='none'?'block':'none';
+}
+
+function openGeneralWhatsApp(){
+  window.open('https://wa.me/','_blank','noopener');
+}
+
 function today(){const d=new Date(),o=d.getTimezoneOffset();return new Date(d.getTime()-o*60000).toISOString().slice(0,10)}
 function addYear(ds){if(!ds)return'';const [y,m,d]=ds.split('-').map(Number),ty=y+1,last=new Date(ty,m,0).getDate(),dd=Math.min(d,last);return `${ty}-${String(m).padStart(2,'0')}-${String(dd).padStart(2,'0')}`}
 function daysBetween(a,b){const A=new Date(a+'T00:00:00'),B=new Date(b+'T00:00:00');return Math.ceil((B-A)/86400000)}
@@ -479,6 +758,6 @@ async function renewOneYear(){const uid=$('editUserId').value;if(!confirm('确�
 async function quickRenew(uid){const m=memberById(uid);if(!m)return;const base=(m.expiry_date&&m.expiry_date>=today())?m.expiry_date:today(),next=addYear(base);if(!confirm(`${m.display_name||m.email}\n\n续费 1 年后预计到期：${fmt(next)}\n\n确定继续？`))return;try{await invoke({action:'renew_one_year',user_id:uid,renewal_date:today()});await refreshMembers()}catch(e){alert(e.message)}}
 async function resetTempFromModal(){const uid=$('editUserId').value,email=$('editEmail').value;if(!confirm('确定要为 '+email+' 重新生成临时密码吗？'))return;setStatus('editStatusMsg','正在生成临时密码…');try{const r=await invoke({action:'reset_password',user_id:uid});$('editTempPassword').textContent=r.temporary_password;$('editTempResult').classList.add('show');setStatus('editStatusMsg','✓ 已生成新的临时密码。','ok');navigator.clipboard.writeText(r.temporary_password).catch(()=>{})}catch(e){setStatus('editStatusMsg',e.message,'err')}}
 function copyEditTemp(){navigator.clipboard.writeText($('editTempPassword').textContent||'').then(()=>setStatus('editStatusMsg','✓ 临时密码已复制。','ok')).catch(()=>{})}
-(async()=>{$('newStart').value=today();$('newPaymentDate').value=today();updateNewExpiryPreview();const {data:{session}}=await sb.auth.getSession();if(session?.user){try{await refreshMembers();$('loginView').classList.add('hidden');$('dashboardView').classList.remove('hidden')}catch(e){await sb.auth.signOut()}}})();
+(async()=>{renderSalesScripts();$('newStart').value=today();$('newPaymentDate').value=today();updateNewExpiryPreview();const {data:{session}}=await sb.auth.getSession();if(session?.user){try{await refreshMembers();$('loginView').classList.add('hidden');$('dashboardView').classList.remove('hidden')}catch(e){await sb.auth.signOut()}}})();
 </script>
 </body></html>
