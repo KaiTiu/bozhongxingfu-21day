@@ -125,7 +125,7 @@ section.course{scroll-margin-top:12px}
     <label for="memberLoginPassword" id="authPasswordLabel">密码</label><input id="memberLoginPassword" type="password" autocomplete="current-password" placeholder="••••••••">
     <div class="authActions"><button class="btn" id="authLoginBtn" type="button" onclick="memberLogin()">登录并检查课程权限</button><button class="btn soft" type="button" onclick="closeMemberLogin()" id="authCancelBtn">取消</button></div>
     <div class="authStatus" id="authStatus"></div>
-    <div class="authDivider"></div><div class="authHint" id="authSupportHint">如果你已经付款但还没有账号，请联系课程方为你开通。</div>
+    <div class="authDivider"></div><div class="authHint" id="authSupportHint">如果你已经付款但还没有账号，请联系课程方为你开通。</div><div style="margin-top:8px;font-size:10px;color:#9aa29a;text-align:right">Member Gate V9.3</div>
   </div>
 </div>
 <div class="tempPassModal" id="tempPassModal" role="dialog" aria-modal="true" aria-labelledby="tempPassTitle">
@@ -595,6 +595,7 @@ function updateBackupInfo(){let s=get();const el=$('backupInfo');if(!el)return;e
 // ===== V9.0 Supabase Auth + Enrollment Gate =====
 const BZXF_SUPABASE_URL='https://sopjtukcrghvgemdishz.supabase.co';
 const BZXF_SUPABASE_PUBLISHABLE_KEY='sb_publishable_ltqt7kjBSZE-YO3SRnnbxg_uqmt6Ooh';
+const BZXF_MEMBER_ACCESS_URL=BZXF_SUPABASE_URL+'/functions/v1/member-access';
 let BZXF_SB=null;
 let BZXF_CURRENT_USER=null;
 let BZXF_CURRENT_ENROLLMENT=null;
@@ -615,17 +616,106 @@ function localDateISO(){const d=new Date(),off=d.getTimezoneOffset();return new 
 function enrollmentIsUsable(en){if(!en||en.status!=='active')return {ok:false,reason:'inactive'};const today=localDateISO();if(en.start_date&&en.start_date>today)return {ok:false,reason:'future'};if(en.expiry_date&&en.expiry_date<today)return {ok:false,reason:'expired'};return {ok:true}}
 function unlockPaidCourse(user,enrollment){BZXF_CURRENT_USER=user;BZXF_CURRENT_ENROLLMENT=enrollment;document.body.classList.add('paid-member');const fg=document.getElementById('freeGate');if(fg)fg.style.display='none';const h=document.getElementById('mainHeader'),m=document.getElementById('mainApp');if(h)h.classList.remove('mainAppHidden');if(m)m.classList.remove('mainAppHidden');const em=document.getElementById('memberEmail');if(em)em.textContent=user?.email||'';const badge=document.getElementById('memberAccessBadge');if(badge)badge.textContent='ACTIVE';closeMemberLogin();setLang(CURRENT_LANG);cur=(get().last||1);showDay(cur);updateBackupInfo();if(typeof loadMeditationNote==='function')loadMeditationNote();window.scrollTo({top:0,behavior:'smooth'})}
 function lockPaidCourse(){BZXF_CURRENT_USER=null;BZXF_CURRENT_ENROLLMENT=null;document.body.classList.remove('paid-member');const h=document.getElementById('mainHeader'),m=document.getElementById('mainApp'),fg=document.getElementById('freeGate');if(h)h.classList.add('mainAppHidden');if(m)m.classList.add('mainAppHidden');if(fg)fg.style.display='block'}
-async function checkPaidAccess(user,{silent=false}={}){const t=authCopy();if(!BZXF_SB||!user)return false;if(!silent)setAuthStatus(t.checking);const {data,error}=await BZXF_SB.rpc('get_my_bozhongxingfu_access');if(error){console.error('Course access RPC failed',error);if(!silent)setAuthStatus(t.accessError,'err');return false}const enrollment=Array.isArray(data)?(data[0]||null):data;const valid=enrollmentIsUsable(enrollment);if(!valid.ok){const msg=valid.reason==='future'?t.future:valid.reason==='expired'?t.expired:t.noAccess;if(!silent)setAuthStatus(msg,'err');return false}if(!silent)setAuthStatus(t.active,'ok');setTimeout(()=>unlockPaidCourse(user,enrollment),silent?0:350);return true}
+async function fetchMemberAccessState({silent=false}={}){
+  const t=authCopy();
+  if(!BZXF_SB)return null;
+  if(!silent)setAuthStatus(t.checking);
+  try{
+    const {data:{session},error:sessionError}=await BZXF_SB.auth.getSession();
+    if(sessionError||!session?.access_token){
+      if(!silent)setAuthStatus(t.accessError+' [SESSION]','err');
+      return null;
+    }
+    const res=await fetch(BZXF_MEMBER_ACCESS_URL,{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':'Bearer '+session.access_token,
+        'apikey':BZXF_SUPABASE_PUBLISHABLE_KEY
+      },
+      body:'{}'
+    });
+    const payload=await res.json().catch(()=>({}));
+    if(!res.ok){
+      console.error('member-access failed',res.status,payload);
+      if(!silent)setAuthStatus(t.accessError+' ['+res.status+': '+(payload.error||'member-access')+']','err');
+      return null;
+    }
+    return payload;
+  }catch(err){
+    console.error('member-access request failed',err);
+    if(!silent)setAuthStatus(t.accessError+' [NETWORK]','err');
+    return null;
+  }
+}
+
+async function handleMemberAccess(user,{silent=false}={}){
+  const t=authCopy();
+  if(!BZXF_SB||!user)return false;
+  const state=await fetchMemberAccessState({silent});
+  if(!state)return false;
+  BZXF_CURRENT_USER=user;
+  if(state.user?.must_change_password===true){
+    openTemporaryPasswordChange(user);
+    return false;
+  }
+  const enrollment=state.enrollment||null;
+  const valid=enrollmentIsUsable(enrollment);
+  if(!valid.ok){
+    const msg=valid.reason==='future'?t.future:valid.reason==='expired'?t.expired:t.noAccess;
+    if(!silent)setAuthStatus(msg,'err');
+    return false;
+  }
+  if(!silent)setAuthStatus(t.active,'ok');
+  setTimeout(()=>unlockPaidCourse(user,enrollment),silent?0:350);
+  return true;
+}
 
 function needsTemporaryPasswordChange(user){const v=user&&user.user_metadata?user.user_metadata.must_change_password:null;return v===true||v==='true'||v===1||v==='1'}
 function setTempPassStatus(message,kind=''){const e=document.getElementById('tempPassStatus');if(!e)return;e.textContent=message;e.className='authStatus'+(kind?' '+kind:'')}
 function openTemporaryPasswordChange(user){lockPaidCourse();BZXF_CURRENT_USER=user||BZXF_CURRENT_USER;renderAuthLanguage();closeMemberLogin();const m=document.getElementById('tempPassModal');if(m)m.classList.add('show');const a=document.getElementById('newMemberPassword'),b=document.getElementById('confirmMemberPassword');if(a)a.value='';if(b)b.value='';setTempPassStatus('');if(a)setTimeout(()=>a.focus(),50)}
 function closeTemporaryPasswordChange(){const m=document.getElementById('tempPassModal');if(m)m.classList.remove('show')}
-async function submitTemporaryPasswordChange(){const t=authCopy();if(!BZXF_SB)return;const p1=(document.getElementById('newMemberPassword')?.value||''),p2=(document.getElementById('confirmMemberPassword')?.value||'');if(p1.length<8){setTempPassStatus(t.tempShort,'err');return}if(p1!==p2){setTempPassStatus(t.tempMismatch,'err');return}setTempPassStatus(t.tempSaving);const currentMeta={...(BZXF_CURRENT_USER?.user_metadata||{}),must_change_password:false};const {data,error}=await BZXF_SB.auth.updateUser({password:p1,data:currentMeta});if(error||!data?.user){setTempPassStatus(t.tempError,'err');return}BZXF_CURRENT_USER=data.user;setTempPassStatus(t.tempDone,'ok');setTimeout(async()=>{closeTemporaryPasswordChange();await checkPaidAccess(data.user)},350)}
+async function submitTemporaryPasswordChange(){
+  const t=authCopy();
+  if(!BZXF_SB)return;
+  const p1=(document.getElementById('newMemberPassword')?.value||''),p2=(document.getElementById('confirmMemberPassword')?.value||'');
+  if(p1.length<8){setTempPassStatus(t.tempShort,'err');return}
+  if(p1!==p2){setTempPassStatus(t.tempMismatch,'err');return}
+  setTempPassStatus(t.tempSaving);
+  const currentMeta={...(BZXF_CURRENT_USER?.user_metadata||{}),must_change_password:false};
+  const {data,error}=await BZXF_SB.auth.updateUser({password:p1,data:currentMeta});
+  if(error||!data?.user){console.error('Password update failed',error);setTempPassStatus(t.tempError,'err');return}
+  BZXF_CURRENT_USER=data.user;
+  setTempPassStatus(t.tempDone,'ok');
+  setTimeout(async()=>{
+    closeTemporaryPasswordChange();
+    await handleMemberAccess(data.user);
+  },500)
+}
 
-async function memberLogin(){const t=authCopy();if(!BZXF_SB){setAuthStatus(t.accessError,'err');return}const email=(document.getElementById('memberLoginEmail').value||'').trim();const password=document.getElementById('memberLoginPassword').value||'';if(!email||!password){setAuthStatus(CURRENT_LANG==='en'?'Enter both Email and password.':'请输入 Email 和密码。','err');return}setAuthStatus(t.signing);const {data,error}=await BZXF_SB.auth.signInWithPassword({email,password});if(error||!data?.user){setAuthStatus(t.badLogin,'err');return}const {data:freshData}=await BZXF_SB.auth.getUser();const user=freshData?.user||data.user;BZXF_CURRENT_USER=user;if(needsTemporaryPasswordChange(user)){openTemporaryPasswordChange(user);return}await checkPaidAccess(user)}
+async function memberLogin(){
+  const t=authCopy();
+  if(!BZXF_SB){setAuthStatus(t.accessError,'err');return}
+  const email=(document.getElementById('memberLoginEmail').value||'').trim();
+  const password=document.getElementById('memberLoginPassword').value||'';
+  if(!email||!password){setAuthStatus(CURRENT_LANG==='en'?'Enter both Email and password.':'请输入 Email 和密码。','err');return}
+  setAuthStatus(t.signing);
+  const {data,error}=await BZXF_SB.auth.signInWithPassword({email,password});
+  if(error||!data?.user){console.error('Login failed',error);setAuthStatus(t.badLogin,'err');return}
+  BZXF_CURRENT_USER=data.user;
+  await handleMemberAccess(data.user);
+}
 async function memberLogout(){if(BZXF_SB)await BZXF_SB.auth.signOut();closeTemporaryPasswordChange();lockPaidCourse();const fg=document.getElementById('freeGate');if(fg)fg.style.display='block';setLang(CURRENT_LANG);window.scrollTo({top:0,behavior:'smooth'})}
-async function initSupabaseMemberGate(){renderAuthLanguage();try{if(!window.supabase||!window.supabase.createClient)throw new Error('Supabase library unavailable');BZXF_SB=window.supabase.createClient(BZXF_SUPABASE_URL,BZXF_SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});const {data:{session}}=await BZXF_SB.auth.getSession();if(session?.user){const {data:freshData}=await BZXF_SB.auth.getUser();const user=freshData?.user||session.user;BZXF_CURRENT_USER=user;if(needsTemporaryPasswordChange(user)){openTemporaryPasswordChange(user)}else{const ok=await checkPaidAccess(user,{silent:true});if(!ok)lockPaidCourse()}}BZXF_SB.auth.onAuthStateChange(async(event,session)=>{if(event==='SIGNED_OUT'){closeTemporaryPasswordChange();lockPaidCourse()}else if(event==='SIGNED_IN'&&session?.user){const {data:freshData}=await BZXF_SB.auth.getUser();const user=freshData?.user||session.user;BZXF_CURRENT_USER=user;if(needsTemporaryPasswordChange(user)){openTemporaryPasswordChange(user)}else{await checkPaidAccess(user,{silent:true})}}})}catch(err){console.error('Member gate init failed',err);lockPaidCourse()}}
+async function initSupabaseMemberGate(){
+  renderAuthLanguage();
+  try{
+    if(!window.supabase||!window.supabase.createClient)throw new Error('Supabase library unavailable');
+    BZXF_SB=window.supabase.createClient(BZXF_SUPABASE_URL,BZXF_SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+    const {data:{session}}=await BZXF_SB.auth.getSession();
+    if(session?.user){BZXF_CURRENT_USER=session.user;const ok=await handleMemberAccess(session.user,{silent:true});if(!ok&&!document.getElementById('tempPassModal')?.classList.contains('show'))lockPaidCourse()}
+    BZXF_SB.auth.onAuthStateChange((event)=>{if(event==='SIGNED_OUT'){closeTemporaryPasswordChange();lockPaidCourse()}})
+  }catch(err){console.error('Member gate init failed',err);lockPaidCourse()}
+}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMemberLogin()});
 
 (function(){setLang(CURRENT_LANG);initSupabaseMemberGate();document.getElementById('trialReflect1').value=localStorage.getItem('bzxf_trial_reflect1')||'';document.getElementById('trialReflect2').value=localStorage.getItem('bzxf_trial_reflect2')||'';document.getElementById('trialCustomAction').value=localStorage.getItem('bzxf_trial_custom')||'';const exp=document.getElementById('freeExperience');const hero=document.querySelector('#freeGate .freeHero');if(exp)exp.style.display='none';if(hero)hero.style.display='block';})();
