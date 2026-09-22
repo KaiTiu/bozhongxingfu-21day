@@ -159,6 +159,48 @@ input:focus,textarea:focus,select:focus{border-color:#91aa8e;box-shadow:0 0 0 3p
 @media(max-width:600px){.v53ToolNav{display:grid;grid-template-columns:1fr 1fr}.v53ToolNav .btn{width:100%}}
 
 #needNowTitle{scroll-margin-top:18px}
+
+/* V5.9 — Fix companion card contrast after light-theme redesign */
+.v51CompanionTop .v5Companion{
+  color:var(--green)!important;
+}
+.v51CompanionTop .v5Companion h3{
+  color:var(--green)!important;
+}
+.v51CompanionTop .v5Companion p{
+  color:#68736a!important;
+}
+.v51CompanionTop .v5Companion .v5Last{
+  background:#fff!important;
+  border:1px solid var(--line)!important;
+  box-shadow:0 7px 18px rgba(53,90,66,.04);
+}
+.v51CompanionTop .v5Companion .v5Label{
+  color:#6e7b70!important;
+  opacity:1!important;
+}
+.v51CompanionTop .v5Companion .v5Quote{
+  color:var(--ink)!important;
+}
+.v51CompanionTop .v5Companion .v5Seed{
+  background:#f7faf5!important;
+  border:1px solid var(--line);
+  color:var(--ink)!important;
+}
+.v51CompanionTop .v5CompanionActions .main{
+  background:var(--green)!important;
+  color:#fff!important;
+}
+.v51CompanionTop .v5CompanionActions .alt{
+  background:#fff!important;
+  color:var(--green)!important;
+  border:1px solid var(--line)!important;
+}
+.v51CompanionTop .v5FollowStatus{
+  background:var(--sage2)!important;
+  color:var(--green)!important;
+}
+
 </style>
 
 <style>
@@ -870,7 +912,7 @@ setTimeout(()=>{const p=new URLSearchParams(location.search),tool=p.get('tool');
 
 
 <style id="v58NavScrollStyle">
-/* V5.8: top navigation lands on the actual content heading */
+/* V5.9: top navigation lands on the actual content heading */
 #homeTitle,#scenarioTitle,#progressTitle,#gardenTitle,#historyTitle,#certTitle{scroll-margin-top:18px}
 </style>
 <script id="v58NavScrollPatch">
@@ -920,19 +962,19 @@ setTimeout(()=>{const p=new URLSearchParams(location.search),tool=p.get('tool');
     if(typeof previousSetLanguage==='function') previousSetLanguage(lang);
     setTimeout(bind,0);
     const ver=document.getElementById('v53Version');
-    if(ver)ver.textContent='V5.8 · SINGLE LOGIN + NAV SCROLL';
+    if(ver)ver.textContent='V5.9 · SINGLE LOGIN + NAV SCROLL';
     const footer=document.getElementById('footerText');
     if(footer)footer.innerHTML=LANG==='en'
-      ?'🌱 Planting Happiness | My Happiness Companion · V5.8<br/>A better life can begin with one small decision.'
-      :'🌱 播种幸福｜我的幸福陪伴系统 · V5.8<br/>更好的自己，从一个小小的决定开始。';
+      ?'🌱 Planting Happiness | My Happiness Companion · V5.9<br/>A better life can begin with one small decision.'
+      :'🌱 播种幸福｜我的幸福陪伴系统 · V5.9<br/>更好的自己，从一个小小的决定开始。';
   };
 
   const ver=document.getElementById('v53Version');
-  if(ver)ver.textContent='V5.8 · SINGLE LOGIN + NAV SCROLL';
+  if(ver)ver.textContent='V5.9 · SINGLE LOGIN + NAV SCROLL';
   const footer=document.getElementById('footerText');
   if(footer)footer.innerHTML=LANG==='en'
-    ?'🌱 Planting Happiness | My Happiness Companion · V5.8<br/>A better life can begin with one small decision.'
-    :'🌱 播种幸福｜我的幸福陪伴系统 · V5.8<br/>更好的自己，从一个小小的决定开始。';
+    ?'🌱 Planting Happiness | My Happiness Companion · V5.9<br/>A better life can begin with one small decision.'
+    :'🌱 播种幸福｜我的幸福陪伴系统 · V5.9<br/>更好的自己，从一个小小的决定开始。';
 })();
 </script>
 
