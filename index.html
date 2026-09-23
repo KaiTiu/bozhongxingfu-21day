@@ -1393,4 +1393,81 @@ window.bzBeginFirstUse=bzBeginFirstUse;
 })();
 </script>
 
+
+<script id="bzxfV1033LanguageSyncFix">
+/* V10.3.3 — language-sync audit fix
+   Preset FREE-trial actions are stored by index. Always rebuild the visible action
+   from the CURRENT language instead of replaying an old translated text snapshot. */
+(function(){
+  function bzLocalizedTrialAction(){
+    const input=document.getElementById('trialCustomAction');
+    const liveCustom=(input?.value||'').trim();
+    if(liveCustom)return liveCustom; // User-entered text is intentionally kept as typed.
+
+    const savedCustom=(localStorage.getItem('bzxf_trial_custom')||'').trim();
+    if(savedCustom)return savedCustom; // User-entered text is intentionally kept as typed.
+
+    let idx=FREE_ACTION;
+    if(idx==null){
+      const raw=localStorage.getItem('bzxf_trial_action');
+      if(raw!==null&&raw!=='')idx=Number(raw);
+    }
+    const p=bzFreePersona();
+    return Number.isInteger(idx)&&idx>=0 ? (p?.actions?.[idx]||'') : '';
+  }
+
+  // Make the common action getter language-safe for restored FREE sessions.
+  window.bzLocalizedTrialAction=bzLocalizedTrialAction;
+  bzSelectedFreeAction=bzLocalizedTrialAction;
+
+  // Do not use the old bzxf_trial_action_text snapshot here: it may have been
+  // saved while the page was in Chinese and then shown after switching to English.
+  bzRenderFreeFollowUp=function(){
+    const card=document.getElementById('freeReturnCard');if(!card)return;
+    const done=localStorage.getItem('bzxf_free_completed')==='1';
+    if(!done){card.classList.remove('show');return}
+    const en=CURRENT_LANG==='en',a=bzLocalizedTrialAction(),passed=bzFreeDayPassed(),res=localStorage.getItem('bzxf_free_followup');
+    card.classList.add('show');
+    document.getElementById('freeReturnPill').textContent=en?'24-HOUR CHECK-IN':'24小时回访';
+    document.getElementById('freeReturnTitle').textContent=en?'🌱 Your 24-Hour Experiment':'🌱 你的24小时小实验';
+    document.getElementById('freeReturnAction').innerHTML=`<b>${en?'The action you chose':'你昨天选择的行动'}</b><br>${a||(en?'One small conscious action':'一个真实的小行动')}`;
+    const lead=document.getElementById('freeReturnLead'),btns=document.getElementById('freeReturnBtns'),fb=document.getElementById('freeReturnFeedback');
+    if(!passed){
+      lead.textContent=en?'Your experiment is still in progress. Bookmark this page and come back tomorrow. I will only ask one question: when real life happened, did you have one more choice than before?':'你的24小时小实验正在进行。把这个页面收藏起来，明天回来。我只会问一个问题：真实情况发生时，你有没有比以前多一个选择？';
+      btns.innerHTML='';fb.classList.remove('show');return
+    }
+    lead.textContent=en?'Welcome back. When the real situation happened, what was closest to your experience?':'欢迎回来。真实情况发生时，下面哪一个最像你？';
+    if(!res){
+      btns.innerHTML=`<button class="btn" onclick="bzSaveFreeFollowup('yes')">${en?'✓ I did it':'✓ 我做到了'}</button><button class="btn soft" onclick="bzSaveFreeFollowup('some')">${en?'I did part of it':'我做到一点'}</button><button class="btn soft" onclick="bzSaveFreeFollowup('no')">${en?'I forgot / reacted the old way':'我忘了 / 还是照旧反应'}</button>`;
+      fb.classList.remove('show')
+    }else{btns.innerHTML='';bzShowFreeFollowupFeedback(res)}
+  };
+
+  openWhatsAppDetails=function(){
+    const p=bzFreePersona(),a=bzLocalizedTrialAction();
+    const msg=CURRENT_LANG==='en'
+      ?`Hi, I completed the FREE Planting Happiness experience. The area I most want to improve is: ${p?.whatsapp||'my current life pattern'}.${a?` My 24-hour action is: ${a}.`:''} I would like to learn more about the full 21-day course.`
+      :`你好，我完成了《播种幸福》FREE体验。\n我目前最想改善的是：${p?.whatsapp||'我现在的生活模式'}。${a?`\n我的24小时小行动是：${a}。`:''}\n我想了解完整21天课程。`;
+    window.open('https://wa.me/60177483191?text='+encodeURIComponent(msg),'_blank','noopener')
+  };
+
+  // Re-render all FREE-return language-sensitive blocks immediately after a language switch.
+  const prevSetLang=setLang;
+  setLang=function(lang){
+    prevSetLang(lang);
+    if(typeof bzApplyFreePersona==='function')bzApplyFreePersona();
+    if(typeof renderTrialPersonalResult==='function')renderTrialPersonalResult();
+    bzRenderFreeFollowUp();
+  };
+
+  // Refresh once on load so an older browser session with a Chinese text snapshot
+  // is corrected without requiring the user to redo the FREE experience.
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',()=>{bzRenderFreeFollowUp();if(typeof renderTrialPersonalResult==='function')renderTrialPersonalResult()});
+  }else{
+    bzRenderFreeFollowUp();if(typeof renderTrialPersonalResult==='function')renderTrialPersonalResult();
+  }
+})();
+</script>
+
 </body></html>
