@@ -2705,4 +2705,268 @@ else bzInitSeparateViews();
 })();
 </script>
 
+
+
+<style id="bzV116ToolboxGardenInlineSupplementFix">
+/* ===== V10.16 — toolbox visibility + reliable growth garden + inline daily supplement ===== */
+#courseToolsInline.bzToolsActive{display:block!important}
+#courseGrowthGardenPanel{
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:18px;
+  margin:0;
+}
+#courseGrowthGardenPanel h3{margin:0 0 7px;color:var(--g);font-size:21px}
+#courseGrowthGardenPanel .growthGardenLead{margin:0 0 12px;color:#68736b;line-height:1.65}
+#growthGardenDisplay{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:7px;margin-top:10px}
+#growthGardenDisplay .plant{min-height:38px;display:grid;place-items:center;font-size:18px}
+#growthStageDisplay{font-weight:850;color:var(--g);margin-top:6px}
+/* Old moved sidebar garden is hidden; the growth page now has its own stable garden panel. */
+#courseGrowthExtras>.bzLegacyGardenMoved{display:none!important}
+
+/* The supplement now behaves like a normal daily step, not a modal. */
+#bzSupplementModal{display:none!important}
+#guidedHost #gstep6 .bzInlineSupplementLead{
+  background:#edf4ea;border-left:5px solid var(--g);border-radius:15px;padding:15px;line-height:1.75;margin:12px 0
+}
+#guidedHost #gstep6 .bzInlineSupplementScene{
+  background:#f8f5ef;border:1px solid var(--line);border-radius:15px;padding:15px;line-height:1.75;margin:12px 0
+}
+#guidedHost #gstep6 .bzInlineSupplementNote{
+  background:#fff;border:1px solid var(--line);border-radius:15px;padding:15px;margin:12px 0
+}
+#guidedHost #gstep6 .bzInlineSupplementNote textarea{min-height:110px}
+#guidedHost #gstep6 .bzInlineSupplementSaved{font-size:12px;font-weight:850;color:var(--g);margin-left:8px}
+@media(max-width:620px){
+  #growthGardenDisplay{grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+  #growthGardenDisplay .plant{font-size:15px;min-height:34px}
+}
+</style>
+
+<script id="bzV116ToolboxGardenInlineSupplementFixRuntime">
+/* ===== V10.16 — FINAL STABILITY PATCH ===== */
+(function(){
+  function esc116(v){return String(v==null?'':v).replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[m]))}
+  function nl116(v){return esc116(v).replace(/\n/g,'<br>')}
+
+  // 1) TOOLBOX: make the inline section genuinely visible when selected.
+  const bzV116SetCategoryView=bzSetCategoryView;
+  bzSetCategoryView=function(key,opts={}){
+    const result=bzV116SetCategoryView(key,opts);
+    const tools=document.getElementById('courseToolsInline');
+    if(tools){
+      const on=key==='tools';
+      tools.classList.toggle('bzToolsActive',on);
+      tools.style.display=on?'block':'none';
+      if(on&&typeof bzLoadInlineToolbox==='function'){
+        bzLoadInlineToolbox(BZXF_TOOLBOX_PENDING_TOOL||null);
+        setTimeout(()=>{ if(typeof bzResizeToolboxFrame==='function')bzResizeToolboxFrame(); },150);
+      }
+    }
+    if(key==='growth'){
+      bzEnsureGrowthGardenPanel();
+      bzRenderGrowthGardenPanel();
+    }
+    return result;
+  };
+  window.bzSetCategoryView=bzSetCategoryView;
+
+  // 2) MY GROWTH / HAPPINESS GARDEN: use a dedicated panel with unique IDs.
+  function bzEnsureGrowthGardenPanel(){
+    if(typeof bzPrepareCategoryLayout==='function')bzPrepareCategoryLayout();
+    const extras=document.getElementById('courseGrowthExtras');
+    if(!extras)return null;
+    let panel=document.getElementById('courseGrowthGardenPanel');
+    if(!panel){
+      panel=document.createElement('section');
+      panel.id='courseGrowthGardenPanel';
+      extras.prepend(panel);
+    }
+    // Hide the old moved sidebar garden to prevent duplicate/blank IDs after language switching.
+    const oldGarden=document.getElementById('garden');
+    const oldSection=oldGarden?.closest('.sideSection');
+    if(oldSection&&oldSection!==panel)oldSection.classList.add('bzLegacyGardenMoved');
+    return panel;
+  }
+  function bzRenderGrowthGardenPanel(){
+    const panel=bzEnsureGrowthGardenPanel();
+    if(!panel||typeof get!=='function')return;
+    const s=get()||{};
+    const n=(s.completed||[]).length;
+    const en=CURRENT_LANG==='en';
+    const stageText=typeof stage==='function'?stage(n):(en?`${n}/21 days completed`:`已完成 ${n}/21 天`);
+    const plants=Array.from({length:21},(_,i)=>{
+      const on=i<n;
+      const icon=on?(i<2?'🌰':i<7?'🌱':i<15?'🌿':i<20?'🪻':'🌷'):'·';
+      return `<div class="plant ${on?'on':''}" title="DAY ${String(i+1).padStart(2,'0')}">${icon}</div>`;
+    }).join('');
+    panel.innerHTML=`<h3>${en?'🌷 My Happiness Garden':'🌷 我的幸福花园'}</h3><p class="growthGardenLead">${en?'Your garden grows with the days you actually complete. It is a visual record of your practice, not a score.':'花园会随着你真正完成的天数慢慢成长。它是练习过程的视觉记录，不是分数。'}</p><div id="growthStageDisplay">${esc116(stageText)}</div><div id="growthGardenDisplay">${plants}</div>`;
+  }
+  window.bzRenderGrowthGardenPanel=bzRenderGrowthGardenPanel;
+
+  // Replace the old garden shortcut with the reliable dedicated panel.
+  bzScrollGrowthExtra=function(kind){
+    bzSetCategoryView('growth',{scroll:false});
+    let el=null;
+    if(kind==='garden'){
+      el=bzEnsureGrowthGardenPanel();
+      bzRenderGrowthGardenPanel();
+    }else{
+      el=document.getElementById('courseDataDesktop');
+    }
+    if(el)requestAnimationFrame(()=>el.scrollIntoView({behavior:'smooth',block:'start'}));
+  };
+  window.bzScrollGrowthExtra=bzScrollGrowthExtra;
+
+  if(typeof renderSide==='function'){
+    const bzV116RenderSide=renderSide;
+    renderSide=function(){
+      const out=bzV116RenderSide();
+      bzRenderGrowthGardenPanel();
+      return out;
+    };
+  }
+
+  // 3) DAILY SUPPLEMENT: make it a 6th in-page daily card beside Evening Record.
+  function bzInlineSupplementCopy(){
+    const en=CURRENT_LANG==='en';
+    return en?{
+      pill:'💬 Extra Reminder',
+      title:'STEP 6｜💬 Today’s Extra Reminder',
+      lead:'One extra reminder for today',
+      scene:'One more real-life scenario',
+      note:'My free note',
+      help:'If there is one more thought, discovery or life moment you want to keep, write it here. This is optional.',
+      ph:'What else do I want to remember from today?',
+      save:'Save Extra Note',
+      saved:'✓ Saved',
+      back:'← Evening Record'
+    }:{
+      pill:'💬 今日补充提醒',
+      title:'STEP 6｜💬 今日补充提醒',
+      lead:'今天多带走一个提醒',
+      scene:'另一个生活场景',
+      note:'我的自由记录',
+      help:'如果今天5个步骤以外，还有一句话、一个发现或一个生活片段想留下，可以直接写在这里。这是额外记录，不是必做。',
+      ph:'今天还有什么，我想为自己记下来？',
+      save:'保存补充记录',
+      saved:'✓ 已保存',
+      back:'← 晚上记录'
+    };
+  }
+
+  function bzBuildInlineSupplement(){
+    const host=document.getElementById('guidedHost');
+    const rail=host?.querySelector('.stepRail');
+    const wrap=host?.querySelector('.guidedWrap');
+    if(!host||!rail||!wrap)return;
+
+    // Remove the old popup-trigger pill (it had an addEventListener we do not want to retain).
+    const oldPill=document.getElementById('bzSupplementPill');
+    if(oldPill)oldPill.remove();
+    let pill=document.createElement('span');
+    pill.id='bzSupplementPill';
+    pill.className='stepPill supplementPill';
+    pill.style.cursor='pointer';
+    pill.textContent=bzInlineSupplementCopy().pill;
+    pill.onclick=()=>goGuide(6);
+    rail.appendChild(pill);
+
+    let card=document.getElementById('gstep6');
+    if(card)card.remove();
+    card=document.createElement('section');
+    card.className='guidedCard';
+    card.id='gstep6';
+    const c=bzInlineSupplementCopy();
+    const source=CURRENT_LANG==='en'?(typeof DATA_EN!=='undefined'?DATA_EN:DATA):DATA;
+    const d=source?.[Math.max(0,(cur||1)-1)]||{};
+    const s=typeof get==='function'?get():{};
+    const r=(s?.records||{})[cur]||{};
+    card.innerHTML=`
+      <h3>${esc116(c.title)}</h3>
+      <div class="bzInlineSupplementLead"><b>💬 ${esc116(c.lead)}</b><br>${nl116(d.lead||'')}</div>
+      <div class="bzInlineSupplementScene"><b>📖 ${esc116(c.scene)}</b><br>${nl116(d.story2||'')}</div>
+      <div class="bzInlineSupplementNote"><b>✍️ ${esc116(c.note)}</b><p class="status" style="line-height:1.7">${esc116(c.help)}</p><textarea id="bzInlineSupplementJournal" placeholder="${esc116(c.ph)}">${esc116(r.journal||'')}</textarea><button class="btn soft" type="button" onclick="bzSaveInlineSupplement()">${esc116(c.save)}</button><span class="bzInlineSupplementSaved" id="bzInlineSupplementSaved"></span></div>
+      <div class="guideNav"><button class="btn soft" type="button" onclick="goGuide(5)">${esc116(c.back)}</button><span></span></div>`;
+    const optional=wrap.querySelector('.optionalLinks');
+    if(optional)wrap.insertBefore(card,optional); else wrap.appendChild(card);
+  }
+
+  const bzV116GoGuide=goGuide;
+  goGuide=function(n){
+    if(Number(n)!==6){
+      const out=bzV116GoGuide(n);
+      bzBuildInlineSupplement();
+      return out;
+    }
+    guideStep=6;
+    bzBuildInlineSupplement();
+    document.querySelectorAll('#guidedHost .guidedCard').forEach(x=>x.classList.remove('active'));
+    document.getElementById('gstep6')?.classList.add('active');
+    document.querySelectorAll('#guidedHost .stepPill').forEach(x=>x.classList.remove('active'));
+    document.getElementById('bzSupplementPill')?.classList.add('active');
+    document.getElementById('guidedHost')?.scrollIntoView({behavior:'smooth',block:'start'});
+  };
+  window.goGuide=goGuide;
+
+  function bzSaveInlineSupplement(){
+    const note=document.getElementById('bzInlineSupplementJournal');
+    if(!note||typeof get!=='function'||typeof put!=='function')return;
+    const s=get();
+    s.records=s.records||{};
+    const prev=s.records[cur]||{};
+    s.records[cur]={...prev,journal:note.value,date:new Date().toISOString()};
+    put(s);
+    const ok=document.getElementById('bzInlineSupplementSaved');
+    if(ok)ok.textContent=bzInlineSupplementCopy().saved;
+    const hidden=document.getElementById('journal');
+    if(hidden)hidden.value=note.value;
+    if(typeof updateBackupInfo==='function')updateBackupInfo();
+  }
+  window.bzSaveInlineSupplement=bzSaveInlineSupplement;
+
+  // Any old "open supplement" action now opens the in-page Step 6.
+  bzOpenDailySupplement=function(){goGuide(6)};
+  bzCloseDailySupplement=function(){goGuide(5)};
+  openDeepLibrary=function(){goGuide(6)};
+  window.bzOpenDailySupplement=bzOpenDailySupplement;
+  window.bzCloseDailySupplement=bzCloseDailySupplement;
+
+  if(typeof renderGuide==='function'){
+    const bzV116RenderGuide=renderGuide;
+    renderGuide=function(n){
+      const out=bzV116RenderGuide(n);
+      bzBuildInlineSupplement();
+      return out;
+    };
+  }
+
+  if(typeof setLang==='function'){
+    const bzV116SetLang=setLang;
+    setLang=function(lang){
+      const out=bzV116SetLang(lang);
+      bzRenderGrowthGardenPanel();
+      bzBuildInlineSupplement();
+      return out;
+    };
+  }
+
+  function init116(){
+    document.getElementById('bzSupplementModal')?.remove();
+    bzEnsureGrowthGardenPanel();
+    bzRenderGrowthGardenPanel();
+    bzBuildInlineSupplement();
+    const tools=document.getElementById('courseToolsInline');
+    if(tools&&BZXF_ACTIVE_CATEGORY==='tools'){
+      tools.classList.add('bzToolsActive');
+      tools.style.display='block';
+      if(typeof bzLoadInlineToolbox==='function')bzLoadInlineToolbox();
+    }
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init116);
+  else init116();
+})();
+</script>
+
 </body></html>
