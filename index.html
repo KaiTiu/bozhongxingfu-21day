@@ -253,6 +253,69 @@ section.course{scroll-margin-top:12px}
 }
 </style>
 
+
+<style id="bzV113AppendixSwitcherStyles">
+/* ===== V10.13 — APPENDIX 1 / 2 SWITCHER =====
+   Appendix category opens as a clean chooser.
+   Only one appendix is visible at a time; original appendix content is unchanged. */
+.appendixSwitcherBar{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+  position:sticky;
+  top:70px;
+  z-index:8;
+  margin:12px 0 14px;
+  padding:10px;
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:rgba(255,253,248,.96);
+  backdrop-filter:blur(10px);
+  box-shadow:0 8px 24px rgba(49,84,61,.08);
+}
+.appendixSwitcherBar .appendixSwitchBtn{
+  flex:1;
+  min-width:220px;
+  border:1px solid var(--line);
+  background:#fff;
+  color:var(--g);
+  border-radius:12px;
+  padding:11px 13px;
+  font-weight:900;
+  cursor:pointer;
+  text-align:center;
+}
+.appendixSwitcherBar .appendixSwitchBtn.active{
+  background:var(--g);
+  color:#fff;
+  border-color:var(--g);
+}
+.appendixEmptyState{
+  background:var(--paper);
+  border:1px dashed #b9c8b7;
+  border-radius:18px;
+  padding:22px 18px;
+  margin:12px 0 18px;
+  text-align:center;
+  color:#66736a;
+  line-height:1.7;
+}
+.appendixEmptyState b{
+  display:block;
+  color:var(--g);
+  font-size:18px;
+  margin-bottom:5px;
+}
+#courseAppendixDirectory .actions{display:none!important}
+#courseAppendixContent .appendixPage{margin-top:0}
+#courseAppendixContent .appendixBack{margin-top:0}
+@media(max-width:620px){
+  .appendixSwitcherBar{top:62px;display:grid;grid-template-columns:1fr}
+  .appendixSwitcherBar .appendixSwitchBtn{min-width:0;width:100%}
+}
+</style>
+
 </head><!-- V10.8.9: all course -> toolbox entries land on #welcome; recommended tool no longer uses ?tool= -->
 <body>
 <!-- V10.3.2 visual fix: DAY title in guidedIntro forced white for readability -->
@@ -1929,6 +1992,197 @@ function bzInitSeparateViews(){
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bzInitSeparateViews);
 else bzInitSeparateViews();
+</script>
+
+
+<script id="bzV113AppendixSwitcherRuntime">
+/* ===== V10.13 — CLEAN APPENDIX CATEGORY WITH 2-WAY SWITCHER ===== */
+(function(){
+  let BZXF_APPENDIX_SELECTED=null;
+
+  function bzAppendixCopy(){
+    const en=CURRENT_LANG==='en';
+    return en ? {
+      one:'💼 Appendix 1 · Business Questions',
+      two:'🧘 Appendix 2 · Giving & Receiving Meditation',
+      emptyTitle:'Choose an appendix',
+      emptyText:'Open only the appendix you need. The other appendix will stay hidden.',
+      back:'← Back to Appendices 1 & 2'
+    } : {
+      one:'💼 附录一｜商业问题',
+      two:'🧘 附录二｜施与受冥想',
+      emptyTitle:'请选择一个附录',
+      emptyText:'需要哪一个才打开哪一个；另一个附录会保持隐藏，不会一次显示全部资料。',
+      back:'← 返回附录一和二'
+    };
+  }
+
+  function bzEnsureAppendixSwitcher(){
+    const directory=document.getElementById('courseAppendixDirectory');
+    if(!directory)return null;
+
+    let bar=document.getElementById('appendixSwitcherBar');
+    if(!bar){
+      bar=document.createElement('div');
+      bar.id='appendixSwitcherBar';
+      bar.className='appendixSwitcherBar';
+      bar.innerHTML=
+        '<button class="appendixSwitchBtn" id="appendixSwitch1" type="button"></button>'+
+        '<button class="appendixSwitchBtn" id="appendixSwitch2" type="button"></button>';
+      directory.insertAdjacentElement('afterend',bar);
+
+      document.getElementById('appendixSwitch1').addEventListener('click',()=>bzShowAppendixPage('business'));
+      document.getElementById('appendixSwitch2').addEventListener('click',()=>bzShowAppendixPage('meditation'));
+    }
+
+    let empty=document.getElementById('appendixEmptyState');
+    if(!empty){
+      empty=document.createElement('div');
+      empty.id='appendixEmptyState';
+      empty.className='appendixEmptyState';
+      const content=document.getElementById('courseAppendixContent');
+      if(content)content.insertAdjacentElement('beforebegin',empty);
+      else bar.insertAdjacentElement('afterend',empty);
+    }
+
+    bzRenderAppendixSwitcher();
+    return bar;
+  }
+
+  function bzRenderAppendixSwitcher(){
+    const c=bzAppendixCopy();
+    const b1=document.getElementById('appendixSwitch1');
+    const b2=document.getElementById('appendixSwitch2');
+    const empty=document.getElementById('appendixEmptyState');
+    if(b1)b1.textContent=c.one;
+    if(b2)b2.textContent=c.two;
+    if(empty)empty.innerHTML='<b>'+c.emptyTitle+'</b><span>'+c.emptyText+'</span>';
+
+    [b1,b2].forEach(b=>b?.classList.remove('active'));
+    if(BZXF_APPENDIX_SELECTED==='business')b1?.classList.add('active');
+    if(BZXF_APPENDIX_SELECTED==='meditation')b2?.classList.add('active');
+    if(b1)b1.setAttribute('aria-pressed',BZXF_APPENDIX_SELECTED==='business'?'true':'false');
+    if(b2)b2.setAttribute('aria-pressed',BZXF_APPENDIX_SELECTED==='meditation'?'true':'false');
+
+    document.querySelectorAll('#businessPage .appendixBack,#meditationPage .appendixBack').forEach(btn=>{
+      btn.textContent=c.back;
+      btn.setAttribute('type','button');
+      btn.setAttribute('onclick','bzAppendixHome()');
+    });
+  }
+
+  function bzAppendixHome(){
+    BZXF_APPENDIX_SELECTED=null;
+    const directory=document.getElementById('courseAppendixDirectory');
+    const content=document.getElementById('courseAppendixContent');
+    const business=document.getElementById('businessPage');
+    const meditation=document.getElementById('meditationPage');
+    const empty=document.getElementById('appendixEmptyState');
+
+    if(directory)directory.style.display='';
+    if(content)content.style.display='';
+    business?.classList.remove('show');
+    meditation?.classList.remove('show');
+    if(empty)empty.style.display='';
+    bzRenderAppendixSwitcher();
+
+    requestAnimationFrame(()=>{
+      (document.getElementById('courseAppendixDirectory')||document.getElementById('appendixSwitcherBar'))
+        ?.scrollIntoView({behavior:'smooth',block:'start'});
+    });
+  }
+
+  // Keep the selector visible only inside the Appendix category.
+  const bzV113SetCategoryView=bzSetCategoryView;
+  bzSetCategoryView=function(key,opts={}){
+    const result=bzV113SetCategoryView(key,opts);
+    const bar=bzEnsureAppendixSwitcher();
+    const empty=document.getElementById('appendixEmptyState');
+
+    if(key==='appendix'){
+      if(bar)bar.style.display='';
+      const directory=document.getElementById('courseAppendixDirectory');
+      const content=document.getElementById('courseAppendixContent');
+      if(content)content.style.display='';
+
+      // A normal click on "Appendices 1 & 2" always opens the clean chooser.
+      if(!opts.keepAppendixSelection){
+        BZXF_APPENDIX_SELECTED=null;
+        document.getElementById('businessPage')?.classList.remove('show');
+        document.getElementById('meditationPage')?.classList.remove('show');
+        if(directory)directory.style.display='';
+        if(empty)empty.style.display='';
+      }else{
+        // During language refresh, preserve only the currently selected appendix.
+        if(directory)directory.style.display=BZXF_APPENDIX_SELECTED?'none':'';
+        if(empty)empty.style.display=BZXF_APPENDIX_SELECTED?'none':'';
+      }
+      bzRenderAppendixSwitcher();
+    }else{
+      if(bar)bar.style.display='none';
+      if(empty)empty.style.display='none';
+    }
+    return result;
+  };
+
+  // Selecting an appendix shows exactly one appendix, with the switcher still available.
+  bzShowAppendixPage=function(which){
+    if(typeof bzHasRequiredGoal==='function'&&!bzHasRequiredGoal()){
+      if(typeof bzRequireGoal==='function')return bzRequireGoal();
+      return;
+    }
+    if(which!=='business'&&which!=='meditation')return;
+
+    bzSetCategoryView('appendix',{scroll:false,keepAppendixSelection:true});
+    BZXF_APPENDIX_SELECTED=which;
+
+    const directory=document.getElementById('courseAppendixDirectory');
+    const content=document.getElementById('courseAppendixContent');
+    const business=document.getElementById('businessPage');
+    const meditation=document.getElementById('meditationPage');
+    const empty=document.getElementById('appendixEmptyState');
+
+    if(directory)directory.style.display='none';
+    if(content)content.style.display='';
+    if(empty)empty.style.display='none';
+
+    business?.classList.toggle('show',which==='business');
+    meditation?.classList.toggle('show',which==='meditation');
+    bzRenderAppendixSwitcher();
+
+    requestAnimationFrame(()=>{
+      (document.getElementById('appendixSwitcherBar')||content)
+        ?.scrollIntoView({behavior:'smooth',block:'start'});
+    });
+  };
+
+  // Replace the old appendix handlers so no old scroll/hide behaviour leaks through.
+  showBusiness=function(){bzShowAppendixPage('business')};
+  showMeditation=function(){bzShowAppendixPage('meditation')};
+
+  const bzV113SetLang=setLang;
+  setLang=function(lang){
+    bzV113SetLang(lang);
+    bzEnsureAppendixSwitcher();
+    bzRenderAppendixSwitcher();
+  };
+
+  window.bzAppendixHome=bzAppendixHome;
+  window.bzShowAppendixPage=bzShowAppendixPage;
+
+  function init(){
+    bzEnsureAppendixSwitcher();
+    // Start clean: entering the appendix category must not reveal either appendix automatically.
+    if(typeof BZXF_ACTIVE_CATEGORY!=='undefined'&&BZXF_ACTIVE_CATEGORY!=='appendix'){
+      const bar=document.getElementById('appendixSwitcherBar');
+      const empty=document.getElementById('appendixEmptyState');
+      if(bar)bar.style.display='none';
+      if(empty)empty.style.display='none';
+    }
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);
+  else init();
+})();
 </script>
 
 </body></html>
