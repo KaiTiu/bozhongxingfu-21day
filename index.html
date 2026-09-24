@@ -316,6 +316,72 @@ section.course{scroll-margin-top:12px}
 }
 </style>
 
+
+<style id="bzV114DailySupplementAndHeroCleanup">
+/* ===== V10.14 — DAILY SUPPLEMENT QUICK VIEW + CLEAN HERO NAV ===== */
+/* The Course Map is the single navigation source. Keep only Continue Learning in the hero. */
+#mainApp .hero .topStartBtn,
+#mainApp .hero .topResourceBtn{display:none!important}
+#mainApp .hero .actions{align-items:center}
+#mainApp .hero .topContinueBtn{display:inline-block!important}
+
+/* The old below-the-lesson supplement section remains as a data sink only. */
+#originalPanel{display:none!important}
+.deepLibraryLink{display:none!important}
+
+.stepPill.supplementPill{
+  border-color:#dccb9e;
+  background:#fff8e7;
+  color:#725b2b;
+}
+.stepPill.supplementPill:hover,
+.stepPill.supplementPill.active{
+  background:#8a6c32;
+  color:#fff;
+  border-color:#8a6c32;
+}
+
+.bzSupplementModal{
+  position:fixed;
+  inset:0;
+  z-index:16000;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  background:rgba(20,35,27,.62);
+  backdrop-filter:blur(5px);
+}
+.bzSupplementModal.show{display:flex}
+.bzSupplementCard{
+  width:min(760px,96vw);
+  max-height:88vh;
+  overflow:auto;
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:24px;
+  padding:20px;
+  box-shadow:0 28px 80px rgba(0,0,0,.26);
+}
+.bzSupplementHead{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:12px}
+.bzSupplementHead h2{margin:3px 0 0;color:var(--g);font-size:24px}
+.bzSupplementEyebrow{font-size:11px;font-weight:950;letter-spacing:.11em;color:#9a7a47}
+.bzSupplementClose{border:0;background:var(--sage);color:var(--g);width:38px;height:38px;border-radius:50%;font-size:22px;font-weight:900;cursor:pointer;flex:0 0 auto}
+.bzSupplementBlock{border:1px solid var(--line);border-radius:16px;padding:15px;margin:10px 0;background:#fff;line-height:1.75}
+.bzSupplementBlock.reminder{background:#edf4ea;border-left:5px solid var(--g)}
+.bzSupplementBlock.scene{background:#f8f5ef}
+.bzSupplementBlock h3{margin:0 0 7px;color:var(--g);font-size:18px}
+.bzSupplementBlock p{margin:0;white-space:pre-line}
+.bzSupplementJournal{width:100%;min-height:95px;margin-top:8px}
+.bzSupplementActions{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.bzSupplementSaved{font-size:12px;color:var(--g);font-weight:850}
+@media(max-width:620px){
+  .bzSupplementCard{padding:17px;border-radius:20px}
+  .bzSupplementHead h2{font-size:21px}
+  .bzSupplementActions .btn{width:100%}
+}
+</style>
+
 </head><!-- V10.8.9: all course -> toolbox entries land on #welcome; recommended tool no longer uses ?tool= -->
 <body>
 <!-- V10.3.2 visual fix: DAY title in guidedIntro forced white for readability -->
@@ -2179,6 +2245,155 @@ else bzInitSeparateViews();
       if(bar)bar.style.display='none';
       if(empty)empty.style.display='none';
     }
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);
+  else init();
+})();
+</script>
+
+
+<script id="bzV114DailySupplementAndHeroCleanupRuntime">
+/* ===== V10.14 — DAILY SUPPLEMENT QUICK VIEW + CLEAN HERO NAV ===== */
+(function(){
+  function bzSupplementText(){
+    const en=CURRENT_LANG==='en';
+    return en ? {
+      pill:'💬 Today’s Extra',
+      eyebrow:'OPTIONAL · TODAY ONLY',
+      title:'💬 Today’s Extra Reminder',
+      reminder:'Today’s extra reminder',
+      scene:'Another real-life scene',
+      journal:'My optional note',
+      journalHelp:'If there is one extra thought, discovery or real-life moment you want to keep, write it here. This is optional.',
+      placeholder:'Anything else I want to remember from today?',
+      save:'Save this extra note',
+      saved:'✓ Saved',
+      close:'Close'
+    } : {
+      pill:'💬 今日补充提醒',
+      eyebrow:'选读 · 当天补充',
+      title:'💬 今日补充提醒',
+      reminder:'今天的补充提醒',
+      scene:'另一个生活场景',
+      journal:'我的自由记录',
+      journalHelp:'如果今天5个步骤以外，还有一句话、一个发现或一个生活片段想留下，可以写在这里。这是额外记录，不是必做。',
+      placeholder:'今天还有什么，我想为自己记下来？',
+      save:'保存补充记录',
+      saved:'✓ 已保存',
+      close:'关闭'
+    };
+  }
+
+  function bzEnsureSupplementModal(){
+    let modal=document.getElementById('bzSupplementModal');
+    if(modal)return modal;
+    modal=document.createElement('div');
+    modal.id='bzSupplementModal';
+    modal.className='bzSupplementModal';
+    modal.setAttribute('role','dialog');
+    modal.setAttribute('aria-modal','true');
+    modal.innerHTML='<div class="bzSupplementCard" id="bzSupplementCard"></div>';
+    modal.addEventListener('click',e=>{if(e.target===modal)bzCloseDailySupplement()});
+    document.body.appendChild(modal);
+    return modal;
+  }
+
+  function bzRenderSupplementModal(){
+    const modal=bzEnsureSupplementModal();
+    const card=document.getElementById('bzSupplementCard');
+    if(!card)return;
+    const c=bzSupplementText();
+    const source=CURRENT_LANG==='en'?DATA_EN:DATA;
+    const d=source?.[Math.max(0,(cur||1)-1)]||{};
+    const s=get();
+    const r=(s.records||{})[cur]||{};
+    const esc=v=>String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]));
+    card.innerHTML=`
+      <div class="bzSupplementHead">
+        <div><div class="bzSupplementEyebrow">${esc(c.eyebrow)}</div><h2>${esc(c.title)}</h2></div>
+        <button class="bzSupplementClose" type="button" aria-label="${esc(c.close)}" onclick="bzCloseDailySupplement()">×</button>
+      </div>
+      <div class="bzSupplementBlock reminder"><h3>${esc(c.reminder)}</h3><p>${esc(d.lead||'')}</p></div>
+      <div class="bzSupplementBlock scene"><h3>📖 ${esc(c.scene)}</h3><p>${esc(d.story2||'')}</p></div>
+      <div class="bzSupplementBlock"><h3>✍️ ${esc(c.journal)}</h3><p style="color:#6d756f;font-size:13px">${esc(c.journalHelp)}</p><textarea class="bzSupplementJournal" id="bzSupplementJournal" placeholder="${esc(c.placeholder)}">${esc(r.journal||'')}</textarea><div class="bzSupplementActions"><button class="btn soft" type="button" onclick="bzSaveDailySupplement()">${esc(c.save)}</button><span class="bzSupplementSaved" id="bzSupplementSaved"></span></div></div>`;
+    return modal;
+  }
+
+  function bzInjectSupplementPill(){
+    const rail=document.querySelector('#guidedHost .stepRail');
+    if(!rail)return;
+    let pill=document.getElementById('bzSupplementPill');
+    if(!pill){
+      pill=document.createElement('span');
+      pill.id='bzSupplementPill';
+      pill.className='stepPill supplementPill';
+      pill.style.cursor='pointer';
+      pill.addEventListener('click',bzOpenDailySupplement);
+      rail.appendChild(pill);
+    }
+    pill.textContent=bzSupplementText().pill;
+  }
+
+  function bzOpenDailySupplement(){
+    if(typeof bzHasRequiredGoal==='function'&&!bzHasRequiredGoal()){
+      if(typeof bzRequireGoal==='function')return bzRequireGoal();
+      return;
+    }
+    const modal=bzRenderSupplementModal();
+    modal?.classList.add('show');
+    document.body.style.overflow='hidden';
+  }
+
+  function bzCloseDailySupplement(){
+    document.getElementById('bzSupplementModal')?.classList.remove('show');
+    document.body.style.overflow='';
+    document.getElementById('bzSupplementPill')?.classList.remove('active');
+  }
+
+  function bzSaveDailySupplement(){
+    const note=document.getElementById('bzSupplementJournal');
+    if(!note)return;
+    let s=get();
+    s.records=s.records||{};
+    const prev=s.records[cur]||{};
+    s.records[cur]={...prev,journal:note.value,date:new Date().toISOString()};
+    put(s);
+    const ok=document.getElementById('bzSupplementSaved');
+    if(ok)ok.textContent=bzSupplementText().saved;
+    const legacy=document.getElementById('journal');
+    if(legacy)legacy.value=note.value;
+    if(typeof updateBackupInfo==='function')updateBackupInfo();
+  }
+
+  // Old optional-content button now opens the same quick-view instead of scrolling below.
+  openDeepLibrary=function(){bzOpenDailySupplement()};
+
+  // Add the quick-view button directly beside Night Reflection every time a DAY renders.
+  const bzV114RenderGuide=renderGuide;
+  renderGuide=function(n){
+    bzV114RenderGuide(n);
+    bzInjectSupplementPill();
+  };
+
+  // Keep the quick-view bilingual when language changes.
+  const bzV114SetLang=setLang;
+  setLang=function(lang){
+    bzV114SetLang(lang);
+    setTimeout(()=>{
+      bzInjectSupplementPill();
+      if(document.getElementById('bzSupplementModal')?.classList.contains('show'))bzRenderSupplementModal();
+    },0);
+  };
+
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')bzCloseDailySupplement()});
+
+  window.bzOpenDailySupplement=bzOpenDailySupplement;
+  window.bzCloseDailySupplement=bzCloseDailySupplement;
+  window.bzSaveDailySupplement=bzSaveDailySupplement;
+
+  function init(){
+    bzEnsureSupplementModal();
+    bzInjectSupplementPill();
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);
   else init();
