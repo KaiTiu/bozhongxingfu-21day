@@ -3672,4 +3672,96 @@ else bzInitSeparateViews();
 })();
 </script>
 
+
+<script id="bzV126GrowthCourseDataLanguageFix">
+/* ===== V10.26 — MY GROWTH / COURSE DATA BILINGUAL SYNC =====
+   The desktop course-data card is physically moved out of the DAY sidebar into
+   My Growth. Earlier language switching rebuilt the sidebar, but did not update
+   the already-moved card, leaving Chinese text visible in English mode. */
+(function(){
+  function visibleGrowthDataPanel(){
+    const extras=document.getElementById('courseGrowthExtras');
+    if(extras){
+      const panels=[...extras.querySelectorAll('.sideSection')];
+      const hit=panels.find(p=>p.querySelector('button[onclick*="exportData"]') || p.querySelector('input[type="file"][onchange*="restoreData"]'));
+      if(hit)return hit;
+    }
+    const all=[...document.querySelectorAll('[id="courseDataDesktop"]')];
+    return all.find(el=>el.offsetParent!==null) || all[0] || null;
+  }
+
+  function setLabelTextKeepingInput(label,text){
+    if(!label)return;
+    let span=label.querySelector('[data-bz-restore-text]');
+    if(!span){
+      const input=label.querySelector('input');
+      span=document.createElement('span');
+      span.setAttribute('data-bz-restore-text','1');
+      // Remove only text nodes so the file input stays intact.
+      [...label.childNodes].forEach(n=>{if(n.nodeType===Node.TEXT_NODE)n.remove()});
+      if(input)label.insertBefore(span,input); else label.appendChild(span);
+    }
+    span.textContent=text;
+  }
+
+  function renderGrowthCourseDataLanguage(){
+    const panel=visibleGrowthDataPanel();
+    if(!panel)return;
+    const en=(window.CURRENT_LANG||'zh')==='en';
+    const title=panel.querySelector('h3');
+    const lead=panel.querySelector('p.status');
+    const exportBtn=panel.querySelector('button[onclick*="exportData"]');
+    const restoreLabel=panel.querySelector('label');
+    const privacy=panel.querySelector('.callout');
+    const clearBtn=panel.querySelector('button[onclick*="clearLocalData"]');
+    const info=panel.querySelector('#backupInfo');
+
+    if(title)title.textContent=en?'💾 My Course Data':'💾 我的课程资料';
+    if(lead)lead.textContent=en
+      ?'Member learning records sync automatically to your cloud account. You can also download a backup regularly as an extra safeguard.'
+      :'会员学习记录会自动同步到云端账号；你也可以定期下载备份，作为额外保障。';
+    if(exportBtn)exportBtn.textContent=en?'⬇️ Back Up My Learning Records':'⬇️ 备份我的学习记录';
+    setLabelTextKeepingInput(restoreLabel,en?'⬆️ Restore Learning Records':'⬆️ 恢复学习记录');
+    if(privacy)privacy.innerHTML=en
+      ?'🔒 <b>Privacy:</b> Signed-in members’ learning records sync to their own cloud account and a local copy is kept on this device. They are not automatically shared with other participants.'
+      :'🔒 <b>隐私说明：</b>登录会员的学习记录会同步到自己的云端账号，并保留本机副本；不会自动与其他学员共享。';
+    if(clearBtn)clearBtn.textContent=en?'🧹 Clear My Learning Records (Device + Cloud)':'🧹 清除我的学习记录（本机 + 云端）';
+
+    if(info && typeof get==='function'){
+      const s=get();
+      const days=Array.isArray(s.completed)?s.completed.length:0;
+      const records=Object.keys(s.records||{}).length;
+      info.textContent=en
+        ?`Current: ${days}/21 days completed · ${records} daily records saved`
+        :`目前：完成 ${days}/21 天｜已保存 ${records} 天记录`;
+    }
+  }
+  window.bzRenderGrowthCourseDataLanguage=renderGrowthCourseDataLanguage;
+
+  if(typeof window.setLang==='function'){
+    const previousSetLang=window.setLang;
+    window.setLang=function(lang){
+      const out=previousSetLang(lang);
+      setTimeout(renderGrowthCourseDataLanguage,0);
+      setTimeout(renderGrowthCourseDataLanguage,80);
+      return out;
+    };
+    setLang=window.setLang;
+  }
+
+  if(typeof window.bzSetCategoryView==='function'){
+    const previousCategory=window.bzSetCategoryView;
+    window.bzSetCategoryView=function(key,options){
+      const out=previousCategory(key,options);
+      if(key==='growth')setTimeout(renderGrowthCourseDataLanguage,0);
+      return out;
+    };
+    bzSetCategoryView=window.bzSetCategoryView;
+  }
+
+  function init(){setTimeout(renderGrowthCourseDataLanguage,0);setTimeout(renderGrowthCourseDataLanguage,120)}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+
 </body></html>
