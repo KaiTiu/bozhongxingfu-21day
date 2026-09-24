@@ -456,6 +456,21 @@ section.course{scroll-margin-top:12px}
 </style>
 
 <!-- V10.19: inline toolbox duplicate guide/example blocks fixed -->
+
+<style id="bzV119CompletionDatesStyles">
+/* ===== V10.19 — DAY completion dates + learning record ===== */
+.bzDayDateCard{margin:12px 0 4px;border:1px solid var(--line);border-radius:15px;background:#faf8f2;overflow:hidden}
+.bzDayDateCard summary{cursor:pointer;padding:11px 12px;font-weight:900;color:var(--g);list-style:none}.bzDayDateCard summary::-webkit-details-marker{display:none}
+.bzDayDateList{display:grid;gap:6px;padding:0 10px 11px;max-height:260px;overflow:auto}
+.bzDayDateRow{display:flex;justify-content:space-between;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:12px;line-height:1.45}
+.bzDayDateRow b{color:var(--g);white-space:nowrap}.bzDayDateRow span{text-align:right;color:#68736b}.bzDayDateRow.done span{color:#355a42;font-weight:850}.bzDayDateRow.next{background:#f3f8f0;border-color:#bfd0c0}.bzDayDateRow.locked{opacity:.64}
+.bzGrowthLearning{grid-column:1/-1;margin:0!important;padding:18px!important;border:1px solid var(--line)!important;border-radius:18px!important;background:var(--paper)!important}
+.bzGrowthLearning h3{margin:0 0 6px;color:var(--g);font-size:20px}.bzGrowthLearning>p{margin:0 0 12px;color:#68736b;line-height:1.6;font-size:13px}
+.bzGrowthLearningGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.bzGrowthLearningGrid .bzDayDateRow{font-size:13px;padding:10px 12px}
+.bzCurrentDayDate{margin:10px 0 0;padding:9px 12px;border-radius:12px;background:#ffffff18;border:1px solid #ffffff2e;color:#eef5ef;font-size:12px;font-weight:800}
+@media(max-width:700px){.bzGrowthLearningGrid{grid-template-columns:1fr}.bzDayDateList{max-height:220px}}
+</style>
+
 </head><!-- V10.8.9: all course -> toolbox entries land on #welcome; recommended tool no longer uses ?tool= -->
 <body>
 <!-- V10.3.2 visual fix: DAY title in guidedIntro forced white for readability -->
@@ -882,6 +897,76 @@ function saveGoal(){let s=get();s.goal=$('goal').value;s.whyGoal=$('whyGoal').va
 function stage(n){if(n===0)return'准备播种';if(n<=2)return'🌰 种子｜1–2天';if(n<=7)return'🌱 发芽｜3–7天';if(n<=15)return'🌿 成长｜8–15天';if(n<=20)return'🪻 花苞｜16–20天';return'🌷 开花｜21天'}
 function renderSide(){let s=get();$('days').innerHTML=DATA.map(d=>`<button class="day ${s.completed.includes(d.day)?'done':''} ${cur===d.day?'active':''}" onclick="showDay(${d.day});scrollToDayCourse()">${String(d.day).padStart(2,'0')}</button>`).join('');let n=s.completed.length;$('pt').textContent=n+' / 21';$('pb').style.width=(n/21*100)+'%';$('stage').textContent=stage(n);$('garden').innerHTML=Array.from({length:21},(_,i)=>`<div class="plant ${i<n?'on':''}">${i<n?(i<2?'🌰':i<7?'🌱':i<15?'🌿':i<20?'🪻':'🌷'):'·'}</div>`).join('')}
 
+
+/* ===== V10.18 CORE DAY RUNTIME REPAIR =====
+   Restores the essential day-opening/completion functions that must exist
+   before the later onboarding, category and sequential-unlock wrappers run. */
+function scrollToAppendix(id){
+  const el=document.getElementById(id);if(!el)return;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    const y=el.getBoundingClientRect().top+window.pageYOffset-10;
+    window.scrollTo({top:y,behavior:'smooth'});
+  }));
+}
+function scrollToDayCourse(){
+  const target=document.getElementById('guidedHost')||document.querySelector('section.course');
+  if(!target)return;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    const y=target.getBoundingClientRect().top+window.pageYOffset-12;
+    window.scrollTo({top:Math.max(0,y),behavior:'smooth'});
+  }));
+}
+function showDay(n){
+  const op=document.getElementById('originalPanel');if(op)op.classList.remove('on');
+  document.getElementById('meditationPage')?.classList.remove('show');
+  document.getElementById('businessPage')?.classList.remove('show');
+  Array.from(document.querySelectorAll('.course>div,.course>.sec,.course>.nav,.course>p,.course>h2')).forEach(el=>{
+    if(!el.classList.contains('appendixPage'))el.style.display='';
+  });
+  cur=Math.max(1,Math.min(21,Number(n)||1));
+  const source=CURRENT_LANG==='en'?(typeof DATA_EN!=='undefined'?DATA_EN:DATA):DATA;
+  const d=source[cur-1]||DATA[cur-1];
+  const s=get();s.last=cur;put(s);const r=(s.records||{})[cur]||{};
+  const txt=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v??''};
+  const val=(id,v)=>{const e=document.getElementById(id);if(e)e.value=v??''};
+  txt('ey',`DAY ${String(cur).padStart(2,'0')} / 21`);txt('title',d?.title);txt('headline',d?.headline);txt('lead',d?.lead);txt('hook',d?.hook);
+  txt('sourceStoryTitle',d?.sourceStoryTitle);txt('sourceStory',d?.sourceStory);txt('sourceNote',d?.sourceNote);txt('resonance',d?.resonance);txt('painStory',d?.painStory);
+  txt('turn',d?.turn);txt('repair',d?.repair);txt('explain',d?.explain);txt('story',d?.story);txt('story2',d?.story2);txt('dialogue',d?.dialogue);txt('why',d?.why);
+  txt('mistake',d?.mistake);txt('example',d?.example);txt('example2',d?.example2);txt('q1','① '+((d?.reflections||[])[0]||''));txt('q2','② '+((d?.reflections||[])[1]||''));
+  val('a1',r.a1||'');val('a2',r.a2||'');val('journal',r.journal||'');val('review',r.review||'');
+  txt('action',d?.action);txt('quote',d?.quote);txt('closing',d?.closing);
+  txt('complete',(s.completed||[]).includes(cur)?(CURRENT_LANG==='en'?'✓ Completed · Click to Undo':'✓ 今天已完成｜点击可取消'):(CURRENT_LANG==='en'?'✅ Complete Today':'✅ 完成今天练习'));
+  txt('saved','');
+  if(typeof renderSide==='function')renderSide();
+  if(typeof renderGuide==='function')renderGuide(cur);
+  scrollToDayCourse();
+  return true;
+}
+function saveRecord(){
+  const s=get();s.records=s.records||{};const prev=s.records[cur]||{};
+  s.records[cur]={...prev,a1:document.getElementById('a1')?.value||'',a2:document.getElementById('a2')?.value||'',journal:document.getElementById('journal')?.value||prev.journal||'',review:document.getElementById('review')?.value||'',date:prev.date||new Date().toISOString()};
+  put(s);const ok=document.getElementById('saved');if(ok)ok.textContent=CURRENT_LANG==='en'?'✓ Saved':'✓ 已保存';if(typeof updateBackupInfo==='function')updateBackupInfo();
+}
+function toggleComplete(){
+  saveRecord();const s=get(),i=(s.completed||[]).indexOf(cur);s.completed=s.completed||[];
+  if(i>=0)s.completed.splice(i,1);else s.completed.push(cur);s.completed.sort((a,b)=>a-b);put(s);showDay(cur);if(typeof updateBackupInfo==='function')updateBackupInfo();
+}
+function completeDay(){
+  const s=get();s.completed=s.completed||[];if(!s.completed.includes(cur))s.completed.push(cur);s.completed.sort((a,b)=>a-b);s.last=cur;put(s);if(typeof renderSide==='function')renderSide();return true;
+}
+function hideCourseForAppendix(){
+  Array.from(document.querySelectorAll('.course>div,.course>.sec,.course>.nav,.course>p,.course>h2')).forEach(el=>{if(!el.classList.contains('appendixPage'))el.style.display='none'});
+  document.getElementById('meditationPage')?.classList.remove('show');document.getElementById('businessPage')?.classList.remove('show');
+}
+function loadMeditationNote(){
+  const m=(get().meditation||{});const a=document.getElementById('medWho'),b=document.getElementById('medPain'),c=document.getElementById('medAction');if(a)a.value=m.who||'';if(b)b.value=m.pain||'';if(c)c.value=m.action||'';
+}
+function showMeditation(){hideCourseForAppendix();document.getElementById('meditationPage')?.classList.add('show');scrollToAppendix('meditationPage')}
+function showBusiness(){hideCourseForAppendix();document.getElementById('businessPage')?.classList.add('show');scrollToAppendix('businessPage')}
+function prevDay(){showDay(Math.max(1,cur-1))}
+function nextDay(){showDay(Math.min(21,cur+1))}
+function continueCourse(){showDay((get().last||1))}
+
 const GUIDE_DAYS=[["原来幸福一直都在", "幸福盲点挑战", "如果明天必须暂时失去一样，你最舍不得什么？", ["健康", "家人", "稳定的生活", "一个关心我的人"], "你最舍不得的，可能正是今天已经拥有、却很少认真感觉到的幸福。", "很多幸福不是今天才出现，只是拥有久了，我们容易习惯。问题可以存在，幸福也可以同时存在。", "最近什么事情最让我烦恼？", "虽然它还没解决，我仍然拥有什么？", "今天有什么值得我认真珍惜10秒？", ["认真谢谢一个人", "陪家人10分钟，不看手机", "认真享受一顿饭或一杯茶", "走10分钟，看看身边"]], ["事实，还是我脑中的故事？", "FACT or STORY", "“对方3小时没有回复我的信息。”你最先能确定的是？", ["他不重视我", "他生气了", "暂时没有回复", "我做错了事"], "目前可以观察到的事实只是“暂时没有回复”。其他都可能是解释。", "感觉可以是真的，但我们的第一种解释不一定就是事实。先分开事实与故事，就多一次选择。", "最近哪件事让我想很多？", "如果只写摄像机能拍到的事实，会是什么？", "除了原来的解释，还有什么可能？", ["先问清楚", "等待更多信息", "表达感受而不指责", "今天少做一次猜测"]], ["同一支笔，为什么看见不同世界？", "一支笔的实验", "同一支笔给人和爱咬东西的小狗，它们经验到的意义会完全一样吗？", ["一定一样", "可能不同", "只有一个绝对用途", "不知道"], "同一个对象，在不同需要、经验与关系里可能呈现不同意义。", "今天不是否定现实，而是看见：我们的经验、需要与过去，也参与了我们如何理解世界。", "最近我和谁对同一件事看法完全不同？", "我的立场是什么？", "如果从他的处境看，可能多看到什么？", ["先问一个问题再判断", "认真听完不同意见", "写下两个可能视角", "少一次“你就是…”"]], ["谁拿着我的幸福遥控器？", "幸福遥控器", "谁的一句话最容易立刻改变你的心情？", ["家人/伴侣", "老板/同事", "朋友", "陌生人的评价"], "我们无法控制别人，但可以练习拿回“下一步怎样回应”的选择权。", "真正的自主不是没有情绪，而是情绪出现后，我仍然可以选择下一步。", "最近谁最容易影响我的心情？", "我无法控制他的什么？", "我今天仍然可以控制什么？", ["暂停10秒再回应", "把注意力带回可控制的事", "清楚表达一个需要", "暂时离开冲突现场"]], ["我每天正在种什么？", "种子选择器", "每天重复的念头、语言与行动，最容易变成什么？", ["习惯与模式", "保证好运", "别人改变", "完全没影响"], "重复会形成习惯，也会影响我们与人的互动方式。", "“种子”在课程中作为原著的实践框架：今天先观察自己反复种下什么，不把它当成对所有现实结果的单一解释。", "我最近重复最多的一个行为是什么？", "它正在强化什么模式？", "我想换成什么小行动？", ["少一次抱怨", "多一次感谢", "完成一个拖延的小事", "帮助一个人"]], ["想得到什么，先学习给予什么", "给予实验", "你最近最希望得到哪一种支持？", ["理解", "鼓励", "机会", "帮助"], "今天可以先给另一个人一个你有能力给予的小版本。", "给予不是交换公式，也不是牺牲界限；它是练习成为自己希望世界里更多出现的那种人。", "我现在最想得到什么？", "谁也可能需要类似的东西？", "我能给予的最小版本是什么？", ["认真听一个人5分钟", "鼓励一个人", "分享一个有用资源", "主动帮一个小忙"]], ["为什么同样的问题一直回来？", "人生循环拼图", "哪个顺序最接近常见的自动反应？", ["触发→解释→情绪→反应→结果", "结果→触发→命运", "别人→别人→别人", "情绪→天气→结果"], "看见循环以后，就能寻找一个可以插入新选择的位置。", "改变不一定从“大彻大悟”开始，很多时候只是更早发现自己又进入旧循环。", "我的一个重复问题是什么？", "通常什么会触发它？", "我最想在哪一步停一下？", ["记录一次触发", "换一个解释", "暂停再行动", "做一个相反的小行为"]], ["别人成功，为什么我会不舒服？", "比较陷阱", "看到同龄人得到你也想要的东西，你第一感觉是什么？", ["替他开心", "有点酸", "怀疑自己", "几种都有"], "没有标准答案。先诚实看见反应，不需要羞辱自己。", "羡慕有时也在透露我们真正重视什么。今天把比较从自我攻击，转成方向信息。", "我最近羡慕谁？", "我真正羡慕的是哪一部分？", "它告诉我想创造什么？", ["真诚祝福一个人", "停止一次无意义比较", "写下自己的下一步", "少刷一次让自己焦虑的内容"]], ["情绪来了，不需要马上反应", "10秒情绪按钮", "被一句话触发时，你最先练习什么？", ["立刻反击", "先停10秒", "压住所有感觉", "翻旧账"], "暂停不是认输，是把反应重新变成选择。", "情绪是信息，不是命令。今天只练习在自动反应与行动之间留一点空间。", "最近什么最容易触发我？", "身体最先有什么感觉？", "暂停后我想怎样回应？", ["做3次慢呼吸", "延迟回复10分钟", "先写下来不发送", "说“我需要一点时间”"]], ["为什么最亲的人最容易伤害彼此？", "换位椅", "对方说“你从来不听我说”，先问什么更有帮助？", ["你真正想让我听见什么？", "你才不听", "谁对谁错", "翻旧账"], "理解不等于同意。先听见需要，才更可能进入解决问题。", "关系修复不是永远迁就，而是让事实、感受、需要和界限更清楚。", "最近一个关系冲突是什么？", "我真正需要什么？", "对方可能需要什么？", ["听10分钟不打断", "用“我感到…”表达", "问一个澄清问题", "需要时设立界限"]], ["你说出去的话，正在种什么？", "这句话怎么说？", "“你每次都这样！”怎样说得更具体？", ["刚才这件事让我难受，我想谈谈", "你就是没救", "随便", "大家都知道你这样"], "具体事实 + 感受 + 需要，比贴标签更容易继续沟通。", "温和不等于软弱；真实也不等于伤人。今天练习同时保留诚实与尊重。", "我最近说过哪句话可能伤人？", "我真正想表达什么？", "怎样说得更具体？", ["改写一句话", "少一次讽刺", "多一次真诚肯定", "先确认事实"]], ["原谅，不等于继续允许伤害", "界限判断", "原谅是否等于必须恢复原来的关系？", ["不是", "是", "必须忘记", "不能离开"], "原谅、理解、和解、信任与界限不是同一件事。", "面对持续伤害时，保护自己、寻求现实支持和专业帮助可以比强迫原谅更重要。", "我有什么一直放不下？", "我需要的是放下、沟通还是界限？", "什么会让我更安全？", ["写下一个界限", "停止一次勉强", "找可信任的人谈", "只处理自己能处理的部分"]], ["为什么知道了，还是会重复？", "拔草重种", "发现旧模式又出现，下一步更有帮助的是？", ["看见→停止→修复→重种", "骂自己", "假装没发生", "等别人改变"], "觉察不是为了责备，而是更快重新开始。", "二时书的精神也包括平静观察正负种子。今天练习修正，而不是追求从不犯错。", "我最常重复什么旧模式？", "它出现前有什么信号？", "相反的小行动是什么？", ["道歉或修复一次", "做一个相反行为", "记录触发点", "重新开始而不自责"]], ["金钱：从匮乏走向责任与价值", "RM100人生选择", "如果今天多出RM100，你第一反应会怎样分配？", ["储蓄", "分享/帮助", "学习成长", "享受生活"], "没有唯一正确答案；选择会透露当前的安全感、价值和需要。", "原著谈给予与财富种子；现实财务同时受收入、支出、机会、风险与制度等因素影响。今天把“给予”与“财务责任”放在一起。", "钱最容易触发我什么感觉？", "我现在真正的财务事实是什么？", "本周一个现实动作是什么？", ["记录支出", "建立小额储蓄", "停止一个浪费", "在能力范围内帮助别人"]], ["事业：从证明自己到创造价值", "价值交换挑战", "事业卡住时，哪一个问题更值得先问？", ["我能解决谁的什么问题？", "别人为什么不欣赏我", "怎样看起来更忙", "怎样证明我厉害"], "价值从具体问题与真实交付开始。", "今天不只问“我想得到什么”，也问“谁因为我的工作而变得更好一点？”", "我正在服务谁？", "他最具体的问题是什么？", "我能提供什么更清楚的价值？", ["问一个客户需求", "改善一个交付", "完成一个重要任务", "感谢一个合作伙伴"]], ["家庭：先听见，再解决", "家庭10分钟挑战", "家人说“今天很累”，你先做什么？", ["先听", "马上教方法", "比较谁更累", "叫他别想"], "有时候先被听见，人才能进入解决问题。", "家庭改变常来自重复的小连接，不一定是一次很大的谈话。", "家里谁最需要被我听见？", "我平常最容易怎样打断？", "今天我可以怎样陪伴？", ["10分钟不看手机地听", "一起吃一顿饭", "问“你需要我听还是给建议？”", "表达一次感谢"]], ["关系：成为你希望遇见的人", "镜子游戏", "你最希望身边的人有什么品质？", ["诚信", "温柔", "可靠", "尊重"], "把同一标准轻轻转回来：我今天能不能先活出一点？", "这不是把所有关系责任推给自己，而是把注意力放回自己的选择。", "我希望别人怎样对我？", "我自己做到多少？", "今天最想练习哪种品质？", ["守一个承诺", "尊重一个不同意见", "主动关心一个人", "清楚而温和地拒绝"]], ["时间：我的生命去了哪里？", "生命24小时", "你最不想继续把时间耗在哪里？", ["无意义刷手机", "争执", "拖延", "取悦所有人"], "时间管理更深层是在决定：生命要给什么。", "每个人资源与责任不同，不用效率羞辱自己。今天只把一点时间还给真正重要的事。", "最近时间都去了哪里？", "什么其实不重要？", "什么值得多30分钟？", ["30分钟给重要的人", "30分钟做重要工作", "提前睡觉", "关掉一个干扰"]], ["从“我”走向“我们”", "匿名善意任务", "哪一种更接近不求回报的善意？", ["悄悄帮一个忙", "帮完马上要求回报", "发帖证明自己好", "提醒对方欠我"], "善意不一定需要被看见才有意义。", "当注意力从“我有没有得到”扩展到“我的存在能否让别人好一点”，幸福会多一个维度。", "谁最近可能需要一点帮助？", "我能做什么而不增加自己负担？", "我是否愿意不求称赞？", ["匿名帮助一次", "让一个方便给别人", "分享一个资源", "主动关心一个人"]], ["真正的幸福，也让别人变好", "幸福传递实验", "别人曾经帮助过你吗？", ["有，很具体", "有，但很久了", "暂时想不到", "我更常帮助别人"], "我们都活在彼此影响的世界里。今天把曾经得到的支持继续传下去。", "帮助不保证特定回报，但可以真实增加支持、连接与行动机会。", "谁曾经帮助过我？", "那份帮助改变了什么？", "我想怎样传下去？", ["帮助一个遇到类似问题的人", "感谢曾帮助我的人", "分享经验", "给一个人实际支持"]], ["我想成为怎样的人？", "未来的我", "一年后的你最希望感谢今天的自己做了什么？", ["更珍惜关系", "开始行动", "照顾自己", "成为更有帮助的人"], "21天不是把幸福学完，而是找到值得长期重复的选择。", "世界会继续变化，困难也不会全部消失。真正带走的是：更早看见、更清楚选择、更愿意行动。", "21天里我最大的发现是什么？", "我想停止什么？", "未来30天我要继续哪两个练习？", ["写幸福人生宣言", "选两个30天习惯", "感谢陪伴自己的人", "帮助一个人开始"]]];
 const GUIDE_DAYS_EN=[["Happiness Was Already Here","Happiness Blind-Spot Challenge","If you had to temporarily lose one thing tomorrow, what would be hardest to give up?",["Health","Family","A stable life","Someone who cares about me"],"What you would miss most may already be part of your life, even if you rarely pause to feel it.","Many forms of happiness are not new. We simply get used to them. Problems can exist, and happiness can still exist at the same time.","What has been bothering me most lately?","Even if it is not solved yet, what do I still have?","What deserves 10 seconds of genuine appreciation today?",["Thank someone sincerely","Spend 10 phone-free minutes with family","Enjoy one meal or drink mindfully","Take a 10-minute walk and notice your surroundings"]],["Fact, or the Story in My Head?","FACT or STORY","Someone has not replied to my message for three hours. What can I know for sure?",["They do not value me","They are angry","They have not replied yet","I did something wrong"],"The observable fact is only: they have not replied yet. Everything else may be interpretation.","Feelings can be real, while our first explanation may still be incomplete. Separating facts from stories gives us another choice.","What situation have I been overthinking recently?","If a camera recorded only the facts, what would it show?","What other explanation might be possible?",["Ask for clarification","Wait for more information","Express feelings without blaming","Make one less assumption today"]],["Why Can the Same Pen Mean Different Things?","The Pen Experiment","Would a person and a puppy that loves chewing experience the same pen in exactly the same way?",["Definitely the same","Possibly different","Only one absolute use","I do not know"],"The same object can carry different meanings depending on needs, experience and context.","This does not deny reality. It reminds us that our experience and past also shape how we understand what happens.","Who sees a recent situation very differently from me?","What is my position?","What might I notice from their situation?",["Ask one question before judging","Listen fully to a different view","Write down two possible perspectives","Use one less 'you always...' statement"]],["Who Is Holding My Happiness Remote?","Happiness Remote","Whose words can change your mood almost instantly?",["Family / partner","Boss / colleague","Friend","A stranger's opinion"],"We cannot control others, but we can practise choosing our next response.","Autonomy does not mean having no emotions. It means that after emotion appears, I can still choose what I do next.","Who affects my mood most easily?","What can I not control about them?","What can I still control today?",["Pause 10 seconds before replying","Return attention to what I can control","Express one need clearly","Step away from conflict temporarily"]],["What Am I Planting Every Day?","Seed Selector","Repeated thoughts, words and actions are most likely to become what?",["Habits and patterns","Guaranteed good luck","Other people changing","No effect at all"],"Repetition shapes habits and also influences how we interact with others.","In this course, 'seeds' are used as a practical framework from the source material. Today, observe what you repeatedly practise without treating it as the single cause of every life outcome.","What behaviour have I repeated most lately?","What pattern is it reinforcing?","What small action do I want to replace it with?",["Complain one less time","Say thank you one more time","Finish one delayed task","Help one person"]],["Give a Little of What You Hope to Receive","Giving Experiment","What kind of support do you most want right now?",["Understanding","Encouragement","Opportunity","Help"],"Today, give someone a small version of what you are able to give.","Giving is not a transaction formula and does not require self-sacrifice. It is practice in becoming more like the kind of person you hope to meet in the world.","What do I most want right now?","Who might need something similar?","What is the smallest version I can give?",["Listen to someone for 5 minutes","Encourage one person","Share a useful resource","Offer one small practical help"]],["Why Does the Same Problem Keep Returning?","Life Loop Puzzle","Which sequence best matches a common automatic reaction?",["Trigger → interpretation → emotion → reaction → result","Result → trigger → fate","Others → others → others","Emotion → weather → result"],"Once we can see the loop, we can look for a place to insert a new choice.","Change does not always begin with a breakthrough. Often it begins by noticing the old loop a little earlier.","What problem keeps repeating for me?","What usually triggers it?","At which step do I most want to pause?",["Record one trigger","Try a different interpretation","Pause before acting","Do one opposite small behaviour"]],["Why Can Someone Else's Success Hurt?","Comparison Trap","When someone your age gets something you also want, what do you feel first?",["Happy for them","A little jealous","Doubt myself","A mix of several feelings"],"There is no standard answer. See your reaction honestly without shaming yourself.","Jealousy can also reveal what we value. Today, turn comparison from self-attack into information about direction.","Who have I been comparing myself with?","What part do I actually envy?","What does that tell me I want to create?",["Congratulate someone sincerely","Stop one pointless comparison","Write my own next step","Reduce one source of anxious scrolling"]],["You Do Not Have to React Immediately","10-Second Emotion Button","When a sentence triggers you, what should you practise first?",["Fight back immediately","Pause for 10 seconds","Suppress every feeling","Bring up old issues"],"Pausing is not surrender. It turns an automatic reaction back into a choice.","Emotion is information, not a command. Today, practise creating a little space between reaction and action.","What triggers me most easily lately?","What does my body feel first?","After pausing, how do I want to respond?",["Take 3 slow breaths","Delay replying for 10 minutes","Write it but do not send","Say 'I need a little time'"]],["Why Do the Closest People Hurt Each Other Most?","Perspective Chair","If someone says, 'You never listen to me,' what question is more useful first?",["What do you most want me to hear?","You never listen either","Who is right?","Bring up old issues"],"Understanding does not mean agreeing. Hearing the need first makes problem-solving more possible.","Repairing relationships is not endless accommodation. It is making facts, feelings, needs and boundaries clearer.","What relationship conflict happened recently?","What do I really need?","What might the other person need?",["Listen for 10 minutes without interrupting","Use 'I feel...' language","Ask one clarifying question","Set a boundary when needed"]],["What Are Your Words Planting?","Say It Differently","How can 'You always do this!' be made more specific?",["What just happened hurt me, and I want to talk about it","You are hopeless","Whatever","Everyone knows you are like this"],"Specific facts + feelings + needs usually keep communication open better than labels.","Gentle does not mean weak, and honest does not mean hurtful. Today, practise both truth and respect.","What have I said recently that may have hurt someone?","What was I really trying to express?","How can I say it more specifically?",["Rewrite one sentence","Use one less sarcastic remark","Give one sincere affirmation","Check the facts first"]],["Forgiving Does Not Mean Allowing More Harm","Boundary Check","Does forgiveness mean you must restore the relationship to how it was before?",["No","Yes","You must forget","You cannot leave"],"Forgiveness, understanding, reconciliation, trust and boundaries are not the same thing.","When harm is ongoing, protecting yourself and seeking real-world or professional support may matter more than forcing forgiveness.","What am I still holding onto?","Do I need release, communication, or a boundary?","What would make me safer?",["Write one boundary","Stop one forced obligation","Talk to someone trustworthy","Focus on what I can actually handle"]],["Why Do I Repeat It Even When I Know Better?","Weed and Replant","When an old pattern appears again, what is a more helpful next step?",["Notice → stop → repair → replant","Attack myself","Pretend it did not happen","Wait for others to change"],"Awareness is not for blame. It helps us restart sooner.","The source practice also includes calmly observing positive and negative patterns. Today, practise correction rather than perfection.","What old pattern do I repeat most?","What signals appear before it?","What is one opposite small action?",["Apologise or repair once","Do one opposite behaviour","Record the trigger","Restart without self-attack"]],["Money: From Scarcity to Responsibility and Value","RM100 Life Choice","If you received an extra RM100 today, what would you instinctively do with it?",["Save it","Share / help","Learn and grow","Enjoy life"],"There is no single correct answer. Your choice may reveal current needs, security and values.","The source material discusses giving and wealth. Real finances are also shaped by income, expenses, opportunity, risk and systems. Today, pair generosity with financial responsibility.","What feeling does money trigger most in me?","What are the real facts of my finances right now?","What is one practical action this week?",["Track expenses","Start a small savings habit","Stop one wasteful expense","Help within my actual capacity"]],["Career: From Proving Yourself to Creating Value","Value Exchange Challenge","When your career or business is stuck, which question is more useful first?",["Whose problem can I solve, and what is it?","Why does nobody appreciate me?","How can I look busier?","How can I prove I am impressive?"],"Value begins with a specific problem and a real delivery.","Today, do not ask only 'What do I want to get?' Also ask, 'Who becomes a little better because of my work?'","Who am I serving?","What is their most specific problem?","What clearer value can I provide?",["Ask one customer about a need","Improve one delivery","Finish one important task","Thank one partner"]],["Family: Listen Before You Fix","10-Minute Family Challenge","A family member says, 'I am exhausted today.' What do you do first?",["Listen first","Give advice immediately","Compare who is more tired","Tell them not to think about it"],"Sometimes a person needs to feel heard before they are ready to solve the problem.","Family change often comes from repeated small moments of connection, not one dramatic conversation.","Who at home most needs me to listen?","How do I usually interrupt?","How can I be present today?",["Listen for 10 phone-free minutes","Share a meal together","Ask 'Do you want me to listen or help think of solutions?'","Express one thank-you"]],["Relationships: Become the Person You Hope to Meet","Mirror Game","What quality do you most want in the people around you?",["Integrity","Kindness","Reliability","Respect"],"Gently turn the same standard back toward yourself: can I practise a little of it today?","This does not place all relationship responsibility on you. It returns attention to the part you can choose.","How do I want others to treat me?","How much of that do I practise myself?","Which quality do I want to practise today?",["Keep one promise","Respect one different opinion","Care for someone proactively","Say no clearly and kindly"]],["Time: Where Is My Life Going?","24 Hours of Life","Where do you least want to keep spending your time?",["Mindless scrolling","Arguments","Procrastination","Pleasing everyone"],"At a deeper level, time management is deciding what your life will be given to.","Everyone has different resources and responsibilities. Do not shame yourself with productivity. Give a little time back to what truly matters.","Where has my time gone lately?","What is actually not important?","What deserves 30 more minutes?",["Give 30 minutes to someone important","Give 30 minutes to important work","Sleep earlier","Turn off one distraction"]],["From Me to We","Anonymous Kindness Task","Which action is closest to kindness without expecting a return?",["Quietly help with something","Help and immediately demand repayment","Post it to prove I am good","Remind them they owe me"],"Kindness does not need to be seen to have meaning.","When attention expands from 'What did I get?' to 'Can my presence make life a little better for someone?', happiness gains another dimension.","Who might need a little help lately?","What can I do without overburdening myself?","Am I willing to do it without praise?",["Help anonymously once","Make something easier for someone","Share a useful resource","Check in on someone proactively"]],["Real Happiness Can Help Others Grow Too","Pass-It-On Experiment","Has someone helped you before?",["Yes, very specifically","Yes, but long ago","I cannot think of anyone right now","I more often help others"],"We live in a world where people affect one another. Today, pass forward some support you once received.","Helping does not guarantee a particular return, but it can genuinely increase support, connection and opportunities for action.","Who has helped me before?","What did that help change?","How would I like to pass it on?",["Help someone facing a similar problem","Thank someone who helped me","Share useful experience","Give practical support to one person"]],["Who Do I Want to Become?","Future Me","One year from now, what do you hope your future self will thank today's you for doing?",["Valuing relationships more","Starting to act","Taking care of myself","Becoming more helpful"],"The goal of 21 days is not to finish learning happiness, but to discover choices worth repeating.","Life will keep changing and difficulties will not disappear. What you can take with you is noticing earlier, choosing more clearly, and acting more intentionally.","What is my biggest discovery from these 21 days?","What do I want to stop?","Which two practices will I continue for the next 30 days?",["Write a happiness life statement","Choose two 30-day habits","Thank someone who supported me","Help one person begin"]]];
 const DATA_EN=GUIDE_DAYS_EN.map((g,i)=>{const [title,game,q,choices,reveal,idea,q1,q2,q3,actions]=g;const a0=actions[0]||'Take one small constructive action';const a1=actions[1]||a0;const a2=actions[2]||a1;return {day:i+1,title,headline:idea.split('. ')[0]+(idea.includes('.')?'':'.'),lead:idea,story:`Think about a recent moment connected with today’s theme, “${title}.” ${q} You do not need to find a perfect answer. Notice what you instinctively choose and what that reveals about your current pattern.`,explain:idea,why:`This theme matters because happiness is shaped not only by what happens, but also by how quickly we notice, interpret and respond to what happens. ${reveal}`,mistake:`A common mistake is turning this practice into another reason to judge yourself. The goal is not to react perfectly. The goal is to notice the pattern earlier and make one more conscious choice.`,example:`Try this in real life today: ${a0}.`,reflections:[q1,q2],action:a0,quote:reveal,hook:q,story2:`Try a second angle: ${a1}. Then notice whether your body, emotions or relationship feel even slightly different when you respond with more awareness.`,dialogue:`Instead of reacting on autopilot, pause and ask: “What is actually happening here?”\nThen ask: “What response fits the person I want to become?”`,example2:`Another practical option is: ${a2}. Keep it small enough that you can really do it.`,resonance:`You may recognise this: you already know what you “should” do, but the old reaction happens before you have time to choose. That does not mean you learned nothing. It means this pattern needs practice inside real situations.`,painStory:`Sometimes the painful part is not a lack of knowledge. It is repeating a familiar reaction and only realising afterward that it was not what we truly wanted. Today’s theme gives you one small point where the loop can begin to change.`,turn:`Do not use today’s lesson to blame yourself or another person. ${reveal} Awareness is useful when it creates a new option, not when it becomes self-criticism.`,repair:`Choose one repair small enough to do today: ${a0}. If that still feels too large, make it smaller and more specific.`,closing:`You do not need a perfect day. One more conscious choice is already a seed.`,sourceStoryTitle:`Source-Inspired Reflection · ${title}`,sourceStory:`The source material repeatedly invites readers to examine how patterns, choices and the way we treat other people shape our experience. In this course, that idea is adapted as a practical reflection—not as a guarantee that one behaviour directly controls every outside result. For today, the useful question is: “What can I notice and practise differently?” ${idea}`,sourceNote:`Adapted from the source framework into modern practical language. External outcome claims are not presented as guarantees.`}});
@@ -1142,7 +1227,7 @@ function bzCloudToLocal(data){
  out.goal=cs.goal||'';out.whyGoal=cs.why_goal||'';out.last=Math.max(1,Math.min(21,Number(cs.last_day)||1));out.meditation=cs.meditation&&typeof cs.meditation==='object'?cs.meditation:{};
  for(const r of (data?.daily_progress||[])){
    const d=Number(r.day_number);if(!Number.isInteger(d)||d<1||d>21)continue;
-   if(r.completed)out.completed.push(d);
+   if(r.completed){out.completed.push(d);out.meditation.__dailyReturn=out.meditation.__dailyReturn||{completedAt:{}};out.meditation.__dailyReturn.completedAt=out.meditation.__dailyReturn.completedAt||{};if(!out.meditation.__dailyReturn.completedAt[d]&&(r.completed_at||r.updated_at))out.meditation.__dailyReturn.completedAt[d]=String(r.completed_at||r.updated_at).slice(0,10);}
    const ga=r.guided_answers&&typeof r.guided_answers==='object'?r.guided_answers:{};
    if(bzHasText(ga.a1)||bzHasText(ga.a2)||bzHasText(r.journal)||bzHasText(r.review)||r.updated_at){out.records[d]={a1:ga.a1||'',a2:ga.a2||'',journal:r.journal||'',review:r.review||'',date:r.updated_at||r.completed_at||''}}
    const nr=r.night_record&&typeof r.night_record==='object'?r.night_record:{};
@@ -1160,7 +1245,7 @@ function bzMergeLocalCloud(local,cloud){
    const lg=(local.guide||{})[d]||{},cg=(cloud.guide||{})[d]||{};
    if(Object.keys(lg).length||Object.keys(cg).length)out.guide[d]={ga1:bzPrefer(cg.ga1,lg.ga1),ga2:bzPrefer(cg.ga2,lg.ga2),ga3:bzPrefer(cg.ga3,lg.ga3),action:bzPrefer(cg.action,lg.action),gcustom:bzPrefer(cg.gcustom,lg.gcustom),awFact:bzPrefer(cg.awFact,lg.awFact),awThought:bzPrefer(cg.awThought,lg.awThought),awBody:bzPrefer(cg.awBody,lg.awBody),awNeed:bzPrefer(cg.awNeed,lg.awNeed),awChoice:bzPrefer(cg.awChoice,lg.awChoice),gnight1:bzPrefer(cg.gnight1,lg.gnight1),gnight2:bzPrefer(cg.gnight2,lg.gnight2),seedStatus:bzPrefer(cg.seedStatus,lg.seedStatus)};
  }
- out.meditation={...(local.meditation||{}),...(cloud.meditation||{})};out.meditation.__growth={...(local.meditation?.__growth||{}),...(cloud.meditation?.__growth||{})};return out;
+ out.meditation={...(local.meditation||{}),...(cloud.meditation||{})};out.meditation.__growth={...(local.meditation?.__growth||{}),...(cloud.meditation?.__growth||{})};out.meditation.__dailyReturn={...(local.meditation?.__dailyReturn||{}),...(cloud.meditation?.__dailyReturn||{}),completedAt:{...(local.meditation?.__dailyReturn?.completedAt||{}),...(cloud.meditation?.__dailyReturn?.completedAt||{})}};return out;
 }
 async function bzCloudCall(action,state=null){
  let session=BZXF_AUTH_STATE||bzLoadSession();if(!session?.access_token)throw new Error('No active session');
@@ -1389,7 +1474,7 @@ const BZXF_TOOL_MAP=['diary','choice','map','relationship','seed','gratitude','h
 function bzCourseMemory(s,target){const prior=(s.completed||[]).filter(d=>d<target).sort((a,b)=>b-a)[0];if(!prior)return null;const g=(s.guide||{})[prior]||{},r=(s.records||{})[prior]||{};const text=g.gnight2||g.gnight1||r.review||r.journal||r.a2||r.a1||g.ga3||g.ga2||g.ga1||'';return text?{day:prior,text}:null}
 function bzTargetDay(s){if((s.completed||[]).length>=21)return 21;for(let d=1;d<=21;d++)if(!(s.completed||[]).includes(d))return d;return Math.max(1,Math.min(21,s.last||1))}
 function bzDailyMeta(s){s.meditation=s.meditation||{};s.meditation.__dailyReturn=s.meditation.__dailyReturn||{completedAt:{}};return s.meditation.__dailyReturn}
-function bzMarkDailyCompletion(day){const s=get(),m=bzDailyMeta(s);m.completedAt=m.completedAt||{};m.completedAt[day]=new Date().toLocaleDateString('en-CA');put(s)}
+function bzMarkDailyCompletion(day){const s=get(),m=bzDailyMeta(s);m.completedAt=m.completedAt||{};if(!m.completedAt[day])m.completedAt[day]=new Date().toLocaleDateString('en-CA');put(s)}
 function renderTodayCard(){const card=document.getElementById('todayCard');if(!card)return;const s=get(),en=CURRENT_LANG==='en',n=(s.completed||[]).length,target=bzTargetDay(s),source=en?GUIDE_DAYS_EN:GUIDE_DAYS,d=source[target-1],g=(s.guide||{})[target]||{},memory=bzCourseMemory(s,target),done=n>=21;document.getElementById('todayBadge').textContent=en?'MY TODAY':'我的今天';document.getElementById('todayTitle').textContent=done?(en?'🌷 You completed 21 days. What do you want to keep?':'🌷 21天完成了，接下来要留下什么？'):(en?'🌱 Today, do only this one thing':'🌱 今天，只做这一件事');document.getElementById('todayLead').textContent=done?(en?'The course is complete, but the useful part is what you continue using in real life.':'课程完成了，但真正有用的是：哪些选择会继续留在你的生活里。'):(en?'The system remembers your progress and brings you back to the DAY that is currently unlocked.':'系统会记住你的进度，并直接带你回到目前已经解锁的 DAY。');document.getElementById('todayDayBadge').textContent=`DAY ${String(target).padStart(2,'0')} / 21`;document.getElementById('todayFocusLabel').textContent=en?'Today’s practice':'今天的练习';document.getElementById('todayFocus').textContent=done?(en?'Choose two practices from the 21 days to continue for the next 30 days.':'从21天里选两个最有帮助的练习，继续30天。'):(d?.[5]||'');document.getElementById('todayNightLabel').textContent=en?'Come back tonight':'今晚回来看看';document.getElementById('todayNight').textContent=done?(en?'Review your Day 21 reflection and your growth comparison.':'回看 DAY 21 的反思和“起点 → 现在”的变化。'):(g.gnight1||g.gnight2?(en?'Tonight’s reflection has been recorded. You can review or add to it.':'今晚的记录已经留下，你可以回来看看或补充。'):(en?'After real life happens today, come back for a 30-second reflection.':'今天真实生活发生以后，回来做30秒记录：我有没有比以前多一个选择？'));const mem=document.getElementById('todayMemory');if(memory)mem.innerHTML=`<b>${en?`DAY ${String(memory.day).padStart(2,'0')} · Something you wrote before`:`DAY ${String(memory.day).padStart(2,'0')}｜你之前写过`}</b><div class="memoryQuote">“${escHtmlV102(memory.text).slice(0,260)}${memory.text.length>260?'…':''}”</div><span>${en?'Today, you do not have to start from zero. Continue from the person who already noticed this.':'今天不用从零开始。你是在那个已经看见过自己的你上面，继续往前走。'}</span>`;else if(s.goal||s.whyGoal)mem.innerHTML=`<b>${en?'Your 21-day intention':'你一开始写下的方向'}</b><div class="memoryQuote">${escHtmlV102(s.goal||s.whyGoal)}</div><span>${en?'Let today’s action serve this direction, not another “perfect answer.”':'今天不用做到完美，只要让一个小行动继续服务这个方向。'}</span>`;else mem.innerHTML=`<b>${en?'Today’s reminder':'今天的提醒'}</b><br>${en?'You do not need to change everything. One conscious action is enough for today.':'不用一次改变很多。今天只需要一个更有意识的小选择。'}`;const next=target<21?source[target]?.[0]:'';document.getElementById('tomorrowTeaser').textContent=done?'':(en?`Tomorrow’s theme: ${next||'keep practising the next small choice'}`:`明天我们会练：${next||'继续下一个小选择'}`);document.getElementById('todayContinueBtn').textContent=done?(en?'Review DAY 21 →':'回看 DAY 21 →'):(en?'Start Today’s 5 Minutes →':'开始今天的 5 分钟 →');document.getElementById('todayNightBtn').textContent=en?'🌙 Come Back Tonight':'🌙 晚上回来记录';document.getElementById('todayToolBtn').textContent=en?'🧰 Tool for Today':'🧰 今天推荐工具';window.BZXF_TODAY_TARGET=target}
 function escHtmlV102(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
 function bzOpenToday(){const d=window.BZXF_TODAY_TARGET||bzTargetDay(get());showDay(d);setTimeout(()=>{goGuide(1);document.getElementById('guidedHost')?.scrollIntoView({behavior:'smooth',block:'start'})},50)}
@@ -3063,6 +3148,119 @@ else bzInitSeparateViews();
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init117);
   else init117();
+})();
+</script>
+
+
+<script id="bzV119StartAndCompletionDatesRuntime">
+/* ===== V10.19 — RELIABLE DAY 01 START + COMPLETION DATE DISPLAY ===== */
+(function(){
+  function bzRawCompletionDate(day){
+    const s=(typeof get==='function'?get():{})||{};
+    const meta=s.meditation?.__dailyReturn?.completedAt||{};
+    let raw=meta[day]||'';
+    if(!raw)raw=s.records?.[day]?.date||'';
+    return String(raw||'');
+  }
+  function bzFormatCompletionDate(raw){
+    raw=String(raw||'').trim();if(!raw)return '';
+    const m=raw.match(/^(\d{4})-(\d{2})-(\d{2})/);if(m)return `${m[3]}/${m[2]}/${m[1]}`;
+    const d=new Date(raw);if(Number.isNaN(d.getTime()))return raw;
+    return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+  }
+  function bzCompletionState(){
+    const s=(typeof get==='function'?get():{})||{},completed=Array.isArray(s.completed)?s.completed.map(Number):[];
+    let prefix=0;for(let d=1;d<=21;d++){if(completed.includes(d))prefix=d;else break}
+    return {s,completed,prefix,next:Math.min(21,prefix+1)};
+  }
+  function bzDayStatus(day){
+    const en=CURRENT_LANG==='en',st=bzCompletionState(),done=st.completed.includes(day),date=bzFormatCompletionDate(bzRawCompletionDate(day));
+    if(done)return {cls:'done',text:date?(en?`${date} · Completed`:`${date} 已完成`):(en?'Completed · date not recorded':'已完成 · 日期未记录')};
+    if(day===st.prefix+1)return {cls:'next',text:en?'🔓 Unlocked · Not completed':'🔓 已解锁 · 尚未完成'};
+    return {cls:'locked',text:en?'🔒 Locked':'🔒 尚未解锁'};
+  }
+  function bzRowsHtml(){
+    let html='';for(let d=1;d<=21;d++){const x=bzDayStatus(d);html+=`<div class="bzDayDateRow ${x.cls}"><b>DAY ${String(d).padStart(2,'0')}</b><span>${x.text}</span></div>`}return html;
+  }
+  function bzEnsureDailyDateCard(){
+    const days=document.getElementById('days');if(!days)return null;
+    let card=document.getElementById('bzDayDateCard');if(!card){card=document.createElement('details');card.id='bzDayDateCard';card.className='bzDayDateCard';card.innerHTML=`<summary id="bzDayDateSummary">📅 DAY 进度与完成日期</summary><div class="bzDayDateList" id="bzDayDateList"></div>`;days.insertAdjacentElement('afterend',card)}return card;
+  }
+  function bzEnsureGrowthLearning(){
+    const extras=document.getElementById('courseGrowthExtras');if(!extras)return null;
+    let card=document.getElementById('bzGrowthLearningRecords');if(!card){card=document.createElement('section');card.id='bzGrowthLearningRecords';card.className='sideSection bzGrowthLearning';card.innerHTML=`<h3 id="bzGrowthLearningTitle">📅 学习记录｜DAY 01–21</h3><p id="bzGrowthLearningLead">系统会自动记录每个 DAY 第一次完成的日期；不需要自己填写。</p><div class="bzGrowthLearningGrid" id="bzGrowthLearningGrid"></div>`;extras.appendChild(card)}return card;
+  }
+  function bzRenderCompletionDates(){
+    const en=CURRENT_LANG==='en';
+    bzEnsureDailyDateCard();bzEnsureGrowthLearning();
+    const sum=document.getElementById('bzDayDateSummary');if(sum)sum.textContent=en?'📅 DAY Progress & Completion Dates':'📅 DAY 进度与完成日期';
+    const list=document.getElementById('bzDayDateList');if(list)list.innerHTML=bzRowsHtml();
+    const title=document.getElementById('bzGrowthLearningTitle');if(title)title.textContent=en?'📅 Learning Record · DAY 01–21':'📅 学习记录｜DAY 01–21';
+    const lead=document.getElementById('bzGrowthLearningLead');if(lead)lead.textContent=en?'Completion dates are recorded automatically the first time each DAY is completed. You do not need to enter dates yourself.':'系统会自动记录每个 DAY 第一次完成的日期；不需要自己填写。';
+    const grid=document.getElementById('bzGrowthLearningGrid');if(grid)grid.innerHTML=bzRowsHtml();
+    const intro=document.querySelector('#guidedHost .guidedIntro');
+    if(intro){let line=intro.querySelector('.bzCurrentDayDate');if(!line){line=document.createElement('div');line.className='bzCurrentDayDate';intro.appendChild(line)}const x=bzDayStatus(Number(cur)||1);line.textContent=`DAY ${String(Number(cur)||1).padStart(2,'0')}｜${x.text}`}
+  }
+  window.bzRenderCompletionDates=bzRenderCompletionDates;
+
+  function bzStartDay01FromGuide(){
+    if(typeof bzHasRequiredGoal==='function'&&!bzHasRequiredGoal()){if(typeof bzRequireGoal==='function')return bzRequireGoal();return false}
+    document.getElementById('start')?.classList.remove('show');
+    if(typeof bzSetCategoryView==='function')bzSetCategoryView('daily',{scroll:false});
+    const ok=(typeof showDay==='function')?showDay(1):false;
+    setTimeout(()=>{
+      if(!document.querySelector('#guidedHost .guidedWrap')&&typeof renderGuide==='function')renderGuide(1);
+      if(typeof goGuide==='function')goGuide(1);
+      document.getElementById('guidedHost')?.scrollIntoView({behavior:'smooth',block:'start'});
+      bzRenderCompletionDates();
+    },80);
+    return ok!==false;
+  }
+  window.bzStartDay01FromGuide=bzStartDay01FromGuide;
+
+  function bzBindStartDayButton(){
+    const btn=document.getElementById('bzStartDay1Btn')||[...document.querySelectorAll('#start .guideBlock .btn')].find(b=>/DAY\s*01/i.test(b.textContent||''));
+    if(!btn)return;btn.onclick=bzStartDay01FromGuide;
+  }
+  window.bzBindStartDayButton=bzBindStartDayButton;
+
+  // If Today’s Core is opened before a DAY has rendered, always render the first currently unlocked DAY.
+  if(typeof bzCourseCategory==='function'){
+    const oldCategory=bzCourseCategory;
+    bzCourseCategory=function(key){
+      const out=oldCategory(key);
+      if(key==='daily')setTimeout(()=>{
+        if(!document.querySelector('#guidedHost .guidedWrap')){
+          const st=bzCompletionState();const target=Math.min(21,st.prefix+1);if(typeof showDay==='function')showDay(target||1);
+        }
+        bzRenderCompletionDates();
+      },30);
+      return out;
+    };
+    window.bzCourseCategory=bzCourseCategory;
+  }
+
+  if(typeof bzPrepareFirstUseGuide==='function'){
+    const oldPrepare=bzPrepareFirstUseGuide;bzPrepareFirstUseGuide=function(){const out=oldPrepare();bzBindStartDayButton();return out};window.bzPrepareFirstUseGuide=bzPrepareFirstUseGuide;
+  }
+  if(typeof showDay==='function'){
+    const oldShowDay=showDay;showDay=function(n){const out=oldShowDay(n);setTimeout(()=>{bzBindStartDayButton();bzRenderCompletionDates()},0);return out};window.showDay=showDay;
+  }
+  if(typeof completeDay==='function'){
+    const oldCompleteDay=completeDay;completeDay=function(){const d=Number(cur)||1,was=(get().completed||[]).includes(d);const out=oldCompleteDay();if(!was&&typeof bzMarkDailyCompletion==='function')bzMarkDailyCompletion(d);setTimeout(bzRenderCompletionDates,0);return out};window.completeDay=completeDay;
+  }
+  if(typeof renderSide==='function'){
+    const oldRenderSide=renderSide;renderSide=function(){const out=oldRenderSide();setTimeout(bzRenderCompletionDates,0);return out};window.renderSide=renderSide;
+  }
+  if(typeof renderGrowthDashboard==='function'){
+    const oldGrowth=renderGrowthDashboard;renderGrowthDashboard=function(){const out=oldGrowth();setTimeout(bzRenderCompletionDates,0);return out};window.renderGrowthDashboard=renderGrowthDashboard;
+  }
+  if(typeof setLang==='function'){
+    const oldSetLang=setLang;setLang=function(lang){const out=oldSetLang(lang);setTimeout(()=>{bzBindStartDayButton();bzRenderCompletionDates()},0);return out};window.setLang=setLang;
+  }
+
+  function init119(){bzBindStartDayButton();bzRenderCompletionDates();setTimeout(()=>{bzBindStartDayButton();bzRenderCompletionDates()},180)}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init119);else init119();
 })();
 </script>
 
