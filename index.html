@@ -3673,95 +3673,174 @@ else bzInitSeparateViews();
 </script>
 
 
-<script id="bzV126GrowthCourseDataLanguageFix">
-/* ===== V10.26 — MY GROWTH / COURSE DATA BILINGUAL SYNC =====
-   The desktop course-data card is physically moved out of the DAY sidebar into
-   My Growth. Earlier language switching rebuilt the sidebar, but did not update
-   the already-moved card, leaving Chinese text visible in English mode. */
+
+<style id="bzV125GrowthPanelRestoreStyles">
+/* ===== V10.25 — RESTORE MY COURSE DATA + FULL ENGLISH GROWTH VIEW ===== */
+#courseGrowthExtras{align-items:start}
+#bzGrowthCourseDataPanel{
+  display:block!important;
+  margin:0;
+  padding:18px;
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:var(--paper);
+}
+#bzGrowthCourseDataPanel h3{margin:0 0 8px;color:var(--g);font-size:21px}
+#bzGrowthCourseDataPanel .bzGrowthDataLead{margin:0 0 12px;line-height:1.65;color:#68736b}
+#bzGrowthCourseDataPanel .bzGrowthDataStatus{margin:12px 0;line-height:1.6;color:#56635b;font-size:13px}
+#bzGrowthCourseDataPanel .bzGrowthPrivacy{margin-top:12px;padding:12px;border-radius:14px;background:#edf4ea;line-height:1.6;font-size:12px;color:#46584b}
+#bzGrowthCourseDataPanel .btn,#bzGrowthCourseDataPanel .bzGrowthRestoreLabel{width:100%;text-align:center;margin-top:8px}
+#bzGrowthCourseDataPanel .bzGrowthRestoreLabel{display:block;cursor:pointer}
+#courseGrowthExtras>#courseDataDesktop{display:none!important}
+#bzGrowthLearningRecords{grid-column:1/-1}
+@media(max-width:760px){#bzGrowthLearningRecords{grid-column:auto}}
+</style>
+<script id="bzV125GrowthPanelRestoreRuntime">
 (function(){
-  function visibleGrowthDataPanel(){
+  function bzGrowthStageLabel(n,en){
+    n=Number(n)||0;
+    if(en){
+      if(n===0)return 'Ready to plant';
+      if(n<=2)return '🌰 Seed · Days 1–2';
+      if(n<=7)return '🌱 Sprouting · Days 3–7';
+      if(n<=15)return '🌿 Growing · Days 8–15';
+      if(n<=20)return '🪻 Budding · Days 16–20';
+      return '🌷 Blooming · Day 21';
+    }
+    if(n===0)return '准备播种';
+    if(n<=2)return '🌰 种子｜1–2天';
+    if(n<=7)return '🌱 发芽｜3–7天';
+    if(n<=15)return '🌿 成长｜8–15天';
+    if(n<=20)return '🪻 花苞｜16–20天';
+    return '🌷 开花｜21天';
+  }
+
+  function bzGrowthDataCopy(){
+    const en=window.CURRENT_LANG==='en';
+    return en?{
+      title:'💾 My Course Data',
+      lead:'Member learning records sync automatically to your cloud account. You can also download a backup regularly as an extra safeguard.',
+      backup:'⬇️ Back Up My Learning Records',
+      restore:'⬆️ Restore Learning Records',
+      privacy:'🔒 Privacy: Signed-in members’ learning records sync to their own cloud account and a local copy is kept on this device. Records are not automatically shared with other learners.',
+      clear:'🧹 Clear My Learning Records (Device + Cloud)',
+      current:(done,records)=>`Current: ${done}/21 days completed · ${records} daily records saved`
+    }:{
+      title:'💾 我的课程资料',
+      lead:'会员学习记录会自动同步到自己的云端账号；你也可以定期下载备份，作为额外保障。',
+      backup:'⬇️ 备份我的学习记录',
+      restore:'⬆️ 恢复学习记录',
+      privacy:'🔒 隐私说明：登录会员的学习记录会同步到自己的云端账号，并保留本机副本；不会自动与其他学员共享。',
+      clear:'🧹 清除我的学习记录（本机 + 云端）',
+      current:(done,records)=>`目前：完成 ${done}/21 天｜已保存 ${records} 天记录`
+    };
+  }
+
+  function bzGrowthCounts(){
+    let s={};
+    try{s=typeof get==='function'?(get()||{}):{}}catch(e){}
+    const completed=Array.isArray(s.completed)?s.completed.length:0;
+    const records=s.records&&typeof s.records==='object'?Object.keys(s.records).length:0;
+    return {completed,records};
+  }
+
+  function bzEnsureGrowthCourseData(){
+    if(typeof bzPrepareCategoryLayout==='function')bzPrepareCategoryLayout();
     const extras=document.getElementById('courseGrowthExtras');
-    if(extras){
-      const panels=[...extras.querySelectorAll('.sideSection')];
-      const hit=panels.find(p=>p.querySelector('button[onclick*="exportData"]') || p.querySelector('input[type="file"][onchange*="restoreData"]'));
-      if(hit)return hit;
+    if(!extras)return null;
+    let panel=document.getElementById('bzGrowthCourseDataPanel');
+    if(!panel){
+      panel=document.createElement('section');
+      panel.id='bzGrowthCourseDataPanel';
+      const garden=document.getElementById('courseGrowthGardenPanel');
+      if(garden&&garden.parentElement===extras)garden.insertAdjacentElement('afterend',panel);
+      else extras.prepend(panel);
     }
-    const all=[...document.querySelectorAll('[id="courseDataDesktop"]')];
-    return all.find(el=>el.offsetParent!==null) || all[0] || null;
+    return panel;
   }
 
-  function setLabelTextKeepingInput(label,text){
-    if(!label)return;
-    let span=label.querySelector('[data-bz-restore-text]');
-    if(!span){
-      const input=label.querySelector('input');
-      span=document.createElement('span');
-      span.setAttribute('data-bz-restore-text','1');
-      // Remove only text nodes so the file input stays intact.
-      [...label.childNodes].forEach(n=>{if(n.nodeType===Node.TEXT_NODE)n.remove()});
-      if(input)label.insertBefore(span,input); else label.appendChild(span);
-    }
-    span.textContent=text;
-  }
-
-  function renderGrowthCourseDataLanguage(){
-    const panel=visibleGrowthDataPanel();
+  function bzRenderGrowthCourseData(){
+    const panel=bzEnsureGrowthCourseData();
     if(!panel)return;
-    const en=(window.CURRENT_LANG||'zh')==='en';
-    const title=panel.querySelector('h3');
-    const lead=panel.querySelector('p.status');
-    const exportBtn=panel.querySelector('button[onclick*="exportData"]');
-    const restoreLabel=panel.querySelector('label');
-    const privacy=panel.querySelector('.callout');
-    const clearBtn=panel.querySelector('button[onclick*="clearLocalData"]');
-    const info=panel.querySelector('#backupInfo');
-
-    if(title)title.textContent=en?'💾 My Course Data':'💾 我的课程资料';
-    if(lead)lead.textContent=en
-      ?'Member learning records sync automatically to your cloud account. You can also download a backup regularly as an extra safeguard.'
-      :'会员学习记录会自动同步到云端账号；你也可以定期下载备份，作为额外保障。';
-    if(exportBtn)exportBtn.textContent=en?'⬇️ Back Up My Learning Records':'⬇️ 备份我的学习记录';
-    setLabelTextKeepingInput(restoreLabel,en?'⬆️ Restore Learning Records':'⬆️ 恢复学习记录');
-    if(privacy)privacy.innerHTML=en
-      ?'🔒 <b>Privacy:</b> Signed-in members’ learning records sync to their own cloud account and a local copy is kept on this device. They are not automatically shared with other participants.'
-      :'🔒 <b>隐私说明：</b>登录会员的学习记录会同步到自己的云端账号，并保留本机副本；不会自动与其他学员共享。';
-    if(clearBtn)clearBtn.textContent=en?'🧹 Clear My Learning Records (Device + Cloud)':'🧹 清除我的学习记录（本机 + 云端）';
-
-    if(info && typeof get==='function'){
-      const s=get();
-      const days=Array.isArray(s.completed)?s.completed.length:0;
-      const records=Object.keys(s.records||{}).length;
-      info.textContent=en
-        ?`Current: ${days}/21 days completed · ${records} daily records saved`
-        :`目前：完成 ${days}/21 天｜已保存 ${records} 天记录`;
-    }
+    const c=bzGrowthDataCopy();
+    const count=bzGrowthCounts();
+    panel.innerHTML=`
+      <h3>${c.title}</h3>
+      <p class="bzGrowthDataLead">${c.lead}</p>
+      <button class="btn soft" type="button" onclick="exportData()">${c.backup}</button>
+      <label class="btn soft bzGrowthRestoreLabel">${c.restore}<input id="bzGrowthRestoreFile" type="file" accept=".json,application/json" style="display:none"></label>
+      <div class="bzGrowthDataStatus">${c.current(count.completed,count.records)}</div>
+      <div class="bzGrowthPrivacy">${c.privacy}</div>
+      <button class="btn soft" type="button" id="bzGrowthClearBtn" style="background:#f8e7e3;color:#8a3c32">${c.clear}</button>`;
+    const input=panel.querySelector('#bzGrowthRestoreFile');
+    if(input)input.onchange=function(ev){
+      if(typeof restoreData==='function')restoreData(ev);
+      setTimeout(bzRenderGrowthSupportPanels,250);
+      setTimeout(bzRenderGrowthSupportPanels,900);
+    };
+    const clear=panel.querySelector('#bzGrowthClearBtn');
+    if(clear)clear.onclick=function(){
+      if(typeof clearLocalData==='function')clearLocalData();
+      setTimeout(bzRenderGrowthSupportPanels,250);
+      setTimeout(bzRenderGrowthSupportPanels,900);
+    };
   }
-  window.bzRenderGrowthCourseDataLanguage=renderGrowthCourseDataLanguage;
 
-  if(typeof window.setLang==='function'){
-    const previousSetLang=window.setLang;
-    window.setLang=function(lang){
-      const out=previousSetLang(lang);
-      setTimeout(renderGrowthCourseDataLanguage,0);
-      setTimeout(renderGrowthCourseDataLanguage,80);
+  function bzFixGrowthEnglishStage(){
+    let s={};try{s=typeof get==='function'?(get()||{}):{}}catch(e){}
+    const n=Array.isArray(s.completed)?s.completed.length:0;
+    const el=document.getElementById('growthStageDisplay');
+    if(el)el.textContent=bzGrowthStageLabel(n,window.CURRENT_LANG==='en');
+  }
+
+  function bzRenderGrowthSupportPanels(){
+    if(typeof bzRenderGrowthGardenPanel==='function')bzRenderGrowthGardenPanel();
+    bzFixGrowthEnglishStage();
+    bzRenderGrowthCourseData();
+    if(typeof bzRenderCompletionDates==='function')bzRenderCompletionDates();
+  }
+  window.bzRenderGrowthSupportPanels=bzRenderGrowthSupportPanels;
+
+  // Re-render after every language switch because older code can rebuild the sidebar DOM.
+  if(typeof setLang==='function'){
+    const oldSetLang=setLang;
+    setLang=function(lang){
+      const out=oldSetLang(lang);
+      setTimeout(bzRenderGrowthSupportPanels,0);
+      setTimeout(bzRenderGrowthSupportPanels,120);
       return out;
     };
-    setLang=window.setLang;
+    window.setLang=setLang;
   }
 
-  if(typeof window.bzSetCategoryView==='function'){
-    const previousCategory=window.bzSetCategoryView;
-    window.bzSetCategoryView=function(key,options){
-      const out=previousCategory(key,options);
-      if(key==='growth')setTimeout(renderGrowthCourseDataLanguage,0);
+  // Re-render whenever My Growth is opened.
+  if(typeof bzSetCategoryView==='function'){
+    const oldView=bzSetCategoryView;
+    bzSetCategoryView=function(key,opts={}){
+      const out=oldView(key,opts);
+      if(key==='growth')setTimeout(bzRenderGrowthSupportPanels,0);
       return out;
     };
-    bzSetCategoryView=window.bzSetCategoryView;
+    window.bzSetCategoryView=bzSetCategoryView;
+  }
+  if(typeof bzCourseCategory==='function'){
+    const oldCat=bzCourseCategory;
+    bzCourseCategory=function(key){
+      const out=oldCat(key);
+      if(key==='growth')setTimeout(bzRenderGrowthSupportPanels,0);
+      return out;
+    };
+    window.bzCourseCategory=bzCourseCategory;
   }
 
-  function init(){setTimeout(renderGrowthCourseDataLanguage,0);setTimeout(renderGrowthCourseDataLanguage,120)}
+  if(typeof renderSide==='function'){
+    const oldRenderSide=renderSide;
+    renderSide=function(){const out=oldRenderSide();setTimeout(bzRenderGrowthSupportPanels,0);return out};
+    window.renderSide=renderSide;
+  }
+
+  const init=()=>setTimeout(bzRenderGrowthSupportPanels,50);
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
-
 </body></html>
