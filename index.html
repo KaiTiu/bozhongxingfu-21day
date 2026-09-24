@@ -475,6 +475,17 @@ section.course{scroll-margin-top:12px}
 <!-- V10.20 Word-request fixes: unique STEP 1 feedback for all DAY 01–21; English lesson stories/content faithfully translated from Chinese DATA. -->
 <!-- V10.25: verified current toolbox guide is integrated; /tools/ external guide dependency removed -->
 <!-- V10.26: Happiness Companion entry remains permanently visible even when saved records exist -->
+
+<style id="bzV127DailyGrowthOnlyStyles">
+/* ===== V10.27 — TODAY'S CORE CLEANUP =====
+   Happiness Garden and My Course Data belong only to My Growth.
+   Keep the DAY 01–21 selector in Today's Core, but hide legacy sidebar copies. */
+#mainApp .layout > .side > .sideSection{display:none!important}
+/* If older language/runtime code recreates the legacy blocks, keep them hidden in the daily sidebar. */
+#mainApp .layout > .side > #courseDataDesktop{display:none!important}
+#mainApp .layout > .side > .sideSection:has(#garden),
+#mainApp .layout > .side > .sideSection:has(#stage){display:none!important}
+</style>
 </head><!-- V10.8.9: all course -> toolbox entries land on #welcome; recommended tool no longer uses ?tool= -->
 <body>
 <!-- V10.3.2 visual fix: DAY title in guidedIntro forced white for readability -->
