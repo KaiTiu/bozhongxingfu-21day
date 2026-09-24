@@ -220,6 +220,39 @@ section.course{scroll-margin-top:12px}
 @media(max-width:560px){.courseCategoryGrid{grid-template-columns:1fr}.courseCategoryBtn:last-child{grid-column:auto}.courseCategoryBtn{min-height:auto}.courseGroupQuick{display:grid}.courseGroupQuick .btn{width:100%}}
 </style>
 
+
+<style id="bzV112SeparateCategoryViews">
+/* ===== V10.12 — TRUE 5-CATEGORY VIEWS =====
+   Each category shows only its own materials. Course lesson content is unchanged. */
+.courseCategoryBtn.active{
+  background:var(--g);
+  border-color:var(--g);
+  box-shadow:0 8px 20px rgba(49,84,61,.12);
+}
+.courseCategoryBtn.active b,.courseCategoryBtn.active span{color:#fff}
+#courseGrowthExtras{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:14px;
+  margin:14px 0 18px;
+}
+#courseGrowthExtras>.sideSection{
+  margin:0;
+  padding:18px;
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:var(--paper);
+}
+#courseGrowthExtras #courseDataDesktop{display:block!important}
+#courseAppendixContent{margin-top:14px}
+#mobileBottomResources,#mobileCourseData{display:none!important}
+.mainApp .topResourceBtn{display:none!important}
+@media(max-width:760px){
+  #courseGrowthExtras{grid-template-columns:1fr}
+  #courseGrowthExtras #courseDataDesktop{display:block!important}
+}
+</style>
+
 </head><!-- V10.8.9: all course -> toolbox entries land on #welcome; recommended tool no longer uses ?tool= -->
 <body>
 <!-- V10.3.2 visual fix: DAY title in guidedIntro forced white for readability -->
@@ -1619,6 +1652,283 @@ window.bzOpenStartFromCategory=bzOpenStartFromCategory;
 window.bzScrollGrowthExtra=bzScrollGrowthExtra;
 window.bzScrollToId=bzScrollToId;
 setTimeout(bzRenderCourseCategories,0);
+</script>
+
+
+<script id="bzV112SeparateCategoryRuntime">
+/* ===== V10.12 — VARIABLE STEP-2 FEEDBACK + TRUE CATEGORY VIEWS ===== */
+
+// 1) FREE EXPERIENCE · STEP 2:
+// Every answer now receives a different reflection, for every Step-1 persona.
+const BZXF_SCENARIO_FEEDBACK={
+  zh:[
+    [
+      '你很自然地把“空出来的时间”再次变成任务时间。这个选择常见于长期处在责任模式的人：不是不会休息，而是一停下来就会觉得还有事情没做。可以先练习把很小的一段空白留给自己，而不是马上填满。',
+      '你可能真的想休息，只是手机让大脑用最快的方式暂时离开疲惫。问题不在于“不能滑手机”，而是30分钟过去以后，你未必真的恢复了。下次可以先问自己：我现在需要的是娱乐、休息，还是安静？',
+      '你的大脑很习惯提前处理下一件事，所以连空档也会自动变成规划时间。这说明“继续向前”可能已经成为惯性。练习不是停止上进，而是在规划之前，先确认这一刻是否也值得被好好使用。',
+      '你先暂停、看见自己的状态，再决定这30分钟给什么。这不是浪费时间，而是在把“自动填满”变成“我自己选择”。这正是本练习要培养的能力。'
+    ],
+    [
+      '你很在乎对方，所以第一反应是赶快帮他解决问题。善意是真的，只是有时候建议来得太快，对方还没来得及感觉“我被听见了”。下次可以先问一句：你现在想让我听，还是一起想办法？',
+      '你可能想让对方知道“你不是一个人辛苦”，但“大家都很累”也可能让他的感受被缩小。练习不是不能分享自己的辛苦，而是先让对方这一刻的感受被接住。',
+      '你可能是在给空间，也可能是不知道该怎样回应，所以先保持沉默。不过继续看手机容易让对方把“空间”理解成“不在意”。一个很小的改变，是先抬头看他，再说：如果你想讲，我在这里。',
+      '你没有马上猜测对方需要什么，而是先确认他想被倾听还是需要建议。这个动作让关心变得更贴近对方真正的需要，也为双方多创造一个选择。'
+    ],
+    [
+      '你的注意力很快落在“我还没到那里”的差距上。比较于是从观察别人，变成对自己的评判。下次不必逼自己马上正面，只要多问一句：他的成就提醒了我真正重视什么？',
+      '当你不断把自己的条件、速度和成果与对方逐项比较，比较就很容易变成一张永远算不完的计分表。可以试着把问题改成：我自己的下一步是什么，而不是我跟他差多少。',
+      '把对方的成就说成“没什么特别”，有时是在保护自己不舒服的感觉。它能让情绪暂时降低，却没有真正处理触发点。更有帮助的是承认：我有点被触发了，然后看看这份在意想告诉我什么。',
+      '你先承认自己被触发，再把比较转换成“我重视什么、我的下一步是什么”。这样比较就不再只是攻击自己，而开始变成方向。'
+    ],
+    [
+      '马上替自己的反应找理由，会让当下比较容易受，但也可能让旧模式继续躲起来。练习不是否定你的理由，而是在解释之前先问：我刚才真正发生了什么？',
+      '你已经在事后看见“我又照旧反应了”。虽然觉察来得比较晚，它仍然是改变的起点。下一次的目标不用是完美，只要把看见旧模式的时间提早一点点。',
+      '逃开可以暂时降低压力，却也让你少了一次练习新回应的机会。如果情况是安全的，可以把挑战缩小：不必马上解决，只先留下来10秒，做一个和过去不同的小动作。',
+      '你认出旧模式、暂停，再改变一个小动作。这就是“知道”开始变成“做到”的关键桥梁：不是一次彻底改变，而是在真实触发里早一点多出选择。'
+    ]
+  ],
+  en:[
+    [
+      'You naturally turn unexpected free time back into task time. This is common when responsibility has been “on” for a long time: stopping can feel uncomfortable because there is always more to do. The practice is to protect a very small piece of empty space before automatically filling it.',
+      'You may genuinely want a break, while your phone gives your brain the fastest escape from fatigue. The issue is not that scrolling is “bad”; it is that 30 minutes later you may not feel restored. Next time, ask first: do I need entertainment, rest, or quiet?',
+      'Your mind is used to preparing for the next thing, so even free space turns into planning. “Keep moving” may have become automatic. The practice is not to lose ambition, but to check whether this moment also deserves to be lived before planning the next one.',
+      'You pause, notice your state, and then decide what the 30 minutes are for. That is not wasting time. It turns “automatically filling the gap” into “I choose,” which is exactly the skill this exercise is building.'
+    ],
+    [
+      'You care, so your first impulse is to solve the problem quickly. The intention is kind, but advice can arrive before the other person feels heard. A useful next step is to ask: “Do you want me to listen, or think of solutions with you?”',
+      'You may be trying to say, “You are not the only one struggling,” but “everyone is tired” can also make the person’s experience feel smaller. The practice is not to hide your own fatigue; it is to let their feeling land first.',
+      'You may be giving space, or you may simply not know what to say. Continuing to look at the phone can easily be read as disinterest. One small change is to look up first and say: “If you want to talk, I’m here.”',
+      'You do not assume what the person needs. You first check whether they want listening or problem-solving. That makes your care fit the person more closely and gives both of you another choice.'
+    ],
+    [
+      'Your attention quickly lands on the gap: “Why am I not there yet?” Comparison then shifts from observing someone else to judging yourself. You do not have to force positivity; simply add one question: what does their achievement reveal that I genuinely value?',
+      'When you compare your circumstances, speed and results point by point, comparison becomes an endless scoreboard. Try changing the question from “How far behind am I?” to “What is my own next step?”',
+      'Calling the achievement “nothing special” can protect you from an uncomfortable feeling for a moment, but it does not resolve the trigger. A more useful response is: “I notice this affects me—what is this reaction trying to tell me?”',
+      'You notice the trigger and turn comparison into information: what matters to me, and what is my next step? Comparison starts becoming direction instead of self-attack.'
+    ],
+    [
+      'Quickly justifying your reaction may reduce discomfort, but it can also keep the old pattern hidden. The practice is not to deny your reasons; it is to ask before explaining: what actually happened inside me just now?',
+      'You already notice afterward that you reacted the old way. The awareness came late, but it is still the beginning of change. The next goal does not need to be perfection—only to notice the pattern a little earlier next time.',
+      'Avoiding the situation can lower pressure temporarily, but it also removes a chance to practise a new response. If the situation is safe, make the challenge smaller: you do not need to solve it; stay for ten seconds and change just one small action.',
+      'You recognise the old pattern, pause, and change one small action. That is the bridge from knowing to doing: not changing everything at once, but creating a choice earlier inside a real trigger.'
+    ]
+  ]
+};
+
+function bzScenarioPainIndex(){
+  if(FREE_PAIN!=null)return Number(FREE_PAIN);
+  const raw=localStorage.getItem('bzxf_trial_pain');
+  return raw===''||raw==null?null:Number(raw);
+}
+function bzScenarioText(choice){
+  const lang=CURRENT_LANG==='en'?'en':'zh';
+  const pain=bzScenarioPainIndex();
+  return (pain!=null&&BZXF_SCENARIO_FEEDBACK[lang]?.[pain]?.[choice])
+    || (bzFreePersona()?.[choice===bzFreePersona()?.best?'good':'learn'])
+    || tr(choice===3?'scenarioGood':'scenarioLearn');
+}
+function bzRenderScenarioFeedback(choice){
+  const f=document.getElementById('scenarioFeedback');
+  if(!f||choice==null)return;
+  f.innerHTML='';
+  const head=document.createElement('b');
+  head.textContent='🪞 '+tr('awareMoment');
+  f.appendChild(head);
+  f.appendChild(document.createElement('br'));
+  f.appendChild(document.createTextNode(bzScenarioText(Number(choice))));
+  f.style.display='block';
+}
+chooseScenario=function(btn,i){
+  FREE_SCENARIO=i;
+  document.querySelectorAll('#scenarioOptions .freeOption').forEach(x=>x.classList.remove('chosen'));
+  btn.classList.add('chosen');
+  bzRenderScenarioFeedback(i);
+  document.getElementById('scenarioNext').disabled=false;
+};
+
+// 2) TRUE 5-CATEGORY COURSE VIEWS.
+let BZXF_ACTIVE_CATEGORY='home';
+let BZXF_CATEGORY_PREPARED=false;
+
+function bzPrepareCategoryLayout(){
+  if(BZXF_CATEGORY_PREPARED)return;
+  const main=document.getElementById('mainApp');
+  if(!main)return;
+
+  // Move growth-only items out of the DAY 01–21 sidebar.
+  const growthCard=document.getElementById('growthCard');
+  let growthExtras=document.getElementById('courseGrowthExtras');
+  if(!growthExtras){
+    growthExtras=document.createElement('section');
+    growthExtras.id='courseGrowthExtras';
+    if(growthCard)growthCard.insertAdjacentElement('afterend',growthExtras);
+  }
+  const garden=document.getElementById('garden');
+  const gardenSection=garden?.closest('.sideSection');
+  const courseData=document.getElementById('courseDataDesktop');
+  if(gardenSection&&gardenSection.parentElement!==growthExtras)growthExtras.appendChild(gardenSection);
+  if(courseData&&courseData.parentElement!==growthExtras)growthExtras.appendChild(courseData);
+
+  // Move both appendices into their own category content area.
+  const appendixDirectory=document.getElementById('courseAppendixDirectory');
+  let appendixContent=document.getElementById('courseAppendixContent');
+  if(!appendixContent){
+    appendixContent=document.createElement('section');
+    appendixContent.id='courseAppendixContent';
+    if(appendixDirectory)appendixDirectory.insertAdjacentElement('afterend',appendixContent);
+  }
+  const business=document.getElementById('businessPage');
+  const meditation=document.getElementById('meditationPage');
+  if(business&&business.parentElement!==appendixContent)appendixContent.appendChild(business);
+  if(meditation&&meditation.parentElement!==appendixContent)appendixContent.appendChild(meditation);
+
+  // The 5-category menu replaces these duplicate mobile resource blocks.
+  document.getElementById('mobileBottomResources')?.style.setProperty('display','none','important');
+  document.getElementById('mobileCourseData')?.style.setProperty('display','none','important');
+
+  const keys=['home','daily','tools','growth','appendix'];
+  document.querySelectorAll('.courseCategoryBtn').forEach((btn,i)=>{
+    if(keys[i])btn.dataset.category=keys[i];
+  });
+
+  BZXF_CATEGORY_PREPARED=true;
+}
+
+function bzCategoryNodes(){
+  const main=document.getElementById('mainApp');
+  const layout=main?.querySelector(':scope > .layout');
+  return {
+    hero:main?.querySelector(':scope > .hero'),
+    menu:document.getElementById('courseCategoryMenu'),
+    home:[document.getElementById('courseHomeAnchor'),document.getElementById('todayCard'),document.getElementById('start')],
+    daily:[document.getElementById('courseDailyAnchor'),layout],
+    growth:[document.getElementById('courseGrowthAnchor'),document.getElementById('growthCard'),document.getElementById('courseGrowthExtras')],
+    appendix:[document.getElementById('courseAppendixDirectory'),document.getElementById('courseAppendixContent')]
+  };
+}
+function bzDisplay(el,on){
+  if(!el)return;
+  el.style.display=on?'':'none';
+}
+function bzCategoryTop(){
+  const menu=document.getElementById('courseCategoryMenu');
+  if(!menu)return 0;
+  return Math.max(0,menu.getBoundingClientRect().top+window.pageYOffset-68);
+}
+function bzSetCategoryView(key,{scroll=true,keepAppendixSelection=false}={}){
+  bzPrepareCategoryLayout();
+  if(key==='tools'){openToolboxWithReturn(null);return}
+  if(!['home','daily','growth','appendix'].includes(key))key='home';
+  BZXF_ACTIVE_CATEGORY=key;
+
+  const n=bzCategoryNodes();
+  bzDisplay(n.hero,key==='home');
+  bzDisplay(n.menu,true);
+  ['home','daily','growth','appendix'].forEach(group=>{
+    (n[group]||[]).forEach(el=>bzDisplay(el,group===key));
+  });
+
+  // Mobile duplicate blocks remain hidden; the real data now lives in My Growth.
+  bzDisplay(document.getElementById('mobileBottomResources'),false);
+  bzDisplay(document.getElementById('mobileCourseData'),false);
+
+  // DAY view contains only DAY 01–21 content; growth-only sidebar blocks were moved out.
+  if(key==='daily'){
+    document.getElementById('meditationPage')?.classList.remove('show');
+    document.getElementById('businessPage')?.classList.remove('show');
+  }
+
+  // Entering the appendix category shows only the appendix directory first.
+  if(key==='appendix'){
+    const meditation=document.getElementById('meditationPage');
+    const business=document.getElementById('businessPage');
+    const hasSelected=!!(meditation?.classList.contains('show')||business?.classList.contains('show'));
+    if(!keepAppendixSelection){
+      meditation?.classList.remove('show');
+      business?.classList.remove('show');
+      bzDisplay(document.getElementById('courseAppendixDirectory'),true);
+    }else{
+      bzDisplay(document.getElementById('courseAppendixDirectory'),!hasSelected);
+    }
+  }
+
+  document.querySelectorAll('.courseCategoryBtn').forEach(btn=>{
+    btn.classList.toggle('active',btn.dataset.category===key);
+  });
+
+  if(scroll){
+    requestAnimationFrame(()=>window.scrollTo({top:bzCategoryTop(),behavior:'smooth'}));
+  }
+}
+function bzCourseCategory(key){
+  bzSetCategoryView(key,{scroll:true});
+}
+
+function bzShowAppendixPage(which){
+  if(typeof bzHasRequiredGoal==='function'&&!bzHasRequiredGoal()){
+    if(typeof bzRequireGoal==='function')return bzRequireGoal();
+    return;
+  }
+  bzSetCategoryView('appendix',{scroll:false,keepAppendixSelection:true});
+  const directory=document.getElementById('courseAppendixDirectory');
+  const business=document.getElementById('businessPage');
+  const meditation=document.getElementById('meditationPage');
+  bzDisplay(directory,false);
+  business?.classList.toggle('show',which==='business');
+  meditation?.classList.toggle('show',which==='meditation');
+  requestAnimationFrame(()=>window.scrollTo({top:bzCategoryTop(),behavior:'smooth'}));
+}
+showBusiness=function(){bzShowAppendixPage('business')};
+showMeditation=function(){bzShowAppendixPage('meditation')};
+
+function bzScrollGrowthExtra(kind){
+  bzSetCategoryView('growth',{scroll:false});
+  let el=null;
+  if(kind==='garden'){
+    const g=document.getElementById('garden');
+    el=g?.closest('.sideSection')||g;
+  }else{
+    el=document.getElementById('courseDataDesktop');
+  }
+  if(el)requestAnimationFrame(()=>el.scrollIntoView({behavior:'smooth',block:'start'}));
+}
+
+// Any action that opens a day should switch to the Today’s Core category first.
+const bzV112ShowDay=showDay;
+showDay=function(n){
+  bzSetCategoryView('daily',{scroll:false});
+  return bzV112ShowDay(n);
+};
+
+// After a member enters the paid course, always land on the clean Home view.
+const bzV112UnlockCourse=bzUnlockCourse;
+bzUnlockCourse=async function(user,enrollment){
+  await bzV112UnlockCourse(user,enrollment);
+  bzPrepareCategoryLayout();
+  bzSetCategoryView('home',{scroll:false});
+  window.scrollTo({top:0,behavior:'auto'});
+};
+
+// Keep the selected Step-2 reflection and category labels correct when language changes.
+const bzV112SetLang=setLang;
+setLang=function(lang){
+  bzV112SetLang(lang);
+  if(FREE_SCENARIO!=null)bzRenderScenarioFeedback(FREE_SCENARIO);
+  if(document.getElementById('mainApp')&&!document.getElementById('mainApp').classList.contains('mainAppHidden')){
+    bzSetCategoryView(BZXF_ACTIVE_CATEGORY,{scroll:false,keepAppendixSelection:true});
+  }
+};
+
+window.bzCourseCategory=bzCourseCategory;
+window.bzScrollGrowthExtra=bzScrollGrowthExtra;
+window.bzShowAppendixPage=bzShowAppendixPage;
+
+function bzInitSeparateViews(){
+  bzPrepareCategoryLayout();
+  bzSetCategoryView('home',{scroll:false});
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bzInitSeparateViews);
+else bzInitSeparateViews();
 </script>
 
 </body></html>
