@@ -3843,4 +3843,217 @@ else bzInitSeparateViews();
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
+
+
+<style id="bzV126GrowthCourseDataFinalStyles">
+/* ===== V10.26 — GROWTH COURSE DATA: SINGLE LOCATION + RELIABLE BILINGUAL RENDER ===== */
+/* Keep course-data controls only inside My Growth. */
+#courseDataDesktop,#mobileCourseData{display:none!important}
+#courseGrowthExtras{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
+#courseGrowthGardenPanel,#bzGrowthCourseDataPanel{min-width:0}
+#bzGrowthLearningRecords{grid-column:1/-1}
+@media(max-width:760px){
+  #courseGrowthExtras{grid-template-columns:1fr}
+  #bzGrowthLearningRecords{grid-column:auto}
+}
+</style>
+<script id="bzV126GrowthCourseDataFinalRuntime">
+(function(){
+  function bz126IsEnglish(){
+    try{ if(typeof CURRENT_LANG!=='undefined') return CURRENT_LANG==='en'; }catch(e){}
+    const htmlLang=(document.documentElement.getAttribute('lang')||'').toLowerCase();
+    if(htmlLang.startsWith('en'))return true;
+    if(document.body?.classList?.contains('lang-en'))return true;
+    try{return localStorage.getItem('bzxf_lang')==='en';}catch(e){return false}
+  }
+
+  function bz126StageLabel(n){
+    const en=bz126IsEnglish();
+    n=Number(n)||0;
+    if(en){
+      if(n===0)return 'Ready to plant';
+      if(n<=2)return '🌰 Seed · Days 1–2';
+      if(n<=7)return '🌱 Sprouting · Days 3–7';
+      if(n<=15)return '🌿 Growing · Days 8–15';
+      if(n<=20)return '🪻 Budding · Days 16–20';
+      return '🌷 Blooming · Day 21';
+    }
+    if(n===0)return '准备播种';
+    if(n<=2)return '🌰 种子｜1–2天';
+    if(n<=7)return '🌱 发芽｜3–7天';
+    if(n<=15)return '🌿 成长｜8–15天';
+    if(n<=20)return '🪻 花苞｜16–20天';
+    return '🌷 开花｜21天';
+  }
+
+  function bz126DataCopy(){
+    return bz126IsEnglish()?{
+      title:'💾 My Course Data',
+      lead:'Member learning records sync automatically to your cloud account. You can also download a backup regularly as an extra safeguard.',
+      backup:'⬇️ Back Up My Learning Records',
+      restore:'⬆️ Restore Learning Records',
+      privacy:'🔒 Privacy: Signed-in members’ learning records sync to their own cloud account and a local copy is kept on this device. Records are not automatically shared with other learners.',
+      clear:'🧹 Clear My Learning Data (Device + Cloud)',
+      current:(done,records)=>`Current: ${done}/21 days completed · ${records} daily records saved`
+    }:{
+      title:'💾 我的课程资料',
+      lead:'会员学习记录会自动同步到自己的云端账号；你也可以定期下载备份，作为额外保障。',
+      backup:'⬇️ 备份我的学习记录',
+      restore:'⬆️ 恢复学习记录',
+      privacy:'🔒 隐私说明：登录会员的学习记录会同步到自己的云端账号，并保留本机副本；不会自动与其他学员共享。',
+      clear:'🧹 清除我的学习记录（本机 + 云端）',
+      current:(done,records)=>`目前：完成 ${done}/21 天｜已保存 ${records} 天记录`
+    };
+  }
+
+  function bz126Counts(){
+    let s={};
+    try{s=typeof get==='function'?(get()||{}):{}}catch(e){}
+    return {
+      completed:Array.isArray(s.completed)?s.completed.length:0,
+      records:s.records&&typeof s.records==='object'?Object.keys(s.records).length:0
+    };
+  }
+
+  function bz126EnsureLayout(){
+    try{if(typeof bzPrepareCategoryLayout==='function')bzPrepareCategoryLayout()}catch(e){}
+    const extras=document.getElementById('courseGrowthExtras');
+    if(!extras)return null;
+
+    // The legacy course-data blocks belong nowhere else now.
+    const legacy=document.getElementById('courseDataDesktop');
+    if(legacy)legacy.style.setProperty('display','none','important');
+    const mobile=document.getElementById('mobileCourseData');
+    if(mobile)mobile.style.setProperty('display','none','important');
+
+    // Ensure the stable Happiness Garden is first.
+    let garden=document.getElementById('courseGrowthGardenPanel');
+    if(!garden && typeof bzEnsureGrowthGardenPanel==='function'){
+      try{garden=bzEnsureGrowthGardenPanel()}catch(e){}
+    }
+
+    // Ensure the single My Course Data panel lives inside My Growth, directly beside the garden.
+    let panel=document.getElementById('bzGrowthCourseDataPanel');
+    if(!panel){
+      panel=document.createElement('section');
+      panel.id='bzGrowthCourseDataPanel';
+    }
+    if(panel.parentElement!==extras){
+      if(garden&&garden.parentElement===extras)garden.insertAdjacentElement('afterend',panel);
+      else extras.prepend(panel);
+    }else if(garden&&garden.parentElement===extras&&garden.nextElementSibling!==panel){
+      garden.insertAdjacentElement('afterend',panel);
+    }
+
+    // Keep the DAY 01–21 learning record under both cards.
+    const learning=document.getElementById('bzGrowthLearningRecords');
+    if(learning&&learning.parentElement===extras)extras.appendChild(learning);
+    return {extras,garden,panel};
+  }
+
+  function bz126RenderGarden(){
+    const layout=bz126EnsureLayout();
+    const panel=layout?.garden;
+    if(!panel||typeof get!=='function')return;
+    const s=get()||{};
+    const n=Array.isArray(s.completed)?s.completed.length:0;
+    const en=bz126IsEnglish();
+    const plants=Array.from({length:21},(_,i)=>{
+      const on=i<n;
+      const icon=on?(i<2?'🌰':i<7?'🌱':i<15?'🌿':i<20?'🪻':'🌷'):'·';
+      return `<div class="plant ${on?'on':''}" title="DAY ${String(i+1).padStart(2,'0')}">${icon}</div>`;
+    }).join('');
+    panel.innerHTML=`<h3>${en?'🌷 My Happiness Garden':'🌷 我的幸福花园'}</h3><p class="growthGardenLead">${en?'Your garden grows with the days you actually complete. It is a visual record of your practice, not a score.':'花园会随着你真正完成的天数慢慢成长。它是练习过程的视觉记录，不是分数。'}</p><div id="growthStageDisplay">${bz126StageLabel(n)}</div><div id="growthGardenDisplay">${plants}</div>`;
+  }
+
+  function bz126RenderCourseData(){
+    const layout=bz126EnsureLayout();
+    const panel=layout?.panel;
+    if(!panel)return;
+    const c=bz126DataCopy(), count=bz126Counts();
+    panel.innerHTML=`
+      <h3>${c.title}</h3>
+      <p class="bzGrowthDataLead">${c.lead}</p>
+      <button class="btn soft" type="button" id="bz126BackupBtn">${c.backup}</button>
+      <label class="btn soft bzGrowthRestoreLabel">${c.restore}<input id="bz126RestoreFile" type="file" accept=".json,application/json" style="display:none"></label>
+      <div class="bzGrowthDataStatus">${c.current(count.completed,count.records)}</div>
+      <div class="bzGrowthPrivacy">${c.privacy}</div>
+      <button class="btn soft" type="button" id="bz126ClearBtn" style="background:#f8e7e3;color:#8a3c32">${c.clear}</button>`;
+
+    const backup=panel.querySelector('#bz126BackupBtn');
+    if(backup)backup.onclick=function(){if(typeof exportData==='function')exportData()};
+    const input=panel.querySelector('#bz126RestoreFile');
+    if(input)input.onchange=function(ev){
+      if(typeof restoreData==='function')restoreData(ev);
+      setTimeout(bz126RenderAll,250);setTimeout(bz126RenderAll,900);
+    };
+    const clear=panel.querySelector('#bz126ClearBtn');
+    if(clear)clear.onclick=function(){
+      if(typeof clearLocalData==='function')clearLocalData();
+      setTimeout(bz126RenderAll,250);setTimeout(bz126RenderAll,900);
+    };
+  }
+
+  function bz126RenderAll(){
+    bz126EnsureLayout();
+    bz126RenderGarden();
+    bz126RenderCourseData();
+    try{if(typeof bzRenderCompletionDates==='function')bzRenderCompletionDates()}catch(e){}
+    // Reassert English labels after older renderers have finished.
+    const stage=document.getElementById('growthStageDisplay');
+    if(stage){const c=bz126Counts();stage.textContent=bz126StageLabel(c.completed)}
+  }
+  window.bzRenderGrowthSupportPanelsFinal=bz126RenderAll;
+
+  // The My Course Data shortcut must target the visible Growth panel, not the hidden legacy sidebar block.
+  window.bzScrollGrowthExtra=function(kind){
+    try{if(typeof bzSetCategoryView==='function')bzSetCategoryView('growth',{scroll:false})}catch(e){}
+    setTimeout(()=>{
+      bz126RenderAll();
+      const el=kind==='garden'?document.getElementById('courseGrowthGardenPanel'):document.getElementById('bzGrowthCourseDataPanel');
+      if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+    },30);
+  };
+
+  // Final language wrapper: after every older language handler, repaint the Growth page using the actual active language.
+  if(typeof setLang==='function'){
+    const prev=setLang;
+    setLang=function(lang){
+      const out=prev(lang);
+      setTimeout(bz126RenderAll,0);
+      setTimeout(bz126RenderAll,150);
+      return out;
+    };
+    window.setLang=setLang;
+  }
+
+  if(typeof bzSetCategoryView==='function'){
+    const prev=bzSetCategoryView;
+    bzSetCategoryView=function(key,opts={}){
+      const out=prev(key,opts);
+      if(key==='growth')setTimeout(bz126RenderAll,0);
+      return out;
+    };
+    window.bzSetCategoryView=bzSetCategoryView;
+  }
+  if(typeof bzCourseCategory==='function'){
+    const prev=bzCourseCategory;
+    bzCourseCategory=function(key){
+      const out=prev(key);
+      if(key==='growth')setTimeout(bz126RenderAll,0);
+      return out;
+    };
+    window.bzCourseCategory=bzCourseCategory;
+  }
+  if(typeof renderSide==='function'){
+    const prev=renderSide;
+    renderSide=function(){const out=prev();setTimeout(bz126RenderAll,0);return out};
+    window.renderSide=renderSide;
+  }
+
+  const init=()=>setTimeout(bz126RenderAll,80);
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+
 </body></html>
