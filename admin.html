@@ -68,13 +68,14 @@ label{display:block;font-weight:900;color:var(--g);margin:13px 0 6px}input,selec
 
 /* ===== V2.5 BILINGUAL + PRICE-STAGE SALES SCRIPTS ===== */
 .scriptModeBar{display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-top:14px;padding:12px;background:#f6f8f3;border:1px solid var(--line);border-radius:14px}
-.scriptModeBar>div{min-width:180px}
+.scriptModeBar>div{min-width:180px}.scriptModeBar>div:first-child{min-width:280px}
 .scriptModeBar label{display:block;margin:0 0 5px;font-size:11px;font-weight:900;color:var(--g)}
 .scriptModeBar select{width:100%;margin:0}
 .scriptModeHint{flex:1;min-width:240px;font-size:12px;color:var(--muted);line-height:1.55;padding:4px 0}
 .scriptStageBadge{display:inline-block;background:#fff1cc;color:#7a5b21;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:900;margin-left:6px}
 @media(max-width:650px){.scriptModeBar>div,.scriptModeHint{width:100%;min-width:0}}
 
+.priceQuick{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}.priceQuick button{border:1px solid var(--line);background:#fff;color:var(--g);border-radius:999px;padding:5px 9px;font-size:11px;font-weight:900;cursor:pointer}.priceQuick button:hover{background:var(--sage);border-color:#9fb9a5}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -121,7 +122,7 @@ label{display:block;font-weight:900;color:var(--g);margin:13px 0 6px}input,selec
 
       <div class="salesGroup">
         <h3>💰 销售 / 付款资料</h3>
-        <div class="row2"><div><label>WhatsApp</label><input id="newWhatsapp" placeholder="例如：0177483191"></div><div><label>付款金额 (RM)</label><input id="newPaymentAmount" type="number" min="0" step="0.01" placeholder="0.00"></div></div>
+        <div class="row2"><div><label>WhatsApp</label><input id="newWhatsapp" placeholder="例如：0177483191"></div><div><label>付款金额 (RM)</label><input id="newPaymentAmount" type="number" min="0" step="0.01" placeholder="0.00"><div class="priceQuick"><button type="button" onclick="$('newPaymentAmount').value='99'">RM99</button><button type="button" onclick="$('newPaymentAmount').value='149'">RM149</button><button type="button" onclick="$('newPaymentAmount').value='199'">RM199</button></div></div></div>
         <div class="row2"><div><label>付款日期</label><input id="newPaymentDate" type="date"></div><div><label>客户来源</label><select id="newSource"><option value="">未选择</option><option>Facebook</option><option>Instagram</option><option>TikTok</option><option>WhatsApp</option><option>Website</option><option>Referral</option><option>Other</option></select></div></div>
         <label>付款状态</label><select id="newPaymentStatus"><option value="paid">PAID</option><option value="pending">PENDING</option><option value="refunded">REFUNDED</option></select>
         <label>备注</label><input id="newNotes" placeholder="例如：银行转账 / 特别优惠 / 客户要求">
@@ -176,13 +177,20 @@ label{display:block;font-weight:900;color:var(--g);margin:13px 0 6px}input,selec
     <div class="scriptLibraryHead">
       <div>
         <h2>💬 成交话术库</h2>
-        <p>客户回复到哪一步，就点对应按钮。话术会自动出现，再按「复制话术」即可。</p>
+        <p>客户回复到哪一步，就点对应按钮。话术会自动出现，再按「复制话术」即可。已加入 LEARVIA 家长咨询与成交话术 35 条，并自动排除完全重复内容。</p>
       </div>
       <button class="btn soft" type="button" onclick="toggleScriptLibrary()">收起 / 展开</button>
     </div>
 
     <div id="scriptLibraryBody">
       <div class="scriptModeBar">
+        <div>
+          <label>话术系列 / Script Library</label>
+          <select id="scriptSeries" onchange="changeScriptMode()">
+            <option value="original">原有成交话术</option>
+            <option value="learvia">LEARVIA 启源教育｜家长咨询与成交</option>
+          </select>
+        </div>
         <div>
           <label>话术语言 / Language</label>
           <select id="scriptLang" onchange="changeScriptMode()">
@@ -194,6 +202,7 @@ label{display:block;font-weight:900;color:var(--g);margin:13px 0 6px}input,selec
           <label>销售阶段 / Price Stage</label>
           <select id="scriptStage" onchange="changeScriptMode()">
             <option value="launch99">首发价 RM99</option>
+            <option value="offer149">优惠价 RM149</option>
             <option value="official199">正式价 RM199</option>
           </select>
         </div>
@@ -226,7 +235,7 @@ label{display:block;font-weight:900;color:var(--g);margin:13px 0 6px}input,selec
 
     <div class="salesGroup">
       <h3>💰 销售 / 付款资料</h3>
-      <div class="row2"><div><label>WhatsApp</label><input id="editWhatsapp"></div><div><label>付款金额 (RM)</label><input id="editPaymentAmount" type="number" min="0" step="0.01"></div></div>
+      <div class="row2"><div><label>WhatsApp</label><input id="editWhatsapp"></div><div><label>付款金额 (RM)</label><input id="editPaymentAmount" type="number" min="0" step="0.01"><div class="priceQuick"><button type="button" onclick="$('editPaymentAmount').value='99'">RM99</button><button type="button" onclick="$('editPaymentAmount').value='149'">RM149</button><button type="button" onclick="$('editPaymentAmount').value='199'">RM199</button></div></div></div>
       <div class="row2"><div><label>付款日期</label><input id="editPaymentDate" type="date"></div><div><label>客户来源</label><select id="editSource"><option value="">未选择</option><option>Facebook</option><option>Instagram</option><option>TikTok</option><option>WhatsApp</option><option>Website</option><option>Referral</option><option>Other</option></select></div></div>
       <label>付款状态</label><select id="editPaymentStatus"><option value="paid">paid</option><option value="pending">pending</option><option value="refunded">refunded</option></select>
       <label>营运备注</label><input id="editNotes">
@@ -657,6 +666,363 @@ If you'd like to start, I can send you the payment details directly. 😊`
 
 ];
 
+
+const LEARVIA_SCRIPTS_ZH = [
+  {
+    "key": "家长第一次询问",
+    "title": "LEARVIA｜第一阶段｜家长第一次询问",
+    "text": "您好 😊 谢谢您对我们的 How to Score A with AI 学习成长系统 感兴趣。\n在介绍配套之前，我比较想先了解一下孩子目前的情况，\n因为不同孩子遇到的问题其实不一样。\n想请问孩子目前大概几年级呢？\n如果要选一个您现在最担心的问题，会比较接近哪一种？\nA｜有读书，但成绩进步不明显\nB｜比较被动，经常需要父母提醒\nC｜不会规划时间，考试前才开始紧张\nD｜粗心、同样的问题重复犯错\nE｜会使用AI，但担心越来越依赖AI\nF｜不知道怎样复习和找到自己的弱点\n您回复一个字母就可以 😊"
+  },
+  {
+    "key": "有读书，但成绩进步不明显",
+    "title": "LEARVIA｜第二阶段｜A：有读书，但成绩进步不明显",
+    "text": "明白 👍 其实这种情况很常见。\n孩子愿意读书，本身已经是一个很好的开始。\n但“花时间学习”和“有效学习”并不完全一样。\n有些孩子每天读两个小时，主要是在重复看笔记；另一个孩子可能只用一个小时，却会：\n找弱点 → 测试自己 → 分析错误 → 重新练习 → 检查是否真正掌握。\n长期下来，两个人的学习效果可能差很多。\n所以我们不会第一时间要求孩子“读更多”，我们更希望先帮助他找出：\n到底是学习方法、复习方式、时间规划，还是错误分析出了问题。\n想问一下，孩子目前比较像：\n① 看很多，但考试时想不起来\n② 平时会，考试容易粗心\n③ 不知道重点在哪里\n④ 每一科都读，但没有规划\n这样我可以更准确告诉您应该先从哪里开始。"
+  },
+  {
+    "key": "孩子比较被动，需要父母一直吹",
+    "title": "LEARVIA｜第三阶段｜B：孩子比较被动，需要父母一直催",
+    "text": "这个其实是很多家长最头痛的问题。\n不过我们通常不会马上把孩子定义成“不自律”。\n因为一个孩子看起来被动，背后可能有很多不同原因：\n不知道从哪里开始、任务太多、长期没有成就感、觉得学习只是父母的要求，或者已经习惯“等别人安排”。\n所以如果一直提醒：\n“快点读书。”\n“功课做完了吗？”\n“为什么又要我叫？”\n短期可能有效，但孩子容易越来越依赖提醒。\n我们的方向刚好相反：\n慢慢减少父母提醒，让孩子逐渐学会自己决定下一步。\n开始时不要求他突然变得很自律。\n例如今天只问：\n“今天你觉得最重要的一件学习任务是什么？”\n让孩子自己选择、完成、打勾。\n自主性通常不是一天培养出来的，而是从很多次慢慢建立起来：\n“这是我自己决定并完成的。”"
+  },
+  {
+    "key": "不会安排时间",
+    "title": "LEARVIA｜第四阶段｜C：不会安排时间",
+    "text": "如果孩子的问题主要是时间管理，我反而不建议一开始把每天排得满满的。\n因为很多时间表最后失败，不是孩子没有时间，而是计划太理想化。\n我们会先帮助孩子分清楚：\n必须完成的事情 和 希望完成的事情。\n然后每天只抓最重要的 1–3 项任务。例如：\n今天数学错题20分钟\n→ 英文Grammar 25分钟\n→ 科学复习20分钟\n完成以后就可以休息，我们希望孩子慢慢建立一个观念：\n时间管理不是把自己变得很忙，而是知道什么事情应该先做。\n这项能力以后上大学、工作，甚至进入社会以后都会继续用到。"
+  },
+  {
+    "key": "粗心，同样错误重复出现",
+    "title": "LEARVIA｜第五阶段｜D：粗心、同样错误重复出现",
+    "text": "这个问题很值得处理，因为“粗心”其实只是一个表面名称。\n例如同一道数学题做错，背后可能是：\n看错题目\n计算错误\n概念不清\n步骤跳太快\n时间压力\n检查方法不正确\n如果每一次都只是告诉孩子：\n“下次细心一点。”\n孩子其实不知道“怎样才叫细心”。\n所以我们的错题系统不是单纯抄错题，而是要求孩子找：\n我为什么错？\n然后再决定：下一次要改变什么？例如：\n“我不是数学不会，而是经常漏看单位。”\n那么下一次考试的检查重点就非常明确：\n所有单位重新检查一次。\n这样错误才会慢慢变成学习资料，而不是挫折。"
+  },
+  {
+    "key": "担心孩子依赖AI",
+    "title": "LEARVIA｜第六阶段｜E：担心孩子依赖AI",
+    "text": "这个担心其实非常重要，而且我们也不鼓励孩子什么都直接问AI拿答案。\n我们有一个很重要的原则：\nAI可以帮助孩子思考，但不能替孩子思考。\n例如一道题不会，我们不建议：\n“AI，给我答案。”\n而是训练孩子问：\n“先不要告诉我答案，请给我一个提示，让我自己尝试。”\n如果还是不会：\n“告诉我可能是哪一个概念没理解。”\n做完以后再问：\n“请检查我的思路哪里有问题，但先不要直接修改。”\n最后：\n“再出一道类似题测试我是不是真的懂了。”\n这时候AI从：\n答录机器 变成：学习教练\n我们真正希望培养的是孩子使用AI以后越来越会思考，而不是越来越依赖AI。"
+  },
+  {
+    "key": "不知道怎样复习",
+    "title": "LEARVIA｜第七阶段｜F：不知道怎样复习",
+    "text": "很多孩子所谓的“复习”其实是：\n看书 → 看笔记 → 再看一次。\n看起来很认真，但大脑可能只是在“重新阅读”。\n我们比较希望孩子建立：\n学习 → 回忆 → 测试 → 找错 → 重学 → 再测试\n例如学完一个Science章节以后，不马上继续看书，而是把书关起来问自己：\n“如果现在要我解释这个章节，我能够讲出多少？”\n讲不出来的地方，才是真正应该重新学习的地方。\n所以我们希望孩子慢慢从：\n“我今天读了两小时。” 变成：“我今天真正掌握了什么？”"
+  },
+  {
+    "key": "家长问：真的会有效吗",
+    "title": "LEARVIA｜第八阶段｜家长问：“真的会有效吗？”",
+    "text": "这个问题非常合理，我不会告诉您：\n“用了就一定有效、一定考A。”\n因为每个孩子的基础、投入程度和学习环境都不同。\n我们更关注的是，孩子使用以后，有没有开始出现一些真实的小变化：\n会不会自己规划？\n有没有比较清楚自己的弱点？\n错误会不会开始减少？\n有没有开始主动检查？\n父母提醒次数有没有慢慢减少？\n这些学习行为如果能够逐渐改变，才比较有机会带来稳定的成绩进步。\n就像学游泳一样，买了泳镜不会自动学会游泳。\n真正产生效果的是：\n正确方法 + 实际练习 + 反馈 + 调整 + 坚持。\n我们的系统负责提供这个学习框架，但孩子仍然需要实际去做。"
+  },
+  {
+    "key": "学生自己问：真的有用吗",
+    "title": "LEARVIA｜第九阶段｜学生自己问：“真的有用吗？”",
+    "text": "你问得很好 👍\n其实我不会叫你相信“用了就一定变学霸”。\n你可以先把它当成一个实验，给自己7天。\n选一个你最想改善的问题，例如：\n粗心\n拖延\n不会安排时间\n不知道怎样复习\n然后连续7天用同一个方法，第7天再问自己：\n“有没有比以前容易一点？”\n如果没有，我们再找原因。\n真正会学习的人，不是别人告诉他什么都相信，而是会：\n尝试 → 观察 → 判断 → 调整。\n这本身就是我们希望你培养的能力。"
+  },
+  {
+    "key": "怕很难用",
+    "title": "LEARVIA｜第十阶段｜“怕很难用。”",
+    "text": "这个您可以不用太担心 😊\n我们反而不建议孩子第一天把所有工具全部用完。\n我们的原则是：\n一次解决一个问题。\n如果目前最大问题是：\n不会安排时间\n→ 先用时间规划。\n粗心\n→ 先用错题分析。\n考试快到了\n→ 先用考试冲刺计划。\n比较被动\n→ 先建立每日一个自主目标。\n就像刚开始运动，不会第一天跑10公里。\n我们希望孩子：\n先做到 → 再做好 → 最后形成习惯。\n真正好的学习系统应该让孩子越来越清楚，而不是越来越复杂。"
+  },
+  {
+    "key": "他已经有补习了",
+    "title": "LEARVIA｜第十一阶段｜“他已经有补习了。”",
+    "text": "有补习其实完全没有冲突 😊\n因为补习主要解决：\n“这门科目不会怎么办？”\n而我们更关注：\n“孩子离开老师以后，会不会自己学习？”\n例如：补习老师教完数学，孩子回家以后是否知道：\n哪里不会？\n哪一道题应该重做？\n什么时候复习？\n为什么一直错？\n考试前怎样安排？\n所以我们的目标不是取代补习。\n反而是希望帮助孩子：\n更懂得使用学校、补习老师、教材和AI这些资源。"
+  },
+  {
+    "key": "孩子功课已经很多，没有时间",
+    "title": "LEARVIA｜第十二阶段｜“孩子功课已经很多，没有时间。”",
+    "text": "如果孩子已经很忙，我们反而不会建议再塞很多额外练习给他。\n因为我们的目标不是：\n增加学习量。\n而是：提高现有学习时间的质量。\n例如每天原本已经读一个小时，我们会先看看：\n这一个小时是不是有明确目标？\n有没有最重要的任务？\n错题有没有重新处理？\n完成以后有没有知道自己掌握多少？\n有时候最需要改变的不是：\n“再增加30分钟。”\n而是：“把原本60分钟用得更清楚。”"
+  },
+  {
+    "key": "怕买了孩子不用",
+    "title": "LEARVIA｜第十三阶段｜“怕买了孩子不用。”",
+    "text": "这个担心其实非常真实。\n很多家长买教育产品最大的浪费，不是产品不好，而是：\n买了以后没有形成使用习惯。\n所以我反而不建议您买了以后马上告诉孩子：\n“我买了这么多东西给你，你一定要全部做。”\n这样孩子第一天就有压力。\n比较好的方式是：\n“我们先选一个你觉得最有帮助的工具，试7天看看。”\n例如: 孩子最讨厌粗心，就先做错题分析。\n如果他开始发现：\n“原来我不是不会，我只是经常漏看题目。”\n他才会开始感觉：\n这个工具对我有用。\n使用习惯应该从价值感开始，而不是从父母命令开始。"
+  },
+  {
+    "key": "RM49 值得吗",
+    "title": "LEARVIA｜第十四阶段｜“RM59值得吗？”",
+    "text": "如果只是把它当成几张表格，我反而不建议这样看。\n我们真正希望提供的是一套：\n帮助孩子开始学习如何管理自己学习的方法。\n里面的时间管理、错题分析、考试规划、学习方法和AI学习方式，其实都围绕同一个目标：\n让孩子越来越知道自己应该怎样学习。\n当然，RM59值不值得，最终还是要看孩子有没有实际使用。\n所以我们的建议一直是：\n不要追求一次全部用完，先用一个工具解决一个真实问题。\n只要孩子开始建立一种以后还能继续使用的学习方法，这个价值就不只是一次考试。"
+  },
+  {
+    "key": "多久可以看到效果",
+    "title": "LEARVIA｜第十五阶段｜“多久可以看到效果？”",
+    "text": "这个要看您所说的“效果”是哪一种。\n如果是：会不会马上从60分变90分？\n这个我们不会承诺。\n但如果观察的是：\n开始会规划\n比较知道怎样复习\n愿意分析错误\n减少父母提醒\n开始主动完成小目标\n这些行为上的变化，有些家庭可能较早观察到，有些孩子需要更长时间。\n我们比较重视：\n先改变学习行为，再观察学习结果。\n因为只有行为真正改变，成长才比较容易持续。"
+  },
+  {
+    "key": "我的孩子成绩已经很好了，还需要吗",
+    "title": "LEARVIA｜第十六阶段｜“我的孩子成绩已经很好，还需要吗？”",
+    "text": "如果孩子成绩已经很好，我们反而不会把重点放在“怎样再多拿几分”。\n可以观察另外几个问题：\n他是不是自己规划学习？\n遇到不会的问题能不能自己处理？\n考试失败一次会不会很受打击？\n会不会过度依赖补习？\n会不会正确使用AI？\n有没有时间管理能力？\n如果这些能力已经很好，那么真的不一定需要很多额外系统。\n但如果成绩很好，却仍然完全依赖父母和老师安排，\n那么我们更希望培养的是：\n把“成绩优秀”进一步升级成“学习能力优秀”。"
+  },
+  {
+    "key": "孩子基础很弱，适合吗",
+    "title": "LEARVIA｜第十七阶段｜“孩子基础很弱，适合吗？”",
+    "text": "基础弱的孩子反而更不应该一次给太多任务。\n第一步不是追别人。\n而是：找到自己真正卡住的位置。\n例如数学不好，不要直接定义成：\n“数学很差。”\n可能真正的问题只是：\n分数概念没掌握，\n乘法基础不稳，\n或者应用题看不懂。\n先找到第一个缺口，解决它，再进入下一个。\n我们希望孩子建立的是：\n“我不是不行，我只是还有一个地方没学会。”"
+  },
+  {
+    "key": "孩子不愿意配合怎么办",
+    "title": "LEARVIA｜第十八阶段｜“孩子不愿意配合怎么办？”",
+    "text": "这种情况下，我通常不会建议父母强迫孩子马上完成整套系统。\n可以先问他：\n“如果学习里面只能改善一件事情，你最想改善什么？”\n让孩子自己选，可能他说：\n“不要那么粗心。”\n或者：“考试不要那么紧张。”\n或者：“不要每天读那么久。”\n这就是入口。\n当孩子觉得：这是在解决我的问题\n而不是：这是妈妈又买东西来管我\n接受程度通常会完全不同。"
+  },
+  {
+    "key": "跟普通CHATGPT有什么不同",
+    "title": "LEARVIA｜第十九阶段｜“跟普通 ChatGPT 有什么不同？”",
+    "text": "ChatGPT本身是非常强大的工具。\n我们的价值不是告诉家长：\n“只有我们才有AI。”\n真正不同的是：\n怎样使用AI。\n孩子直接使用AI，很容易形成：\n问题 → 答案。\n我们的学习方法希望形成：\n问题\n→ 自己先思考\n→ AI提示\n→ 自己尝试\n→ AI反馈\n→ 修正\n→ 再测试\n→ 自己解释。\n所以我们卖的不是一个“会回答问题的AI”。\n我们真正建立的是：\n孩子正确使用AI学习的方法。"
+  },
+  {
+    "key": "你们是不是补习",
+    "title": "LEARVIA｜第二十阶段｜“你们是不是补习？”",
+    "text": "不是传统补习，补习主要解决：\n“老师教孩子知识。”\n我们主要解决：\n“孩子怎样管理自己的学习。”\n包括：\n时间规划\n学习方法\n错题分析\n复习策略\n考试准备\nAI正确使用\n自主学习习惯。\n所以可以把我们理解成：\n学习系统 + 学习教练\n帮助孩子慢慢成为更独立的学习者。"
+  },
+  {
+    "key": "从诊断自然进入产品",
+    "title": "LEARVIA｜第二十一阶段｜从诊断自然进入产品",
+    "text": "从您刚才分享的情况来看，我觉得孩子现在最需要处理的，不一定是“再增加补习”。\n比较值得先改善的是：\n【填入孩子真实问题】\n例如：时间规划 + 错题分析。\n这也是我们为什么设计 AI学习成长启航配套。\n它不是要求孩子一次完成很多东西，而是提供一套工具，让孩子根据自己的问题一步一步开始。\n目前启航配套是 RM59。\n如果您愿意，我可以把里面的内容和“您的孩子应该先从哪一个部分开始”一起告诉您，\n这样您可以先判断适不适合，不需要急着决定 😊"
+  },
+  {
+    "key": "RM49 正式介绍",
+    "title": "LEARVIA｜第二十二阶段｜RM59正式介绍",
+    "text": "好的 😊\n目前 How to Score A with AI 学习成长启航配套提供优惠价 RM59，核心包含：\n📘 学霸成长规划总控表\n⏰ 每周时间管理系统\n🔍 错题与粗心分析\n📈 学习成长路径\n🎯 考试高分学习系统\n🍅 Pomodoro + Feynman 学习方法\n🤖 How to Score A with AI 学习Prompt精选\n🤖 SCORE A 教育学习系统提示词精选 - 进阶版\n🎓 学霸考试高分系统\n🎓 30天考试冲刺执行指南\n🎓 作文高分训练法\n🎓 系统家长陪伴指南\n我们的重点不是让孩子一次完成所有工具。\n先让孩子体验：\n“原来学习可以有方法。”\n之后才慢慢加入其他工具。\n如感兴趣，回复：【我要更了解配套内容】"
+  },
+  {
+    "key": "家长说：我考虑一下",
+    "title": "LEARVIA｜第二十三阶段｜家长说：“我考虑一下。”",
+    "text": "当然可以 😊 教育产品本来就应该了解清楚以后再决定。\n您考虑的时候，我建议不要只问：\n“RM59贵不贵？”\n可以问自己三个问题：\n① 孩子目前的问题如果一直不改变，会不会持续影响学习？\n② 现在缺的是更多练习，还是更好的学习方法？\n③ 这个系统是否适合孩子目前真正的问题？\n如果您最后觉得不适合，也没有关系。\n我们的目的还是希望家长先看懂孩子真正需要改善的是什么。"
+  },
+  {
+    "key": "已读不回：第一次跟进",
+    "title": "LEARVIA｜第二十四阶段｜已读不回：第一次跟进",
+    "text": "您好 😊 前两天您提到孩子目前比较困扰的是 【问题】。\n刚好想补充一个小建议给您。\n今晚可以先不用任何工具，试着问孩子：\n“如果学习里面只能改善一件事情，你最希望变好的是哪一件？”\n先不要纠正他的答案，只听听看。\n有时候孩子自己认为的问题，跟我们大人看到的问题会不太一样。\n如果您愿意，也可以把他的答案告诉我，我可以帮您一起分析应该从哪里开始。"
+  },
+  {
+    "key": "第二次跟进",
+    "title": "LEARVIA｜第二十五阶段｜第二次跟进",
+    "text": "您好 😊 想再分享一个很简单的方法给您。\n如果孩子比较被动，这个星期先不要要求他改变很多。\n每天只让他自己决定：\n“今天最重要的一件学习任务是什么？”\n完成以后自己打一个 ✓。\n先连续做7天。\n我们培养自主性不是从“突然变自律”开始，而是从：\n自己决定 → 自己完成\n如果之后您想系统化进行，再考虑我们的启航配套也不迟 😊"
+  },
+  {
+    "key": "最后一次跟进",
+    "title": "LEARVIA｜第二十六阶段｜最后一次跟进",
+    "text": "您好 😊 这是最后一次打扰您。\n之前您提到孩子 【问题】，我帮您简单总结一个方向：\n【一句针对性的建议】\n您可以先自己在家尝试。\n如果之后发现孩子还是需要比较完整的规划、错题分析或AI学习方法，随时回来找我们就可以。\n教育不是一次购买决定，而是一个长期过程。\n希望孩子慢慢找到适合自己的学习节奏 🌱"
+  },
+  {
+    "key": "成交以后第一句话",
+    "title": "LEARVIA｜第二十七阶段｜成交以后第一句话",
+    "text": "欢迎加入 LEARVIA 启源教育 🌱\n接下来我们最重要的事情不是“把所有资料做完”。\n而是：帮助孩子找到第一个可以改善的小问题。\n根据之前了解，孩子目前主要是：\n【问题】\n所以我建议第一周先从：\n【工具】\n开始。\n其他内容先不用急。\n我们的目标是：\n先做到 → 再做好 → 最后形成习惯。"
+  },
+  {
+    "key": "给家长的第一条陪伴规则",
+    "title": "LEARVIA｜第二十八阶段｜给家长的第一条陪伴规则",
+    "text": "欢迎加入 LEARVIA 启源教育 🌱\n接下来我们最重要的事情不是“把所有资料做完”。\n而是：帮助孩子找到第一个可以改善的小问题。\n请家长第一周尽量不要每天问：\n“做了吗？”\n可以改成：\n“你今天准备先完成什么？”\n孩子完成以后，不要只说：\n“很好，继续保持。”\n可以问：\n“今天你觉得自己哪一个地方做得比昨天好？”\n让孩子自己看见成长。\n我们的目标是：先做到 → 再做好 → 最后形成习惯。"
+  },
+  {
+    "key": "粗心：建立错误诊断习惯",
+    "title": "LEARVIA｜A｜粗心：建立「错误诊断习惯」",
+    "text": "不要只告诉孩子“下次细心一点”，因为“粗心”只是结果，我们要找的是原因。\n解决方法，每次错题先分类：\n① 看错题目 → 圈出关键词\n② 计算错误 → 检查步骤\n③ 概念不清 → 回去补知识点\n④ 漏写/漏答 → 使用检查清单\n⑤ 时间太赶 → 调整答题时间\n然后记录：\n我为什么错？\n下次怎样避免？\n给孩子的话可以这样说：\n“错题不可怕，重要的是找出为什么会错。今天先找出3道错题真正的原因，不需要做很多题。只要同一种错误越来越少，你就在进步了。💪”\n启源目标： 从“不要粗心”变成“我知道怎样减少错误”。\nFrom: “Don’t be careless.” to: “I know how to reduce my mistakes.”"
+  },
+  {
+    "key": "拖延：建立5分钟启动法",
+    "title": "LEARVIA｜B｜拖延：建立「5分钟启动法」",
+    "text": "第一步：只选一个任务。\n第二步：告诉自己先做5分钟。\n第三步：开始以后，再决定是否继续。\n例如不要写：“复习数学。”\n改成：“5分钟完成昨天做错的2道数学题。”\n给孩子的话：\n“今天不用要求自己突然变得很自律。选一件最小的学习任务，先开始5分钟。我们的第一个目标不是做很多，而是学会‘说开始，就开始’。🚀”\n启源目标： 从“等别人催我”变成“我能够启动自己”。\nFrom:  “I wait for someone to remind me.” to: “I can get myself started.”"
+  },
+  {
+    "key": "不会安排时间： 建立每日 Top 3",
+    "title": "LEARVIA｜C｜不会安排时间：建立「每日Top 3」",
+    "text": "不要把时间表排得满满。\n每天先写下：今天最重要的3件事是什么？\n然后分成：\n必须完成 Must Do\n应该完成 Should Do\n有时间再做 Could Do\n例如：\nMust： 数学错题20分钟\nMust： 明天英文默写15分钟\nShould： Science复习25分钟\nCould： 阅读20分钟\n再配合25分钟专注 + 5分钟休息。\n给孩子的话：\n“时间管理不是把每一分钟排满，而是知道什么事情最重要。今晚先选出明天最重要的3件事，并决定什么时候完成。⏰”\n启源目标： 从“我很忙”变成“我知道什么应该先做”。\nFrom:  “I’m very busy.”  to:  “I know what I should do first.”"
+  },
+  {
+    "key": "不知道怎样复习： 建立",
+    "title": "LEARVIA｜D｜不知道怎样复习：建立「主动回忆循环」",
+    "text": "学习 → 关书 → 自己回忆 → 做题测试 → 找出不会 → 重新学习 → 再测试\n例如Science读完一个章节：不要马上再看第二遍。\n先把书关起来，问自己：“如果现在要我教一个同学，我能不能把这个概念讲清楚？”\n讲不出来的地方，就是下一轮应该复习的重点。\n给孩子的话：\n“复习不是看过多少次，而是没有看书的时候，你还能说出多少。今天选一个小章节，用自己的话讲给自己听。📚”\n启源目标： 从“我看过了”变成“我真的会了”。\nFrom:  “I’ve read it.”  to:  “I truly understand and can apply it.”"
+  },
+  {
+    "key": "开始容易紧张：建立",
+    "title": "LEARVIA｜E｜考试容易紧张：建立「可控制事项清单」",
+    "text": "考试紧张不能只告诉孩子：“不要紧张。”\n因为孩子通常不知道怎样“不紧张”。\n应该把注意力从：结果\n转移到：我现在可以控制什么。\n考前可以做四件事：\n① 熟悉考试流程，进行计时模拟练习。\n② 建立答题顺序，先处理较有把握的题目。\n③ 建立卡题规则， 一道题卡太久，先标记、继续、最后回来。\n④ 建立考前稳定程序，准备文具、正常睡眠、简单呼吸调整、避免临时疯狂塞知识。\n给孩子的话：\n“紧张不代表你不会，而是因为这件事情对你很重要。我们不用要求自己完全不紧张，只需要知道紧张的时候下一步应该做什么。🎯”\n启源目标： 从“我怕考不好”变成“即使紧张，我也知道怎样处理”。\nFrom:  “I’m afraid I won’t do well.”  to:  “Even when I feel nervous, I know how to handle it.”"
+  },
+  {
+    "key": "太依赖 AI",
+    "title": "LEARVIA｜F｜太依赖AI：建立「Think → Ask → Verify → Explain」",
+    "text": "不要禁止孩子使用AI，要教他怎样不被AI代替思考。\n建立四步规则：\nSTEP 1｜THINK — 自己先想\n至少先尝试一次。\nSTEP 2｜ASK — 再问AI\n不要问：“答案是什么？”\n改成：“不要直接告诉我答案，请给我一个提示，让我自己尝试。”\nSTEP 3｜VERIFY — 验证\n问：“这个答案有没有其他可能？请告诉我应该怎样检查。”\nSTEP 4｜EXPLAIN — 自己输出\n最后关闭AI，自己解释一次。\n如果讲不出来，代表还没有真正掌握。\n给孩子的话：\n“AI很强，但真正厉害的人不是让AI替自己做，而是懂得利用AI让自己变得更会思考。🤖🧠”\n启源目标： 从“AI帮我做”变成“AI帮助我学会自己做”。\nFrom:  “AI does it for me.”  to: “AI helps me learn how to do it myself.”"
+  },
+  {
+    "key": "接下来7天",
+    "title": "LEARVIA｜接下来7天，我们只改善这一件事。",
+    "text": "Day 1：发现问题\nDay 2：学习一个方法\nDay 3：实际尝试\nDay 4：继续练习\nDay 5：记录困难\nDay 6：调整方法\nDay 7：自己回答三个问题：\n① 我改善了什么？\n② 什么方法对我最有帮助？\n③ 下星期我要继续改善什么？\n不用一次改变很多，我们先选一个最想改善的问题，用7天认真尝试一个方法。🌱\n学习真正的进步，不是突然变得很厉害，而是每天比昨天更懂得管理自己的学习。\n我们的目标，是让你慢慢从“别人告诉我怎么学”，成长到“我知道自己下一步该怎么做”。💪"
+  }
+];
+
+const LEARVIA_SCRIPTS_EN = [
+  {
+    "key": "家长第一次询问",
+    "title": "LEARVIA | Stage 1 | Parent’s First Enquiry",
+    "text": "Hello 😊 Thank you for your interest in our How to Score A with AI Learning & Growth System.\nBefore introducing the package, I’d first like to understand your child’s current situation,\nbecause different children may face very different learning challenges.\nMay I know what grade your child is currently in?\nIf you had to choose the issue that worries you most right now, which one would be the closest?\nA | Studies regularly, but grades are not improving much\nB | Rather passive and often needs reminders from parents\nC | Does not know how to manage time and only starts worrying before exams\nD | Careless and keeps repeating the same mistakes\nE | Uses AI, but you are worried about becoming too dependent on it\nF | Does not know how to revise or identify learning weaknesses\nYou can simply reply with one letter 😊"
+  },
+  {
+    "key": "有读书，但成绩进步不明显",
+    "title": "LEARVIA | Stage 2 | A: Studies, but Grades Are Not Improving Much",
+    "text": "Understood 👍This situation is actually very common.\nThe fact that your child is willing to study is already a very good start.\nHowever, spending time studying and studying effectively are not exactly the same.\nSome children may study for two hours every day but mainly repeat read their notes. Another child may study for only one hour but will:\nIdentify weaknesses → Test themselves → Analyze mistakes → Practise again → Check whether they have truly mastered the topic\nOver the time, the difference in learning effectiveness can become significant.\nSo we do not immediately ask the child to “study more.” Instead, we first want to help identify whether the real issue is:\nStudy methods, revision methods, time planning, or mistake analysis.\nMay I ask which situation sounds more like your child?\n① Reads a lot, but cannot remember during exams\n② Usually understands, but makes careless mistakes in exams\n③ Does not know what the key points are\n④ Studies every subject, but without a clear plan\nThis will help me give you a more accurate suggestion on where your child should start."
+  },
+  {
+    "key": "孩子比较被动，需要父母一直吹",
+    "title": "LEARVIA | Stage 3 | B: Child Is Passive and Needs Constant Reminders",
+    "text": "This is actually one of the most common concerns among parents.\nHowever, we usually do not immediately label a child as “undisciplined.”\nA child who appears passive may have many different reasons behind the behaviour:\nNot knowing where to start, having too many tasks, lacking a sense of achievement for a long time, feeling that studying is only something parents demand, or becoming used to waiting for someone else to arrange everything.\nSo if parents keep saying:\n“Go and study now.”\n“Have you finished your homework?”\n“Why do I have to keep reminding you?”\nIt may work in the short term, but the child can gradually become more dependent on reminders.\nOur approach is the opposite:\nGradually reduce parental reminders and help the child learn to decide what to do next.\nAt the beginning, we do not expect the child to suddenly become highly disciplined.\nFor example, today you can simply ask:\n“What do you think is the most important learning task you should complete today?”\nLet the child choose it, complete it, and tick it off.\nIndependence is usually not built in one day. It is built gradually through repeated experiences of:\n“I decided this myself, and I completed it.”"
+  },
+  {
+    "key": "不会安排时间",
+    "title": "LEARVIA | Stage 4 | C: Does Not Know How to Manage Time",
+    "text": "If your child’s main issue is time management, I actually would not recommend filling every day with a packed schedule from the beginning.\nMany schedules fail not because the child has no time, but because the plan is too idealistic.\nWe first help the child distinguish between:\nThings that must be completed and Things they hope to complete.\nThen, each day, focus only on the most important 1–3 tasks. For example:\nMathematics mistake review — 20 minutes\n→ English Grammar — 25 minutes\n→ Science revision — 20 minutes\nAfter completing these tasks, the child can rest. We want the child to gradually understand:\nTime management is not about making yourself busy. It is about knowing what should be done first.\nThis is a skill that will remain useful in university, at work, and throughout adult life."
+  },
+  {
+    "key": "粗心，同样错误重复出现",
+    "title": "LEARVIA | Stage 5 | D: Careless and Repeats the Same Mistakes",
+    "text": "This is an important issue to work on because “carelessness” is often only a surface-level description.\nFor example, if the same Mathematics question is answered incorrectly, the real reason could be:\nMisreading the question\nCalculation error\nUnclear concept\nSkipping steps too quickly\nTime pressure\nIneffective checking method\nIf we only tell the child:\n“Be more careful next time.”\nThe child may not actually know how to be more careful.\nThat is why our mistake analysis system does not simply ask students to copy down incorrect questions. Instead, the child must identify:\nWhy did I get this wrong?\nThen decide: What should I change next time? For example:\n“I do understand Mathematics, but I often forget to check the units.”\nThen the checking priority for the next exam becomes very clear:\nCheck every unit again.\nThis allows mistakes to gradually become useful learning data instead of sources of frustration."
+  },
+  {
+    "key": "担心孩子依赖AI",
+    "title": "LEARVIA | Stage 6 | E: Worried About AI Dependence",
+    "text": "This concern is very important, and we also do not encourage children to ask AI for direct answers to everything.\nWe follow one important principle:\nAI can help children think, but it should not think for them.\nFor example, when a child does not know how to solve a question, we do not recommend:\n“AI, give me the answer.”\nInstead, we train the child to ask:\n“Please don’t tell me the answer yet. Give me one hint so I can try it myself.”\nIf the child still does not understand:\n“Tell me which concept I may not have understood.”\nAfter trying:\n“Please check where my reasoning went wrong, but don’t correct it for me immediately.”\nFinally:\n“Give me another similar question to test whether I really understand it.”\nAt this point, AI changes from:\nAnswering Machine into: Learning Coach\nWhat we truly want is for children to become better thinkers after using AI, not more dependent on AI."
+  },
+  {
+    "key": "不知道怎样复习",
+    "title": "LEARVIA | Stage 7 | F: Does Not Know How to Revise",
+    "text": "For many children, “revision” actually means:\nRead the textbook → Read the notes → Read them again.\nIt looks very hardworking, but the brain may simply be repeat reading.\nWe prefer students to build this cycle:\nLearn → Recall → Test → Find Mistakes → Relearn → Retest\nFor example, after finishing a Science chapter, instead of continuing to read immediately, close the book and ask:\n“If I had to explain this chapter right now, how much could I explain?”\nThe parts that cannot be explained clearly are the parts that actually need to be reviewed.\nSo we want students to gradually move from:\n“I studied for two hours today.” to become: “What did I truly master today?”"
+  },
+  {
+    "key": "家长问：真的会有效吗",
+    "title": "LEARVIA | Stage 8 | Parent Asks: “Will It Really Work?”",
+    "text": "That is a very reasonable question，I will not tell you:\n“It will definitely work, and your child will definitely get an A.”\nEvery child has a different foundation, level of effort, and learning environment.\nWhat we focus on instead is whether some real, small changes begin to appear after using the system:\nDoes the child start planning independently?\nDo they understand their weaknesses more clearly?\nAre mistakes beginning to decrease?\nDo they start checking their work proactively?\nAre parents needing to remind them less often?\nIf these learning behaviours gradually improve, there is a better chance of achieving more stable academic progress.\nIt is like learning to swim，Buying swimming goggles does not automatically teach someone how to swim.\nWhat creates results is:\nThe right method + Actual practice + Feedback + Adjustment + Consistency\nOur system provides the learning framework, but the child still needs to put it into practice."
+  },
+  {
+    "key": "学生自己问：真的有用吗",
+    "title": "LEARVIA | Stage 9 | Student Asks: “Does It Really Work?”",
+    "text": "That is a good question 👍\nI’m not going to ask you to believe that “using this will definitely turn you into a top student.”\nYou can treat it like an experiment, give yourself 7 days.\nChoose one problem that you most want to improve, such as:\nCarelessness\nProcrastination\nPoor time management\nNot knowing how to revise\nThen use the same method consistently for 7 days, on Day 7, ask yourself:\n“Is this a little easier than before?”\nIf not, we find out why.\nA person who truly knows how to learn does not blindly believe everything others say, they know how to:\nTry → Observe → Evaluate → Adjust\nThat itself is one of the abilities we want you to develop."
+  },
+  {
+    "key": "怕很难用",
+    "title": "LEARVIA | Stage 10 | “I’m Afraid It Will Be Difficult to Use.”",
+    "text": "You do not need to worry too much about that 😊\nIn fact, we do not recommend that children use every tool on the first day.\nOur principle is:\nSolve one problem at a time.\nIf the biggest issue is:\nPoor time management\n→ Start with time planning.\nCarelessness\n→ Start with mistake analysis.\nExam approaching\n→ Start with the exam sprint plan.\nPassive learning\n→ Start with one independent daily goal.\nJust like starting exercise, you would not run 10 kilometres on the first day.\nWe want children to:\nStart doing it → Improve how they do it → Turn it into a habit\nA good learning system should make things clearer for the child, not more complicated."
+  },
+  {
+    "key": "他已经有补习了",
+    "title": "LEARVIA | Stage 11 | “My Child Already Has Tuition.”",
+    "text": "Having tuition is not a conflict at all 😊\nTuition mainly helps with:\n“What should my child do when they do not understand this subject?”\nWe focus more on:\n“Can the child learn independently after leaving the teacher?”\nFor example, after a tuition teacher teaches Mathematics, does the child know:\nWhat they still do not understand?\nWhich questions should be redone?\nWhen they should revise?\nWhy they keep making the same mistake?\nHow to prepare before an exam?\nSo our goal is not to replace tuition.\nInstead, we want to help children:\nUse school, tuition teachers, learning materials, and AI more effectively."
+  },
+  {
+    "key": "孩子功课已经很多，没有时间",
+    "title": "LEARVIA | Stage 12 | “My Child Already Has Too Much Homework and No Time.”",
+    "text": "If your child is already very busy, we would not recommend adding a large amount of extra practice.\nOur goal is not:\nTo increase the amount of studying.\nBut: To improve the quality of the study time they already have.\nFor example, if your child already studies for one hour every day, we first look at:\nDoes that one hour have a clear goal?\nIs there a clear priority?\nAre mistakes being reviewed again?\nAfter finishing, does the child know what they have actually mastered?\nSometimes the most important change is not:\n“Add another 30 minutes.”\nBut: “Use the existing 60 minutes more clearly and effectively.”"
+  },
+  {
+    "key": "怕买了孩子不用",
+    "title": "LEARVIA | Stage 13 | “I’m Worried I’ll Buy It and My Child Won’t Use It.”",
+    "text": "That concern is very real.\nOne of the biggest reasons parents waste money on educational products is not because the product is bad, but because:\nA usage habit was never established after purchase.\nSo I would not recommend buying it and immediately telling the child:\n“I bought all of this for you, so you must complete everything.”\nThat can create pressure from the very first day.\nA better approach is:\n“Let’s choose one tool that you think will help you the most and try it for 7 days.”\nFor example: If the child is most frustrated by careless mistakes, start with mistake analysis.\nIf they begin to discover:\n“Actually, I do understand it. I just often miss part of the question.”\nThen they begin to feel:\nThis tool is useful to me.\nUsage habits should begin with a sense of value, not parental commands."
+  },
+  {
+    "key": "RM49 值得吗",
+    "title": "LEARVIA | Stage 14 | “Is RM59 Worth It?”",
+    "text": "If you only see it as a few worksheets, I would not recommend looking at it that way.\nWhat we truly want to provide is a system that helps children begin learning:\nHow to manage their own learning.\nThe time management, mistake analysis, exam planning, learning methods, and AI learning strategies all serve the same goal:\nHelping children gradually understand how they should learn.\nOf course, whether RM59 is worth it ultimately depends on whether the child actually uses it.\nThat is why our recommendation has always been:\nDo not try to use everything at once. Start with one tool to solve one real problem.\nIf the child begins to build a learning method that can still be used in the future, then the value goes beyond one exam."
+  },
+  {
+    "key": "多久可以看到效果",
+    "title": "LEARVIA | Stage 15 | “How Long Before We See Results?”",
+    "text": "That depends on what you mean by “results.”\nIf you mean: Will my child immediately jump from 60 marks to 90 marks?\nWe will not promise that.\nBut if you observe changes such as:\nStarting to plan\nUnderstanding how to revise\nBeing willing to analyze mistakes\nNeeding fewer reminders from parents\nStarting to complete small goals independently\nSome families may notice these behavioural changes earlier, while other children may need more time.\nWe place more importance on:\nChanging learning behaviour first, then observing learning outcomes.\nBecause only when behaviour genuinely changes is growth more likely to continue."
+  },
+  {
+    "key": "我的孩子成绩已经很好了，还需要吗",
+    "title": "LEARVIA | Stage 16 | “My Child Already Gets Good Grades. Do We Still Need This?”",
+    "text": "If your child already performs very well academically, we would not focus mainly on “how to gain a few more marks.”\nInstead, you can look at other questions:\nCan your child plan their own learning?\nCan they solve problems independently when they do not understand something?\nWould one disappointing exam result affect them badly?\nAre they overly dependent on tuition?\nDo they know how to use AI properly?\nDo they have good time management skills?\nIf all of these abilities are already strong, then they may genuinely not need many additional systems.\nBut if the child gets good grades while still depending completely on parents and teachers to arrange everything,\nthen our goal would be:\nUpgrade from “strong academic results” to “strong learning ability.”"
+  },
+  {
+    "key": "孩子基础很弱，适合吗",
+    "title": "LEARVIA | Stage 17 | “My Child Has a Weak Foundation. Is It Suitable?”",
+    "text": "A child with a weak foundation should actually receive fewer, not more, tasks at the beginning.\nThe first step is not to catch up with everyone else.\nIt is: Find the exact point where the child is stuck.\nFor example, if Mathematics is weak, do not immediately label the child as:\n“Bad at Mathematics.”\nThe actual issue may only be:\nWeak understanding of fractions,\nunstable multiplication skills,\nor difficulty understanding word problems.\nFind the first gap, fix it, then move to the next one.\nWe want the child to build this mindset:\n“I’m not incapable. There is simply one part I haven’t learned yet.”"
+  },
+  {
+    "key": "孩子不愿意配合怎么办",
+    "title": "LEARVIA | Stage 18 | “What If My Child Refuses to Cooperate?”",
+    "text": "In this situation, I usually would not recommend forcing the child to complete the entire system immediately.\nYou can first ask:\n“If you could improve only one thing about learning, what would you most want to improve?”\nLet the child choose，they might say:\n“I don’t want to be so careless.”\nor:  “I don’t want to feel so nervous during exams.”\nor:  “I don’t want to study for so long every day.”\nThat becomes the starting point.\nWhen the child feels:  This is helping solve my problem\ninstead of:  Mum bought another thing to control me\ntheir willingness to participate can be very different."
+  },
+  {
+    "key": "跟普通CHATGPT有什么不同",
+    "title": "LEARVIA | Stage 19 | “How Is This Different from Regular ChatGPT?”",
+    "text": "ChatGPT itself is a very powerful tool.\nOur value is not to tell parents:\n“Only we have AI.”\nThe real difference is:\nHow AI is used.\nWhen children use AI directly, it can easily become:\nQuestion → Answer.\nOur learning method is designed to become:\nQuestion\n→ Think independently first\n→ AI gives a hint\n→ Student tries\n→ AI provides feedback\n→ Student corrects\n→ Student retests\n→ Student explains independently\nSo we are not selling an “AI that can answer questions.”\nWhat we are really building is:\nThe right method for children to learn with AI."
+  },
+  {
+    "key": "你们是不是补习",
+    "title": "LEARVIA | Stage 20 | “Are You a Tuition Centre?”",
+    "text": "We are not traditional tuition，Tuition mainly focuses on:\n“The teacher teaches the child subject knowledge.”\nWe mainly focus on:\n“How the child manages their own learning.”\nThis includes:\nTime planning\nStudy methods\nMistake analysis\nRevision strategies\nExam preparation\nProper AI usage\nIndependent learning habits\nYou can think of us as:\nLearning System + Learning Coach\nHelping children gradually become more independent learners."
+  },
+  {
+    "key": "从诊断自然进入产品",
+    "title": "LEARVIA | Stage 21 | Naturally Transitioning from Diagnosis to the Product",
+    "text": "Based on what you’ve shared, I don’t think the most urgent thing your child needs is necessarily “more tuition.”\nThe area that may be more worthwhile to improve first is:\n【Insert the child’s real problem】\nFor example:  Time management + Mistake analysis.\nThat is also why we designed the AI Learning & Growth Starter Kit.\nIt is not designed to make children complete many things all at once. Instead, it provides a set of tools that allows them to start step by step based on their actual needs.\nThe Starter Kit is currently RM59.\nIf you’d like, I can show you what is included and also explain which part your child should start with first.\nThat way, you can decide whether it is suitable before making any decision 😊"
+  },
+  {
+    "key": "RM49 正式介绍",
+    "title": "LEARVIA | Stage 22 | Formal RM59 Introduction",
+    "text": "Sure 😊\nThe How to Score A with AI Learning & Growth Starter Kit is currently RM59，the core package includes:\n📘 Top Student Master Planner\n⏰ Weekly Time Management System\n🔍 Mistake & Careless Error Analysis\n📈 Learning Growth Roadmap\n🎯 Exam Excellence Learning System\n🍅 Pomodoro + Feynman Learning Methods\n🤖 How to Score A with AI Learning Prompt Collection\n🤖 Top Student Prompt Collection - Advanced Edition\n🎓 Exam Excellence System\n🎓 30-Day Exam Sprint ‫Implementation Guidelines\n🎓 High-Scoring Essay Writing Method\n🎓 Parent Support Guide\nOur goal is not to make the child use every tool at once.\nLet the child first experience:\n“Learning can actually have a method.”\nThen gradually introduce the other tools later.\nIf you are interested, please reply with: 【I would like to learn more about the content】"
+  },
+  {
+    "key": "家长说：我考虑一下",
+    "title": "LEARVIA | Stage 23 | Parent Says: “I’ll Think About It.”",
+    "text": "Of course 😊 Educational products should be understood clearly before making a decision.\nWhile you are considering it, I suggest not only asking:\n“Is RM59 expensive?”\nYou can ask yourself three questions:\n① If my child’s current problem does not change, will it continue affecting learning?\n② Does my child need more practice, or a better way to learn?\n③ Is this system suitable for the problem my child is actually facing right now?\nIf you eventually feel it is not suitable, that is completely fine.\nOur goal is still to help parents first understand what their child truly needs to improve."
+  },
+  {
+    "key": "已读不回：第一次跟进",
+    "title": "LEARVIA | Stage 24 | Seen but No Reply: First Follow-Up",
+    "text": "Hello 😊 A few days ago, you mentioned that your child is currently struggling most with 【Problem】.\nI just wanted to share one small suggestion with you.\nTonight, you do not need to use any tools，simply ask your child:\n“If you could improve just one thing about learning, what would you most want to improve?”\nDo not correct the answer immediately. Just listen.\nSometimes what children believe their biggest problem is can be quite different from what adults see.\nIf you’d like, you can also share your child’s answer with me, and I can help you think through where to start."
+  },
+  {
+    "key": "第二次跟进",
+    "title": "LEARVIA | Stage 25 | Second Follow-Up",
+    "text": "Hello 😊 I’d like to share one more simple method with you.\nIf your child tends to be passive, do not ask them to change too many things this week.\nEach day, just let them decide:\n“What is the most important learning task I should complete today?”\nAfter completing it, they can tick it ✓ themselves.\nTry this consistently for 7 days.\nWe do not build independence by expecting children to “suddenly become disciplined.” It starts with:\nDecide independently → Complete independently\nIf you later feel you want to make the process more systematic, you can consider our Starter Kit then 😊"
+  },
+  {
+    "key": "最后一次跟进",
+    "title": "LEARVIA | Stage 26 | Final Follow-Up",
+    "text": "Hello 😊 This will be my last message so I don’t disturb you.\nPreviously, you mentioned that your child struggles with 【Problem】，I’ve summarized one simple direction for you:\n【One specific recommendation】\nYou can try this at home first.\nIf you later feel that your child needs more complete planning, mistake analysis, or AI learning methods, you are always welcome to come back to us.\nEducation is not a one-time purchase decision. It is a long-term process.\nI hope your child gradually finds a learning rhythm that suits them 🌱"
+  },
+  {
+    "key": "成交以后第一句话",
+    "title": "LEARVIA | Stage 27 | First Message After Purchase",
+    "text": "Welcome to LEARVIA Qiyuan Education 🌱\nThe most important thing now is not to “finish all the materials.”\nIt is:  Help your child identify the first small problem that can be improved.\nBased on what we discussed earlier, your child’s main issue is:\n【Problem】\nSo I recommend starting with:\n【Tool】\nduring the first week.\nThere is no need to rush into the other materials yet.\nOur goal is:\nStart doing it → Improve how it is done → Turn it into a habit"
+  },
+  {
+    "key": "给家长的第一条陪伴规则",
+    "title": "LEARVIA | Stage 28 | The First Parent Support Rule",
+    "text": "Welcome to LEARVIA Education 🌱\nThe most important thing now is not to complete all the materials at once.\nInstead, our first priority is to help your child identify one small area that they can start improving.\nDuring the first week, parents are encouraged to avoid asking every day:\n“Have you done it?”\nInstead, try asking:\n“What are you planning to complete first today?”\nAfter your child completes the task, instead of simply saying:\n“Good job. Keep it up.”\nYou can ask:\n“What do you think you did better today than yesterday?”\nThis helps your child recognise their own progress and growth.\nOur goal is:  Start doing it → Learn to do it better → Turn it into a habit."
+  },
+  {
+    "key": "粗心：建立错误诊断习惯",
+    "title": "LEARVIA | A｜Careless Mistakes: Build an “Error Diagnosis Habit”",
+    "text": "Do not simply tell your child, “Be more careful next time,” because “carelessness” is only the result. What we really need to identify is the cause behind the mistake.\nSolution: First, classify each mistake:\n① Misread the question → Circle the keywords\n② Calculation error → Check the working steps\n③ Unclear understanding of the concept → Review the relevant concept\n④ Missed part of the question / incomplete answer → Use a checking checklist\n⑤ Rushed due to time pressure → Adjust time allocation during the exam\nThen record:\nWhy did I make this mistake?\nHow can I avoid making the same mistake next time?\nYou can say this to your child:\n“Making mistakes is not something to be afraid of. What matters is understanding why they happened. Today, just identify the real reasons behind three mistakes—you don’t need to do lots of questions. As long as you make the same type of mistake less often, you are making progress. 💪”\nLEARVIA Goal:"
+  },
+  {
+    "key": "拖延：建立5分钟启动法",
+    "title": "LEARVIA | B｜Procrastination: Build the “5-Minute Start Method”",
+    "text": "Step 1: Choose just one task.\nStep 2: Tell yourself to do it for just 5 minutes.\nStep 3: Once you have started, decide whether to continue.\nFor example, instead of writing:  “Revise Mathematics.”\nChange it to:  “Spend 5 minutes redoing the two Mathematics questions I got wrong yesterday.”\nYou can say this to your child:\n“You don’t need to suddenly become highly disciplined today. Choose one small learning task and start with just 5 minutes. Our first goal is not to do a lot, it is to learn to ‘start when you say you’ll start.’ 🚀”\nLEARVIA Goal:"
+  },
+  {
+    "key": "不会安排时间： 建立每日 Top 3",
+    "title": "LEARVIA | C｜Difficulty Managing Time: Build a “Daily Top 3” Habit",
+    "text": "Do not fill every minute of the child’s schedule.\nInstead, start each day by writing down:  What are the 3 most important things I need to do today?\nThen divide the tasks into:\nMust Do — Tasks that must be completed\nShould Do — Tasks that should be completed\nCould Do — Tasks to complete if there is enough time\nFor example:\nMust Do: Review Mathematics mistakes — 20 minutes\nMust Do: Prepare for tomorrow’s English spelling test — 15 minutes\nShould Do: Science revision — 25 minutes\nCould Do: Reading — 20 minutes\nYou can also combine this with the Pomodoro Method: 25 minutes of focused study + 5 minutes of rest.\nYou can say this to your child:\n“Time management is not about filling every minute of your day. It is about knowing what is most important. Tonight, choose the 3 most important things you need to do tomorrow and decide when you will complete them. ⏰”\nLEARVIA Goal:"
+  },
+  {
+    "key": "不知道怎样复习： 建立",
+    "title": "LEARVIA | D｜Not Knowing How to Revise: Build an “Active Recall Cycle”",
+    "text": "Learn → Close the book → Recall from memory → Test yourself with questions → Identify what you don’t know → Relearn → Test again\nFor example, after finishing a Science chapter:  Do not immediately read it a second time.\nInstead, close the book and ask yourself:  “If I had to teach this concept to a classmate right now, could I explain it clearly?”\nThe parts you cannot explain clearly are exactly what you should focus on in your next round of revision.\nYou can say this to your child:\n“Revision is not about how many times you have read something. It is about how much you can remember and explain without looking at the book. Today, choose one small topic and try explaining it in your own words. 📚”\nLEARVIA Goal:"
+  },
+  {
+    "key": "开始容易紧张：建立",
+    "title": "LEARVIA | E｜Exam Anxiety: Build a “What I Can Control Checklist”",
+    "text": "When a child feels nervous about an exam, simply saying:  “Don’t be nervous.”\nis usually not enough, because the child may not know how to stop feeling nervous.\nInstead, shift the focus from:  The result\nchange to: What can I control right now?\nBefore the exam, students can focus on four things:\n① Become familiar with the exam process, practise under timed exam conditions.\n② Establish an answering order, Start with the questions you feel more confident about.\n③ Create a rule for difficult questions, if you are stuck on one question for too long, mark it, move on, and return to it later.\n④ Establish a calm pre-exam routine, prepare your stationery, get enough sleep, use simple breathing techniques to settle yourself, and avoid last-minute cramming.\nYou can say this to your child:\n“Feeling nervous doesn’t mean you don’t know the answers. It often means the exam is important to you. You don’t need to expect yourself to feel completely calm. What matters is knowing what to do next when you feel nervous. 🎯”\nLEARVIA Goal:"
+  },
+  {
+    "key": "太依赖 AI",
+    "title": "LEARVIA | F｜Over-Reliance on AI: Build the “Think → Ask → Verify → Explain” Habit",
+    "text": "Do not stop your child from using AI, Instead, teach them how to use AI without allowing it to replace their own thinking.\nBuild this four-step rule:\nSTEP 1｜THINK — Think for Yourself First\nAlways try to solve the problem on your own at least once.\nSTEP 2｜ASK — Then Ask AI\nInstead of asking:  “What is the answer?”\nAsk:  “Please don’t give me the answer directly. Give me a hint first and let me try it myself.”\nSTEP 3｜VERIFY — Check and Verify\nAsk:  “Could there be another possible answer? Please show me how I can check whether this answer is correct.”\nSTEP 4｜EXPLAIN — Explain It Yourself\nFinally, close the AI and try to explain the solution or concept in your own words.\nIf you cannot explain it clearly, it means you have not fully understood it yet.\nYou can say this to your child:\n“AI is powerful, but truly capable learners don’t let AI do the thinking for them. They know how to use AI to become better thinkers. 🤖🧠”\nLEARVIA Goal:"
+  },
+  {
+    "key": "接下来7天",
+    "title": "LEARVIA | For the next 7 days, we will focus on improving just one thing.",
+    "text": "Day 1: Identify the problem\nDay 2: Learn one method\nDay 3: Put the method into practice\nDay 4: Keep practising\nDay 5: Record the difficulties you encounter\nDay 6: Adjust your method\nDay 7: Ask yourself these three questions:\n① What have I improved?\n② Which method helped me the most?\n③ What do I want to continue improving next week?\nYou don’t need to change everything at once. Start by choosing one thing you most want to improve, and spend 7 days seriously trying one method. 🌱\nReal progress in learning does not mean suddenly becoming excellent overnight. It means becoming a little better each day at managing your own learning.\nOur goal is to help you gradually grow from: “Someone else tells me how to study.” to:  “I know what I need to do next.” 💪"
+  }
+];
+
 function official199Scripts(base,lang){
   return base.map(s=>{
     let title=s.title, t=s.text;
@@ -690,12 +1056,61 @@ function official199Scripts(base,lang){
 let CURRENT_SCRIPT_INDEX = 0;
 let CURRENT_SCRIPT_LANG = 'zh';
 let CURRENT_SCRIPT_STAGE = 'launch99';
+let CURRENT_SCRIPT_SERIES = 'original';
+
+function applySalesPriceStage(base,lang,stage){
+  return base.map(s=>{
+    let title=String(s.title||''), t=String(s.text||'');
+
+    const replaceAllPrices=(value)=>{
+      title=title.replace(/RM\s?(49|59|99|149|199)/gi,`RM${value}`);
+      t=t.replace(/RM\s?(49|59|99|149|199)/gi,`RM${value}`);
+    };
+
+    if(stage==='launch99'){
+      replaceAllPrices('99');
+      if(lang==='zh'){
+        title=title.replace(/正式会员价|优惠会员价/g,'首发会员价');
+        t=t.replace(/正式会员价|优惠会员价/g,'首发会员价');
+      }else{
+        title=title.replace(/Official Membership Price|Offer Membership Price/gi,'Launch Membership Price');
+        t=t.replace(/official membership price|offer membership price/gi,'launch membership price');
+      }
+    }else if(stage==='offer149'){
+      replaceAllPrices('149');
+      if(lang==='zh'){
+        title=title.replace(/首发会员价|正式会员价/g,'优惠会员价');
+        t=t.replace(/首发会员价|正式会员价/g,'优惠会员价');
+      }else{
+        title=title.replace(/Launch Membership Price|Official Membership Price/gi,'Offer Membership Price');
+        t=t.replace(/launch membership price|official membership price/gi,'offer membership price');
+      }
+    }else{
+      replaceAllPrices('199');
+      if(lang==='zh'){
+        title=title.replace(/首发会员价|优惠会员价/g,'正式会员价');
+        t=t.replace(/首发会员价|优惠会员价/g,'正式会员价')
+          .replace(/\n*之后正式售价会调整到 RM199。/g,'')
+          .replace(/\n*之后正式售价会调整至 RM199。/g,'')
+          .replace(/目前正式会员价是 RM199，完整正式售价之后会调整到 RM199。/g,'目前正式会员价是 RM199。');
+      }else{
+        title=title.replace(/Launch Membership Price|Offer Membership Price/gi,'Official Membership Price');
+        t=t.replace(/launch membership price|offer membership price/gi,'official membership price')
+          .replace(/\n*The official price will later be RM199\./gi,'');
+      }
+    }
+    return {...s,title,text:t};
+  });
+}
 
 function currentSalesScripts(){
-  const base=CURRENT_SCRIPT_LANG==='en'?SALES_SCRIPTS_EN_99:SALES_SCRIPTS_ZH_99;
-  return CURRENT_SCRIPT_STAGE==='official199'
-    ? official199Scripts(base,CURRENT_SCRIPT_LANG)
-    : base;
+  let base;
+  if(CURRENT_SCRIPT_SERIES==='learvia'){
+    base=CURRENT_SCRIPT_LANG==='en'?LEARVIA_SCRIPTS_EN:LEARVIA_SCRIPTS_ZH;
+  }else{
+    base=CURRENT_SCRIPT_LANG==='en'?SALES_SCRIPTS_EN_99:SALES_SCRIPTS_ZH_99;
+  }
+  return applySalesPriceStage(base,CURRENT_SCRIPT_LANG,CURRENT_SCRIPT_STAGE);
 }
 
 function renderSalesScripts(){
@@ -720,6 +1135,7 @@ function selectSalesScript(i){
 }
 
 function changeScriptMode(){
+  CURRENT_SCRIPT_SERIES=$('scriptSeries')?.value||'original';
   CURRENT_SCRIPT_LANG=$('scriptLang')?.value||'zh';
   CURRENT_SCRIPT_STAGE=$('scriptStage')?.value||'launch99';
   CURRENT_SCRIPT_INDEX=0;
@@ -730,10 +1146,13 @@ function updateScriptModeHint(){
   const hint=$('scriptModeHint');
   if(!hint)return;
   const en=CURRENT_SCRIPT_LANG==='en';
-  const official=CURRENT_SCRIPT_STAGE==='official199';
+  const series=CURRENT_SCRIPT_SERIES==='learvia'
+    ? (en?'LEARVIA Parent Enquiry & Closing Scripts':'LEARVIA 启源教育｜家长咨询与成交话术')
+    : (en?'Original Sales Scripts':'原有成交话术');
+  const price=CURRENT_SCRIPT_STAGE==='launch99'?'RM99':(CURRENT_SCRIPT_STAGE==='offer149'?'RM149':'RM199');
   hint.textContent=en
-    ? (official?'Currently showing: English | Official Price RM199.':'Currently showing: English | Launch Price RM99 → Official Price RM199.')
-    : (official?'目前显示：中文｜正式会员价 RM199。':'目前显示：中文｜首发会员价 RM99，之后正式售价 RM199。');
+    ? `Currently showing: ${series} | Price ${price}.`
+    : `目前显示：${series}｜价格 ${price}。`;
 }
 
 async function copyCurrentSalesScript(){
